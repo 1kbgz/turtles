@@ -5,30 +5,25 @@ This directory contains example scripts demonstrating the Python bindings for th
 ## Examples
 
 ### huit_eight.py
-Demonstrates a rose engine with a figure-eight (huit-eight) rosette pattern. Creates a single modulated circular path.
+Demonstrates a multi-pass rose engine creating a classic figure-eight (huit-eight) guilloché pattern by making 16 rotational passes with overlapping cuts.
 
 ### grain_de_riz.py
-Demonstrates a rose engine with a rice grain (grain-de-riz) rosette pattern. Creates a single modulated circular path.
+Demonstrates a multi-pass rose engine creating a classic rice grain (grain-de-riz) guilloché pattern by making 24 rotational passes with fine detail.
 
 ### draperie.py
-Demonstrates a rose engine with a drapery (draperie) rosette pattern. Creates a single modulated circular path with wave-like modulation.
+Demonstrates a multi-pass rose engine creating a classic drapery (draperie) guilloché pattern by making 18 rotational passes with flowing wave modulation.
 
 ### diamant.py
-Demonstrates a rose engine with a diamond (diamant) rosette pattern. Creates a single modulated circular path with diamond-like modulation.
+Demonstrates a multi-pass rose engine creating a classic diamond (diamant) guilloché pattern by making 12 rotational passes forming geometric diamond grids.
 
 ### flinque.py
-Demonstrates the FlinqueLayer class which creates true multi-pass guilloché patterns with radial sunburst/engine-turned effects.
+Demonstrates the FlinqueLayer class which creates radial sunburst/engine-turned patterns with concentric wavy rings.
 
-## Important Notes
+## Multi-Pass Guilloché Patterns
 
-The rose engine examples (huit_eight, grain_de_riz, draperie, diamant) demonstrate **single-pass** rose engine operations. Each generates one circular tool path with amplitude modulation based on the rosette pattern.
+The examples use the `RoseEngineLatheRun` class, which simulates traditional watchmaking techniques by making **multiple overlapping tool passes** at different rotations. This creates the complex intersecting geometry characteristic of classical guilloché patterns.
 
-**Classical guilloché patterns** as seen in traditional watchmaking require **multiple overlapping tool passes** at different rotations and positions. The single-pass rose engine patterns shown here demonstrate the rose engine mechanism but do not replicate the complex intersecting geometry of traditional guilloché work.
-
-To create patterns matching classical guilloché references, you would need to:
-1. Generate multiple rose engine passes at different rotations
-2. Composite the results into a single pattern
-3. Or use dedicated multi-pass generators (like FlinqueLayer for sunburst patterns)
+Each pass is a complete circular sweep of the rose engine lathe, and the combination of all passes creates intricate patterns similar to those found in luxury watch dials.
 
 ## Running the Examples
 
@@ -49,4 +44,4 @@ done
 
 ## Output
 
-Examples generate SVG files in the `examples/svg/` directory.
+Examples generate SVG files in the `examples/svg/` directory showing complex guilloché patterns created by multiple overlapping rose engine passes.

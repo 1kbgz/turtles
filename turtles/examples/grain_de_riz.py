@@ -1,29 +1,30 @@
 #!/usr/bin/env python3
 """
-Grain-de-Riz (Rice Grain) Rose Engine Pattern Example
+Grain-de-Riz (Rice Grain) Guilloché Pattern Example
 
-This example demonstrates a rose engine lathe configured with a grain-de-riz
-rosette pattern. Note: This creates a single-pass modulated circular pattern.
-Classic guilloché grain-de-riz patterns require small individual grain shapes
-arranged in a grid.
+This example demonstrates a multi-pass rose engine creating a classic grain-de-riz
+guilloché pattern by making multiple overlapping cuts at different rotations.
+This creates the complex intersecting geometry characteristic of traditional
+watchmaking guilloché patterns.
 """
 
-from turtles import RoseEngineLathe, RoseEngineConfig, CuttingBit, RosettePattern
+from turtles import RoseEngineLatheRun, RoseEngineConfig, CuttingBit, RosettePattern
 
 
 def main():
     # Create configuration with grain-de-riz rosette
-    config = RoseEngineConfig.grain_de_riz(base_radius=20.0, grain_size=1.0, amplitude=1.5)
+    config = RoseEngineConfig(base_radius=20.0, amplitude=1.5)
+    config.set_rosette(RosettePattern.grain_de_riz(grain_size=1.0, rows=12))
     
     # Create a fine V-shaped cutting bit
     bit = CuttingBit.v_shaped(angle=30.0, width=0.1)
     
-    # Create and generate the lathe pattern
-    lathe = RoseEngineLathe(config, bit)
-    lathe.generate()
+    # Create multi-pass run with 24 rotational passes for fine detail
+    run = RoseEngineLatheRun(config, bit, num_passes=24)
+    run.generate()
     
     # Export to SVG
-    lathe.to_svg("examples/svg/grain_de_riz.svg")
+    run.to_svg("examples/svg/grain_de_riz.svg")
     print("Generated examples/svg/grain_de_riz.svg")
 
 

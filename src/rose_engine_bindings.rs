@@ -1,6 +1,7 @@
 use pyo3::prelude::*;
 use turtles::{
     RoseEngineLathe as BaseRoseEngineLathe,
+    RoseEngineLatheRun as BaseRoseEngineLatheRun,
     RoseEngineConfig as BaseRoseEngineConfig,
     CuttingBit as BaseCuttingBit,
     RosettePattern as BaseRosettePattern,
@@ -404,6 +405,95 @@ impl RoseEngineLathe {
             self.inner.center_x,
             self.inner.center_y,
             self.inner.config.base_radius
+        )
+    }
+}
+
+/// Python wrapper for RoseEngineLatheRun - multi-pass guilloché pattern generator
+#[pyclass]
+pub struct RoseEngineLatheRun {
+    pub(crate) inner: BaseRoseEngineLatheRun,
+}
+
+#[pymethods]
+impl RoseEngineLatheRun {
+    /// Create a new multi-pass rose engine lathe run
+    ///
+    /// # Arguments
+    /// * `config` - Base rose engine configuration
+    /// * `bit` - Cutting bit configuration
+    /// * `num_passes` - Number of rotational passes (typically 8-24)
+    ///
+    /// # Example
+    /// ```python
+    /// from turtles import RoseEngineLatheRun, RoseEngineConfig, CuttingBit, RosettePattern
+    ///
+    /// config = RoseEngineConfig(base_radius=20.0, amplitude=2.0)
+    /// config.set_rosette(RosettePattern.multi_lobe(12))
+    /// bit = CuttingBit.v_shaped(angle=30.0, width=0.5)
+    ///
+    /// run = RoseEngineLatheRun(config, bit, num_passes=12)
+    /// run.generate()
+    /// run.to_svg("pattern.svg")
+    /// ```
+    #[new]
+    fn new(
+        config: PyRef<RoseEngineConfig>,
+        bit: PyRef<CuttingBit>,
+        num_passes: usize,
+    ) -> PyResult<Self> {
+        BaseRoseEngineLatheRun::new(
+            config.inner.clone(),
+            bit.inner.clone(),
+            num_passes,
+        )
+        .map(|inner| RoseEngineLatheRun { inner })
+        .map_err(|e| pyo3::exceptions::PyValueError::new_err(e.to_string()))
+    }
+    
+    /// Create a multi-pass rose engine lathe run with custom center position
+    #[staticmethod]
+    fn with_center(
+        config: PyRef<RoseEngineConfig>,
+        bit: PyRef<CuttingBit>,
+        num_passes: usize,
+        center_x: f64,
+        center_y: f64,
+    ) -> PyResult<Self> {
+        BaseRoseEngineLatheRun::new_with_center(
+            config.inner.clone(),
+            bit.inner.clone(),
+            num_passes,
+            center_x,
+            center_y,
+        )
+        .map(|inner| RoseEngineLatheRun { inner })
+        .map_err(|e| pyo3::exceptions::PyValueError::new_err(e.to_string()))
+    }
+    
+    /// Generate all passes of the rose engine pattern
+    fn generate(&mut self) {
+        self.inner.generate();
+    }
+    
+    /// Export combined pattern as SVG
+    fn to_svg(&self, filename: &str) -> PyResult<()> {
+        self.inner.to_svg(filename)
+            .map_err(|e| pyo3::exceptions::PyIOError::new_err(e.to_string()))
+    }
+    
+    /// Get the number of passes
+    #[getter]
+    fn num_passes(&self) -> usize {
+        self.inner.num_passes()
+    }
+    
+    fn __repr__(&self) -> String {
+        format!(
+            "RoseEngineLatheRun(center=({}, {}), passes={})",
+            self.inner.center_x,
+            self.inner.center_y,
+            self.inner.num_passes()
         )
     }
 }

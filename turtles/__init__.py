@@ -6,11 +6,19 @@ from .turtles import (
     FlinqueLayer,
     RoseEngineConfig,
     RoseEngineLathe,
+    RoseEngineLatheRun,
     RosettePattern,
     WatchFace as RustWatchFace,
 )
 
-__all__ = ("WatchFace", "RoseEngineLathe", "RoseEngineConfig", "CuttingBit", "RosettePattern")
+__all__ = (
+    "WatchFace",
+    "RoseEngineLathe",
+    "RoseEngineLatheRun",
+    "RoseEngineConfig",
+    "CuttingBit",
+    "RosettePattern",
+)
 
 
 class WatchFace:

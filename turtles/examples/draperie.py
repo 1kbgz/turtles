@@ -1,28 +1,30 @@
 #!/usr/bin/env python3
 """
-Draperie (Drapery) Rose Engine Pattern Example
+Draperie (Drapery) Guilloché Pattern Example
 
-This example demonstrates a rose engine lathe configured with a draperie
-rosette pattern. Note: This creates a single-pass modulated circular pattern.
-Classic guilloché draperie patterns require multiple overlapping wavy tool passes.
+This example demonstrates a multi-pass rose engine creating a classic draperie
+guilloché pattern by making multiple overlapping cuts at different rotations.
+This creates flowing wave-like patterns characteristic of traditional
+watchmaking guilloché drapery designs.
 """
 
-from turtles import RoseEngineLathe, RoseEngineConfig, CuttingBit, RosettePattern
+from turtles import RoseEngineLatheRun, RoseEngineConfig, CuttingBit, RosettePattern
 
 
 def main():
     # Create configuration with draperie rosette
-    config = RoseEngineConfig.draperie(base_radius=20.0, wave_frequency=6.0, amplitude=2.0)
+    config = RoseEngineConfig(base_radius=20.0, amplitude=2.0)
+    config.set_rosette(RosettePattern.draperie(frequency=6.0, depth_frequency=3.0))
     
     # Create a fine V-shaped cutting bit
     bit = CuttingBit.v_shaped(angle=30.0, width=0.1)
     
-    # Create and generate the lathe pattern
-    lathe = RoseEngineLathe(config, bit)
-    lathe.generate()
+    # Create multi-pass run with 18 rotational passes
+    run = RoseEngineLatheRun(config, bit, num_passes=18)
+    run.generate()
     
     # Export to SVG
-    lathe.to_svg("examples/svg/draperie.svg")
+    run.to_svg("examples/svg/draperie.svg")
     print("Generated examples/svg/draperie.svg")
 
 

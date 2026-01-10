@@ -18,7 +18,7 @@ pub use common::{
 pub use flinque::{FlinqueConfig, FlinqueLayer};
 pub use guilloche::GuillochePattern;
 pub use rose_engine::{
-    Arc, BitShape, CuttingBit, RenderedOutput, RoseEngineConfig, RoseEngineLathe, RosettePattern,
+    Arc, BitShape, CuttingBit, RenderedOutput, RoseEngineConfig, RoseEngineLathe, RoseEngineLatheRun, RosettePattern,
     ToolPathOutput,
 };
 pub use spirograph::{HorizontalSpirograph, SphericalSpirograph, VerticalSpirograph};

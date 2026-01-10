@@ -6,7 +6,7 @@ mod spirograph_bindings;
 mod watch_face_bindings;
 
 pub use guilloche_bindings::{FlinqueLayer, GuillochePattern};
-pub use rose_engine_bindings::{CuttingBit, RoseEngineConfig, RoseEngineLathe, RosettePattern};
+pub use rose_engine_bindings::{CuttingBit, RoseEngineConfig, RoseEngineLathe, RoseEngineLatheRun, RosettePattern};
 pub use spirograph_bindings::{HorizontalSpirograph, SphericalSpirograph, VerticalSpirograph};
 pub use watch_face_bindings::WatchFace;
 
@@ -28,6 +28,7 @@ fn turtles(_py: Python, m: &Bound<PyModule>) -> PyResult<()> {
     
     // Rose engine classes
     m.add_class::<RoseEngineLathe>().unwrap();
+    m.add_class::<RoseEngineLatheRun>().unwrap();
     m.add_class::<RoseEngineConfig>().unwrap();
     m.add_class::<CuttingBit>().unwrap();
     m.add_class::<RosettePattern>().unwrap();
