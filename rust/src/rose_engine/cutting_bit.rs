@@ -1,7 +1,7 @@
 use std::f64::consts::PI;
 
 /// Cutting bit shape types for rose engine lathe
-/// 
+///
 /// The cutting bit determines the cross-sectional profile of the cut
 /// made into the material. Different bit shapes create different visual effects.
 #[derive(Debug, Clone)]
@@ -11,16 +11,16 @@ pub enum BitShape {
         /// Angle of the V in degrees (e.g., 30, 60, 90)
         angle: f64,
     },
-    
+
     /// Flat/straight bit
     Flat,
-    
+
     /// Round/ball-nose bit
     Round {
         /// Radius of the round bit
         radius: f64,
     },
-    
+
     /// Elliptical bit
     Elliptical {
         /// Width of the ellipse
@@ -28,7 +28,7 @@ pub enum BitShape {
         /// Height of the ellipse
         height: f64,
     },
-    
+
     /// Custom bit shape defined by profile points
     Custom {
         /// Name for the custom bit
@@ -43,25 +43,25 @@ pub enum BitShape {
 pub struct CuttingBit {
     /// Shape of the cutting bit
     pub shape: BitShape,
-    
+
     /// Width/diameter of the bit at its widest point (in mm)
     pub width: f64,
-    
+
     /// Maximum depth/height of the bit (in mm)
     pub depth: f64,
 }
 
 impl CuttingBit {
     /// Create a new V-shaped cutting bit
-    /// 
+    ///
     /// # Arguments
     /// * `angle` - Angle of the V in degrees
     /// * `width` - Width at the top of the V in mm
-    /// 
+    ///
     /// # Example
     /// ```
     /// use turtles::rose_engine::CuttingBit;
-    /// 
+    ///
     /// let bit = CuttingBit::v_shaped(30.0, 1.0);
     /// ```
     pub fn v_shaped(angle: f64, width: f64) -> Self {
@@ -69,16 +69,16 @@ impl CuttingBit {
         // For a V-bit: depth = (width/2) * tan(angle/2)
         let angle_rad = angle * PI / 180.0;
         let depth = (width / 2.0) * (angle_rad / 2.0).tan();
-        
+
         CuttingBit {
             shape: BitShape::VShaped { angle },
             width,
             depth,
         }
     }
-    
+
     /// Create a new flat cutting bit
-    /// 
+    ///
     /// # Arguments
     /// * `width` - Width of the flat bit in mm
     /// * `depth` - Maximum depth of cut in mm
@@ -89,9 +89,9 @@ impl CuttingBit {
             depth,
         }
     }
-    
+
     /// Create a new round/ball-nose cutting bit
-    /// 
+    ///
     /// # Arguments
     /// * `radius` - Radius of the ball in mm
     pub fn round(radius: f64) -> Self {
@@ -101,9 +101,9 @@ impl CuttingBit {
             depth: radius,
         }
     }
-    
+
     /// Create a new elliptical cutting bit
-    /// 
+    ///
     /// # Arguments
     /// * `width` - Width of the ellipse in mm
     /// * `height` - Height of the ellipse in mm
@@ -114,19 +114,19 @@ impl CuttingBit {
             depth: height,
         }
     }
-    
+
     /// Calculate the width of the cut at a specific depth
-    /// 
+    ///
     /// # Arguments
     /// * `cut_depth` - Depth of the cut (0.0 = surface, positive = deeper)
-    /// 
+    ///
     /// # Returns
     /// Width of the cut at the specified depth
     pub fn width_at_depth(&self, cut_depth: f64) -> f64 {
         if cut_depth <= 0.0 {
             return self.width;
         }
-        
+
         match &self.shape {
             BitShape::VShaped { angle } => {
                 if cut_depth >= self.depth {
@@ -139,12 +139,12 @@ impl CuttingBit {
                 let half_width_at_depth = (self.depth - cut_depth) * (angle_rad / 2.0).tan();
                 half_width_at_depth * 2.0
             }
-            
+
             BitShape::Flat => {
                 // Flat bit maintains constant width regardless of depth
                 self.width
             }
-            
+
             BitShape::Round { radius } => {
                 // For round bit, use circle equation: x^2 + y^2 = r^2
                 // Width at depth d: w = 2 * sqrt(r^2 - d^2)
@@ -155,7 +155,7 @@ impl CuttingBit {
                     2.0 * (r * r - cut_depth * cut_depth).sqrt()
                 }
             }
-            
+
             BitShape::Elliptical { width, height } => {
                 // For ellipse: x^2/a^2 + y^2/b^2 = 1
                 // Width at depth d: w = 2a * sqrt(1 - (d/b)^2)
@@ -168,7 +168,7 @@ impl CuttingBit {
                     2.0 * a * (1.0 - ratio * ratio).sqrt()
                 }
             }
-            
+
             BitShape::Custom { profile: _, .. } => {
                 if cut_depth >= self.depth {
                     return 0.0;
@@ -179,17 +179,17 @@ impl CuttingBit {
             }
         }
     }
-    
+
     /// Get the profile of the bit as a series of points
-    /// 
+    ///
     /// # Arguments
     /// * `resolution` - Number of points to generate
-    /// 
+    ///
     /// # Returns
     /// Vector of (x, y) points representing the bit profile
     pub fn profile_points(&self, resolution: usize) -> Vec<(f64, f64)> {
         let mut points = Vec::new();
-        
+
         match &self.shape {
             BitShape::Custom { profile, .. } => {
                 return profile.clone();
@@ -203,7 +203,7 @@ impl CuttingBit {
                 }
             }
         }
-        
+
         points
     }
 }
@@ -218,28 +218,28 @@ impl Default for CuttingBit {
 #[cfg(test)]
 mod tests {
     use super::*;
-    
+
     #[test]
     fn test_v_shaped_bit() {
         let bit = CuttingBit::v_shaped(60.0, 2.0);
         assert_eq!(bit.width, 2.0);
         assert!(bit.depth > 0.0);
     }
-    
+
     #[test]
     fn test_flat_bit() {
         let bit = CuttingBit::flat(1.0, 0.5);
         assert_eq!(bit.width, 1.0);
         assert_eq!(bit.depth, 0.5);
     }
-    
+
     #[test]
     fn test_round_bit() {
         let bit = CuttingBit::round(0.5);
         assert_eq!(bit.width, 1.0);
         assert_eq!(bit.depth, 0.5);
     }
-    
+
     #[test]
     fn test_width_at_depth_flat() {
         let bit = CuttingBit::flat(2.0, 1.0);
@@ -247,7 +247,7 @@ mod tests {
         assert_eq!(bit.width_at_depth(0.5), 2.0);
         assert_eq!(bit.width_at_depth(1.0), 2.0);
     }
-    
+
     #[test]
     fn test_width_at_depth_v() {
         let bit = CuttingBit::v_shaped(90.0, 2.0);
@@ -256,7 +256,7 @@ mod tests {
         // At tip, width should be 0
         assert!(bit.width_at_depth(bit.depth) < 0.01);
     }
-    
+
     #[test]
     fn test_profile_points() {
         let bit = CuttingBit::round(1.0);

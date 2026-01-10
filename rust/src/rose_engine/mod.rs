@@ -12,5 +12,5 @@ pub mod rosette;
 // Re-export main types for convenience
 pub use config::RoseEngineConfig;
 pub use cutting_bit::{BitShape, CuttingBit};
-pub use lathe::{Arc, RoseEngineLathe, RenderedOutput, ToolPathOutput};
+pub use lathe::{Arc, RenderedOutput, RoseEngineLathe, ToolPathOutput};
 pub use rosette::RosettePattern;
