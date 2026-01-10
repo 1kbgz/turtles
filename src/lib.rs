@@ -1,13 +1,21 @@
 use pyo3::prelude::*;
 
-mod example;
+mod spirograph_bindings;
+mod guilloche_bindings;
 
-pub use example::Example;
+pub use spirograph_bindings::{HorizontalSpirograph, VerticalSpirograph, SphericalSpirograph};
+pub use guilloche_bindings::GuillochePattern;
 
 
 #[pymodule]
 fn turtles(_py: Python, m: &Bound<PyModule>) -> PyResult<()> {
-    // Example
-    m.add_class::<Example>().unwrap();
+    // Spirograph classes
+    m.add_class::<HorizontalSpirograph>().unwrap();
+    m.add_class::<VerticalSpirograph>().unwrap();
+    m.add_class::<SphericalSpirograph>().unwrap();
+
+    // Guilloche pattern
+    m.add_class::<GuillochePattern>().unwrap();
+
     Ok(())
 }
