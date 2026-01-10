@@ -6,7 +6,7 @@ edition = "2021"
 license = "Apache-2.0"
 readme = "../README.md"
 repository = "https://github.com/1kbgz/turtles"
-description = ""
+description = "turtles turtles turtles turtles turtles turtles turtles turtles turtles turtles turtles turtles turtles turtles turtles turtles"
 
 [lib]
 name = "turtles"
@@ -14,6 +14,9 @@ path = "src/lib.rs"
 crate-type = ["rlib"]
 
 [dependencies]
+svg = "0.18"
+stl_io = "0.7"
+chrono = "0.4"
 
 [profile.test.junit]
 path = "junit.xml"

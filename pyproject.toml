@@ -85,6 +85,7 @@ ignore = [
     "Cargo.lock",
     "Makefile",
     "docs/**/*",
+    "examples/**/*",
     "rust/.config/*",
     "rust/Cargo.lock",
     "rust/README.md",
