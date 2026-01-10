@@ -1,11 +1,8 @@
 import os
 import tempfile
 
-from turtles import GuillochePattern, HorizontalSpirograph, SphericalSpirograph, VerticalSpirograph
-
-
-def test_all():
-    assert True
+from turtles import WatchFace
+from turtles.turtles import GuillochePattern, HorizontalSpirograph, SphericalSpirograph, VerticalSpirograph
 
 
 def test_horizontal_spirograph():
@@ -133,3 +130,39 @@ def test_guilloche_export_all():
         assert os.path.exists(base_path + ".svg")
         assert os.path.exists(base_path + ".stl")
         assert os.path.exists(base_path + ".stp")
+
+
+def test_flinque_layer():
+    """Test FlinqueLayer creation and generation"""
+    from turtles.turtles import FlinqueLayer
+
+    flinque = FlinqueLayer(
+        radius=38.0,
+        num_petals=12,
+        num_waves=40,
+        wave_amplitude=2.0,
+        wave_frequency=1.0,
+        inner_radius_ratio=0.03,
+    )
+    assert flinque is not None
+
+
+def test_watch_top_level():
+    wf = WatchFace(radius=38.0)
+    wf.add_inner()
+    wf.add_outer()
+    wf.add_center_hole()
+
+    wf.add_flinque(
+        radius=38.0,
+        num_petals=12,  # 12 chevron peaks per ring (defines the petals)
+        num_waves=40,  # 80 concentric rings for dense line work
+        wave_amplitude=2.0,  # Chevron amplitude (how much the V points outward)
+        wave_frequency=1.0,  # Fine ripple texture (1.0 = minimal ripple)
+        inner_radius_ratio=0.03,  # Start very close to center
+    )
+    wf.generate()
+
+    with tempfile.TemporaryDirectory() as tmpdir:
+        svg_path = os.path.join(tmpdir, "guilloche_pattern.svg")
+        wf.to_svg(svg_path)

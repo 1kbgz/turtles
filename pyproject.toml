@@ -3,7 +3,7 @@ requires = ["hatchling", "hatch-rs>=0.1.4"]
 build-backend="hatchling.build"
 
 [project]
-name = "turtles"
+name = "pyturtles"
 authors = [{name = "the turtles authors", email = "dev@1kbgz.com"}]
 description = "turtles turtles turtles turtles turtles turtles turtles turtles turtles turtles turtles turtles turtles turtles turtles turtles"
 readme = "README.md"

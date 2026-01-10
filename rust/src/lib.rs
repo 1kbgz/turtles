@@ -5,6 +5,8 @@ pub mod flinque;
 // Spirograph and guilloche pattern generation modules
 pub mod guilloche;
 pub mod spirograph;
+// Watch face wrapper
+pub mod watch_face;
 
 // Re-export main types for convenience
 pub use common::{
@@ -14,6 +16,7 @@ pub use common::{
 pub use flinque::{FlinqueConfig, FlinqueLayer};
 pub use guilloche::GuillochePattern;
 pub use spirograph::{HorizontalSpirograph, SphericalSpirograph, VerticalSpirograph};
+pub use watch_face::{BezelConfig, DialConfig, HoleConfig, WatchFace};
 
 /**********************************/
 // #[cfg(test)]
