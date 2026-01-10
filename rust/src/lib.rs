@@ -7,6 +7,8 @@ pub mod guilloche;
 pub mod spirograph;
 // Watch face wrapper
 pub mod watch_face;
+// Rose engine lathe - generic guilloché pattern generator
+pub mod rose_engine;
 
 // Re-export main types for convenience
 pub use common::{
@@ -15,6 +17,10 @@ pub use common::{
 };
 pub use flinque::{FlinqueConfig, FlinqueLayer};
 pub use guilloche::GuillochePattern;
+pub use rose_engine::{
+    Arc, BitShape, CuttingBit, RenderedOutput, RoseEngineConfig, RoseEngineLathe, RosettePattern,
+    ToolPathOutput,
+};
 pub use spirograph::{HorizontalSpirograph, SphericalSpirograph, VerticalSpirograph};
 pub use watch_face::{BezelConfig, DialConfig, HoleConfig, WatchFace};
 
