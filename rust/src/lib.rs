@@ -5,6 +5,8 @@ pub mod flinque;
 // Spirograph and guilloche pattern generation modules
 pub mod guilloche;
 pub mod spirograph;
+// Rose engine lathe module
+pub mod rose_engine;
 // Watch face wrapper
 pub mod watch_face;
 
@@ -15,6 +17,10 @@ pub use common::{
 };
 pub use flinque::{FlinqueConfig, FlinqueLayer};
 pub use guilloche::GuillochePattern;
+pub use rose_engine::{
+    Arc, BitShape, CuttingBit, RenderedOutput, RoseEngineConfig, RoseEngineLathe, RosettePattern,
+    ToolPathOutput,
+};
 pub use spirograph::{HorizontalSpirograph, SphericalSpirograph, VerticalSpirograph};
 pub use watch_face::{BezelConfig, DialConfig, HoleConfig, WatchFace};
 
