@@ -157,6 +157,9 @@ turtles/labextension
 
 # Rust
 target
+*.stl
+*.svg
+*.step
 
 # Testing
 /tmp*.py
