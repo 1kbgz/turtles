@@ -1,10 +1,12 @@
 use pyo3::prelude::*;
 
 mod guilloche_bindings;
+mod rose_engine_bindings;
 mod spirograph_bindings;
 mod watch_face_bindings;
 
 pub use guilloche_bindings::{FlinqueLayer, GuillochePattern};
+pub use rose_engine_bindings::{CuttingBit, RoseEngineConfig, RoseEngineLathe, RosettePattern};
 pub use spirograph_bindings::{HorizontalSpirograph, SphericalSpirograph, VerticalSpirograph};
 pub use watch_face_bindings::WatchFace;
 
@@ -20,6 +22,12 @@ fn turtles(_py: Python, m: &Bound<PyModule>) -> PyResult<()> {
 
     // Flinqué (engine-turned) layer
     m.add_class::<FlinqueLayer>().unwrap();
+
+    // Rose engine lathe
+    m.add_class::<RoseEngineLathe>().unwrap();
+    m.add_class::<RoseEngineConfig>().unwrap();
+    m.add_class::<RosettePattern>().unwrap();
+    m.add_class::<CuttingBit>().unwrap();
 
     // Watch face
     m.add_class::<WatchFace>().unwrap();
