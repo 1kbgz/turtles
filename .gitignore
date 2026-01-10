@@ -157,3 +157,6 @@ turtles/labextension
 
 # Rust
 target
+
+# Testing
+/tmp*.py

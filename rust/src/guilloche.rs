@@ -146,6 +146,19 @@ impl GuillochePattern {
         self.spirograph_layers.len() + self.flinque_layers.len()
     }
 
+    /// Get all spirograph layer points (for rendering)
+    pub fn spirograph_points(&self) -> Vec<Vec<Point2D>> {
+        self.spirograph_layers
+            .iter()
+            .map(|layer| layer.points_2d())
+            .collect()
+    }
+
+    /// Get all flinqué layer lines (for rendering)
+    pub fn flinque_lines(&self) -> Vec<&Vec<Vec<Point2D>>> {
+        self.flinque_layers.iter().map(|f| f.lines()).collect()
+    }
+
     /// Export all layers to separate files with the given base name
     pub fn export_all(
         &self,

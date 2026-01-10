@@ -1,11 +1,12 @@
 use pyo3::prelude::*;
 
-mod spirograph_bindings;
 mod guilloche_bindings;
+mod spirograph_bindings;
+mod watch_face_bindings;
 
-pub use spirograph_bindings::{HorizontalSpirograph, VerticalSpirograph, SphericalSpirograph};
-pub use guilloche_bindings::{GuillochePattern, FlinqueLayer};
-
+pub use guilloche_bindings::{FlinqueLayer, GuillochePattern};
+pub use spirograph_bindings::{HorizontalSpirograph, SphericalSpirograph, VerticalSpirograph};
+pub use watch_face_bindings::WatchFace;
 
 #[pymodule]
 fn turtles(_py: Python, m: &Bound<PyModule>) -> PyResult<()> {
@@ -19,6 +20,9 @@ fn turtles(_py: Python, m: &Bound<PyModule>) -> PyResult<()> {
 
     // Flinqué (engine-turned) layer
     m.add_class::<FlinqueLayer>().unwrap();
+
+    // Watch face
+    m.add_class::<WatchFace>().unwrap();
 
     Ok(())
 }

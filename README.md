@@ -3,7 +3,7 @@
 [![Build Status](https://github.com/1kbgz/turtles/actions/workflows/build.yaml/badge.svg?branch=main&event=push)](https://github.com/1kbgz/turtles/actions/workflows/build.yaml)
 [![codecov](https://codecov.io/gh/1kbgz/turtles/branch/main/graph/badge.svg)](https://codecov.io/gh/1kbgz/turtles)
 [![License](https://img.shields.io/github/license/1kbgz/turtles)](https://github.com/1kbgz/turtles)
-[![PyPI](https://img.shields.io/pypi/v/turtles.svg)](https://pypi.python.org/pypi/turtles)
+[![PyPI](https://img.shields.io/pypi/v/pyturtles.svg)](https://pypi.python.org/pypi/pyturtles)
 
 ## Overview
 
@@ -23,9 +23,21 @@ A library for generating spirograph and guilloché patterns.
 
 ## Installation
 
+### Rust
+
 ```bash
-pip install turtles
+cargo add turtle
 ```
+
+### Python
+
+```bash
+pip install pyturtles
+```
+
+### JavaScript
+
+`turtles.js` coming soon.
 
 ## License
 
