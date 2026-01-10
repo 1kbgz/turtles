@@ -46,7 +46,7 @@ impl CuttingBit {
     /// Create a new V-shaped bit
     ///
     /// # Arguments
-    /// * `angle` - Angle of the V in degrees (e.g., 30.0 for a 30° V-bit)
+    /// * `angle` - Angle of the V in degrees (e.g., 30.0 for a 30° V-bit) - must be between 1 and 179 degrees
     /// * `width` - Width of the bit at the surface in mm
     ///
     /// # Example
@@ -56,6 +56,8 @@ impl CuttingBit {
     /// let bit = CuttingBit::v_shaped(30.0, 1.0);
     /// ```
     pub fn v_shaped(angle: f64, width: f64) -> Self {
+        // Validate angle to avoid division by zero
+        let angle = angle.clamp(1.0, 179.0);
         let depth = width / 2.0 / (angle.to_radians() / 2.0).tan();
         CuttingBit {
             shape: BitShape::VShaped { angle },
@@ -159,7 +161,7 @@ impl CuttingBit {
                 for i in 0..num_points {
                     let t = (i as f64) / ((num_points - 1) as f64);
                     let x = -half_width + t * self.width;
-                    let y = (radius * radius - x * x).max(0.0).sqrt();
+                    let y = (radius * radius - x * x).sqrt();
                     points.push(Point2D::new(x, y));
                 }
             }

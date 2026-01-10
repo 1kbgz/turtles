@@ -182,14 +182,29 @@ impl RoseEngineLathe {
                 let dy = self.tool_path[i].y - self.tool_path[i - 1].y;
                 dy.atan2(dx)
             } else {
-                // Use average of angles to/from this point
+                // Use average of unit vectors to handle angle wraparound correctly
                 let dx1 = self.tool_path[i].x - self.tool_path[i - 1].x;
                 let dy1 = self.tool_path[i].y - self.tool_path[i - 1].y;
                 let dx2 = self.tool_path[i + 1].x - self.tool_path[i].x;
                 let dy2 = self.tool_path[i + 1].y - self.tool_path[i].y;
-                let angle1 = dy1.atan2(dx1);
-                let angle2 = dy2.atan2(dx2);
-                (angle1 + angle2) / 2.0
+                
+                // Normalize to unit vectors
+                let len1 = (dx1 * dx1 + dy1 * dy1).sqrt();
+                let len2 = (dx2 * dx2 + dy2 * dy2).sqrt();
+                
+                if len1 > 0.0 && len2 > 0.0 {
+                    let ux1 = dx1 / len1;
+                    let uy1 = dy1 / len1;
+                    let ux2 = dx2 / len2;
+                    let uy2 = dy2 / len2;
+                    
+                    // Average unit vectors
+                    let avg_ux = (ux1 + ux2) / 2.0;
+                    let avg_uy = (uy1 + uy2) / 2.0;
+                    avg_uy.atan2(avg_ux)
+                } else {
+                    dy1.atan2(dx1)
+                }
             };
             
             let perp_angle = angle + PI / 2.0;
@@ -236,7 +251,12 @@ impl RoseEngineLathe {
                 self.rendered.depth_map.push(depth);
                 
                 // Simple shading based on depth (deeper = darker)
-                let shading = 1.0 - (depth / (self.cutting_bit.depth * 2.0)).min(1.0);
+                // Avoid division by zero when depth is 0
+                let shading = if self.cutting_bit.depth > 0.0 {
+                    1.0 - (depth / (self.cutting_bit.depth * 2.0)).min(1.0)
+                } else {
+                    0.5 // Default shading for zero-depth bits
+                };
                 self.rendered.shading.push(shading);
             }
         }
@@ -318,7 +338,9 @@ impl RoseEngineLathe {
         }
         
         svg::save(filename, &document)
-            .map_err(|e| SpirographError::ExportError(e.to_string()))
+            .map_err(|e| SpirographError::ExportError(
+                format!("Failed to save SVG file '{}': {}", filename, e)
+            ))
     }
     
     /// Export to STL format

@@ -89,7 +89,7 @@ impl RosettePattern {
             
             RosettePattern::Custom { table, samples } => {
                 // Interpolate from lookup table
-                let normalized_angle = (angle % (2.0 * PI)) / (2.0 * PI);
+                let normalized_angle = angle.rem_euclid(2.0 * PI) / (2.0 * PI);
                 let index_f = normalized_angle * (*samples as f64);
                 let index = index_f.floor() as usize % *samples;
                 let next_index = (index + 1) % *samples;

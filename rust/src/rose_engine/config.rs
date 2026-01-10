@@ -133,14 +133,15 @@ impl RoseEngineConfig {
     /// * `base_depth` - Base depth value
     ///
     /// # Returns
-    /// Modulated depth value
+    /// Modulated depth value (always non-negative)
     pub fn depth_at_angle(&self, angle: f64, base_depth: f64) -> f64 {
         if !self.depth_modulation {
             return base_depth;
         }
         
         let modulation = (angle * self.depth_modulation_frequency).sin();
-        base_depth * (1.0 + self.depth_modulation_amplitude * modulation)
+        // Clamp to ensure depth remains positive
+        base_depth * (1.0 + self.depth_modulation_amplitude * modulation).max(0.0)
     }
 }
 
