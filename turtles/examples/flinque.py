@@ -7,8 +7,6 @@ sunburst/engine-turned patterns with multiple concentric wavy rings.
 This is a true multi-pass guilloché effect unlike the single-pass rose engine examples.
 """
 
-import sys
-sys.path.insert(0, '.')
 from turtles.turtles import GuillochePattern, FlinqueLayer
 
 

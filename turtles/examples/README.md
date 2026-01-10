@@ -32,9 +32,10 @@ To create patterns matching classical guilloché references, you would need to:
 
 ## Running the Examples
 
+From the project root directory:
+
 ```bash
 # Install the package first
-cd ../..
 python -m pip install -e .
 
 # Run an example
