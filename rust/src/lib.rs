@@ -1,5 +1,7 @@
 // Common types shared across modules
 pub mod common;
+// Diamant (diamond) pattern generation
+pub mod diamant;
 // Flinque (engine-turned) pattern generation
 pub mod flinque;
 // Spirograph and guilloche pattern generation modules
@@ -15,11 +17,12 @@ pub use common::{
     clock_to_cartesian, polar_to_cartesian, validate_radius, ExportConfig, Point2D, Point3D,
     SpirographError,
 };
+pub use diamant::{DiamantConfig, DiamantLayer};
 pub use flinque::{FlinqueConfig, FlinqueLayer};
 pub use guilloche::GuillochePattern;
 pub use rose_engine::{
-    Arc, BitShape, CuttingBit, RenderedOutput, RoseEngineConfig, RoseEngineLathe, RosettePattern,
-    ToolPathOutput,
+    Arc, BitShape, CuttingBit, RenderedOutput, RoseEngineConfig, RoseEngineLathe,
+    RoseEngineLatheRun, RosettePattern, ToolPathOutput,
 };
 pub use spirograph::{HorizontalSpirograph, SphericalSpirograph, VerticalSpirograph};
 pub use watch_face::{BezelConfig, DialConfig, HoleConfig, WatchFace};

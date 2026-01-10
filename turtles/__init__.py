@@ -1,9 +1,27 @@
 __version__ = "0.1.0"
 
 # Import all classes from the Rust extension
-from .turtles import FlinqueLayer, WatchFace as RustWatchFace
+from .turtles import (
+    CuttingBit,
+    DiamantLayer,
+    FlinqueLayer,
+    RoseEngineConfig,
+    RoseEngineLathe,
+    RoseEngineLatheRun,
+    RosettePattern,
+    WatchFace as RustWatchFace,
+)
 
-__all__ = ("WatchFace",)
+__all__ = (
+    "WatchFace",
+    "RoseEngineLathe",
+    "RoseEngineLatheRun",
+    "RoseEngineConfig",
+    "CuttingBit",
+    "RosettePattern",
+    "DiamantLayer",
+    "FlinqueLayer",
+)
 
 
 class WatchFace:
@@ -137,10 +155,44 @@ class WatchFace:
             inner_radius_ratio=inner_radius_ratio,
         )
 
-    def add_layer(self, layer):
-        """Add a spirograph or flinque layer."""
+    def add_diamant(
+        self,
+        num_circles: int = 72,
+        circle_radius: float = 20.0,
+        hour: int = 12,
+        minute: int = 0,
+        distance: float = 0.0,
+        resolution: int = 360,
+    ):
+        """Add a diamant (diamond) guilloché pattern.
+
+        The diamant pattern is formed by creating equally-sized circles that are
+        tangent to the center, rotated around the center. The overlapping circles
+        create the characteristic diamond/mesh appearance.
+
+        Args:
+            num_circles: Number of circles to draw (more = denser mesh).
+            circle_radius: Radius of each individual circle.
+            hour: Hour position for center (1-12, default 12 = centered).
+            minute: Minute position for center (0-59).
+            distance: Distance from center (0 = centered on watch face).
+            resolution: Number of points per circle.
+        """
+        self._watch_face.add_diamant_at_clock(
+            num_circles=num_circles,
+            circle_radius=circle_radius,
+            hour=hour,
+            minute=minute,
+            distance=distance,
+            resolution=resolution,
+        )
+
+    def add(self, layer):
+        """Add a spirograph, flinque, or diamant layer."""
         if isinstance(layer, FlinqueLayer):
             self._watch_face.add_flinque_layer(layer)
+        elif isinstance(layer, DiamantLayer):
+            self._watch_face.add_diamant_layer(layer)
         else:
             self._watch_face.add_layer(layer)
 
