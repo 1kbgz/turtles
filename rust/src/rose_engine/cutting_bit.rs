@@ -66,9 +66,10 @@ impl CuttingBit {
     /// ```
     pub fn v_shaped(angle: f64, width: f64) -> Self {
         // Calculate depth from angle and width
-        // For a V-bit: depth = (width/2) * tan(angle/2)
+        // For a V-bit: depth = (width/2) / tan(angle/2)
+        // This gives correct geometry where wider angles produce shallower bits
         let angle_rad = angle * PI / 180.0;
-        let depth = (width / 2.0) * (angle_rad / 2.0).tan();
+        let depth = (width / 2.0) / (angle_rad / 2.0).tan();
 
         CuttingBit {
             shape: BitShape::VShaped { angle },
@@ -135,6 +136,7 @@ impl CuttingBit {
                 // For V-bit, width decreases linearly with depth
                 // At surface: width = self.width
                 // At tip: width = 0
+                // half_width = (depth_from_tip) * tan(angle/2)
                 let angle_rad = angle * PI / 180.0;
                 let half_width_at_depth = (self.depth - cut_depth) * (angle_rad / 2.0).tan();
                 half_width_at_depth * 2.0
