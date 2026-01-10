@@ -286,4 +286,3 @@ def test_rose_engine_patterns():
         lathe = RoseEngineLathe(config, bit)
         lathe.generate()
         assert lathe is not None
-

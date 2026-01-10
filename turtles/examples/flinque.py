@@ -16,7 +16,7 @@ pattern = GuillochePattern(radius=38.0)
 flinque = FlinqueLayer(
     radius=38.0,
     num_petals=12,  # 12 chevron peaks radiating from center
-    num_waves=60,   # Dense concentric rings for fine line work
+    num_waves=60,  # Dense concentric rings for fine line work
     wave_amplitude=0.8,  # Chevron amplitude
     wave_frequency=20.0,  # Fine ripple texture
     inner_radius_ratio=0.05,  # Start very close to center
