@@ -1,0 +1,409 @@
+use pyo3::prelude::*;
+use turtles::{
+    RoseEngineLathe as BaseRoseEngineLathe,
+    RoseEngineConfig as BaseRoseEngineConfig,
+    CuttingBit as BaseCuttingBit,
+    RosettePattern as BaseRosettePattern,
+    ExportConfig as BaseExportConfig,
+};
+
+/// Python wrapper for RosettePattern
+#[pyclass]
+#[derive(Clone)]
+pub struct RosettePattern {
+    pub(crate) inner: BaseRosettePattern,
+}
+
+#[pymethods]
+impl RosettePattern {
+    /// Create a circular pattern (no modulation)
+    #[staticmethod]
+    fn circular() -> Self {
+        RosettePattern {
+            inner: BaseRosettePattern::Circular,
+        }
+    }
+    
+    /// Create an elliptical pattern
+    #[staticmethod]
+    #[pyo3(signature = (eccentricity, rotation=0.0))]
+    fn elliptical(eccentricity: f64, rotation: f64) -> Self {
+        RosettePattern {
+            inner: BaseRosettePattern::Elliptical { eccentricity, rotation },
+        }
+    }
+    
+    /// Create a sinusoidal wave pattern
+    #[staticmethod]
+    fn sinusoidal(frequency: f64) -> Self {
+        RosettePattern {
+            inner: BaseRosettePattern::Sinusoidal { frequency },
+        }
+    }
+    
+    /// Create a multi-lobe rosette pattern
+    #[staticmethod]
+    fn multi_lobe(lobes: usize) -> Self {
+        RosettePattern {
+            inner: BaseRosettePattern::MultiLobe { lobes },
+        }
+    }
+    
+    /// Create an epicycloid/rose curve pattern
+    #[staticmethod]
+    fn epicycloid(petals: usize) -> Self {
+        RosettePattern {
+            inner: BaseRosettePattern::Epicycloid { petals },
+        }
+    }
+    
+    /// Create a Huit-Eight (Figure-Eight) pattern
+    #[staticmethod]
+    fn huit_eight(lobes: usize) -> Self {
+        RosettePattern {
+            inner: BaseRosettePattern::HuitEight { lobes },
+        }
+    }
+    
+    /// Create a Grain-de-Riz (Rice Grain) pattern
+    #[staticmethod]
+    fn grain_de_riz(grain_size: f64, rows: usize) -> Self {
+        RosettePattern {
+            inner: BaseRosettePattern::GrainDeRiz { grain_size, rows },
+        }
+    }
+    
+    /// Create a Draperie (Drapery) pattern
+    #[staticmethod]
+    fn draperie(frequency: f64, depth_frequency: f64) -> Self {
+        RosettePattern {
+            inner: BaseRosettePattern::Draperie { frequency, depth_frequency },
+        }
+    }
+    
+    /// Create a Diamant (Diamond) pattern
+    #[staticmethod]
+    fn diamant(divisions: usize) -> Self {
+        RosettePattern {
+            inner: BaseRosettePattern::Diamant { divisions },
+        }
+    }
+    
+    fn __repr__(&self) -> String {
+        match &self.inner {
+            BaseRosettePattern::Circular => "RosettePattern.circular()".to_string(),
+            BaseRosettePattern::Elliptical { eccentricity, rotation } => {
+                format!("RosettePattern.elliptical(eccentricity={}, rotation={})", eccentricity, rotation)
+            }
+            BaseRosettePattern::Sinusoidal { frequency } => {
+                format!("RosettePattern.sinusoidal(frequency={})", frequency)
+            }
+            BaseRosettePattern::MultiLobe { lobes } => {
+                format!("RosettePattern.multi_lobe(lobes={})", lobes)
+            }
+            BaseRosettePattern::Epicycloid { petals } => {
+                format!("RosettePattern.epicycloid(petals={})", petals)
+            }
+            BaseRosettePattern::HuitEight { lobes } => {
+                format!("RosettePattern.huit_eight(lobes={})", lobes)
+            }
+            BaseRosettePattern::GrainDeRiz { grain_size, rows } => {
+                format!("RosettePattern.grain_de_riz(grain_size={}, rows={})", grain_size, rows)
+            }
+            BaseRosettePattern::Draperie { frequency, depth_frequency } => {
+                format!("RosettePattern.draperie(frequency={}, depth_frequency={})", frequency, depth_frequency)
+            }
+            BaseRosettePattern::Diamant { divisions } => {
+                format!("RosettePattern.diamant(divisions={})", divisions)
+            }
+            BaseRosettePattern::Custom { samples, .. } => {
+                format!("RosettePattern.custom(samples={})", samples)
+            }
+        }
+    }
+}
+
+/// Python wrapper for CuttingBit
+#[pyclass]
+#[derive(Clone)]
+pub struct CuttingBit {
+    pub(crate) inner: BaseCuttingBit,
+}
+
+#[pymethods]
+impl CuttingBit {
+    /// Create a V-shaped cutting bit
+    #[staticmethod]
+    fn v_shaped(angle: f64, width: f64) -> Self {
+        CuttingBit {
+            inner: BaseCuttingBit::v_shaped(angle, width),
+        }
+    }
+    
+    /// Create a flat cutting bit
+    #[staticmethod]
+    fn flat(width: f64, depth: f64) -> Self {
+        CuttingBit {
+            inner: BaseCuttingBit::flat(width, depth),
+        }
+    }
+    
+    /// Create a round/ball cutting bit
+    #[staticmethod]
+    fn round(diameter: f64) -> Self {
+        CuttingBit {
+            inner: BaseCuttingBit::round(diameter),
+        }
+    }
+    
+    /// Create an elliptical cutting bit
+    #[staticmethod]
+    fn elliptical(width: f64, aspect_ratio: f64) -> Self {
+        CuttingBit {
+            inner: BaseCuttingBit::elliptical(width, aspect_ratio),
+        }
+    }
+    
+    #[getter]
+    fn width(&self) -> f64 {
+        self.inner.width
+    }
+    
+    #[getter]
+    fn depth(&self) -> f64 {
+        self.inner.depth
+    }
+    
+    fn __repr__(&self) -> String {
+        format!(
+            "CuttingBit(width={}, depth={})",
+            self.inner.width,
+            self.inner.depth
+        )
+    }
+}
+
+/// Python wrapper for RoseEngineConfig
+#[pyclass]
+pub struct RoseEngineConfig {
+    pub(crate) inner: BaseRoseEngineConfig,
+}
+
+#[pymethods]
+impl RoseEngineConfig {
+    /// Create a new rose engine configuration
+    #[new]
+    #[pyo3(signature = (base_radius, amplitude))]
+    fn new(base_radius: f64, amplitude: f64) -> Self {
+        RoseEngineConfig {
+            inner: BaseRoseEngineConfig::new(base_radius, amplitude),
+        }
+    }
+    
+    /// Set the rosette pattern
+    fn set_rosette(&mut self, pattern: RosettePattern) {
+        self.inner.rosette = pattern.inner;
+    }
+    
+    /// Set the resolution (number of points)
+    fn set_resolution(&mut self, resolution: usize) {
+        self.inner.resolution = resolution;
+    }
+    
+    /// Add a secondary rosette for compound motion
+    fn with_secondary_rosette(&mut self, rosette: RosettePattern, amplitude: f64) {
+        self.inner.with_secondary_rosette(rosette.inner, amplitude);
+    }
+    
+    /// Enable depth modulation
+    fn with_depth_modulation(&mut self, amplitude: f64, frequency: f64) {
+        self.inner.with_depth_modulation(amplitude, frequency);
+    }
+    
+    /// Classic multi-lobe pattern preset
+    #[staticmethod]
+    fn classic_multi_lobe(base_radius: f64, lobes: usize, amplitude: f64) -> Self {
+        RoseEngineConfig {
+            inner: BaseRoseEngineConfig::classic_multi_lobe(base_radius, lobes, amplitude),
+        }
+    }
+    
+    /// Sunburst pattern preset
+    #[staticmethod]
+    fn sunburst(base_radius: f64, rays: usize, amplitude: f64) -> Self {
+        RoseEngineConfig {
+            inner: BaseRoseEngineConfig::sunburst(base_radius, rays, amplitude),
+        }
+    }
+    
+    /// Wave pattern preset
+    #[staticmethod]
+    fn wave(base_radius: f64, frequency: f64, amplitude: f64) -> Self {
+        RoseEngineConfig {
+            inner: BaseRoseEngineConfig::wave(base_radius, frequency, amplitude),
+        }
+    }
+    
+    /// Rose curve pattern preset
+    #[staticmethod]
+    fn rose_curve(base_radius: f64, petals: usize, amplitude: f64) -> Self {
+        RoseEngineConfig {
+            inner: BaseRoseEngineConfig::rose_curve(base_radius, petals, amplitude),
+        }
+    }
+    
+    /// Compound pattern preset
+    #[staticmethod]
+    fn compound(
+        base_radius: f64,
+        primary_lobes: usize,
+        primary_amplitude: f64,
+        secondary_frequency: f64,
+        secondary_amplitude: f64,
+    ) -> Self {
+        RoseEngineConfig {
+            inner: BaseRoseEngineConfig::compound(
+                base_radius,
+                primary_lobes,
+                primary_amplitude,
+                secondary_frequency,
+                secondary_amplitude,
+            ),
+        }
+    }
+    
+    /// Huit-Eight (Figure-Eight) pattern preset
+    #[staticmethod]
+    fn huit_eight(base_radius: f64, amplitude: f64) -> Self {
+        RoseEngineConfig {
+            inner: BaseRoseEngineConfig::huit_eight(base_radius, amplitude),
+        }
+    }
+    
+    /// Grain-de-Riz (Rice Grain) pattern preset
+    #[staticmethod]
+    fn grain_de_riz(base_radius: f64, grain_size: f64, amplitude: f64) -> Self {
+        RoseEngineConfig {
+            inner: BaseRoseEngineConfig::grain_de_riz(base_radius, grain_size, amplitude),
+        }
+    }
+    
+    /// Draperie (Drapery) pattern preset
+    #[staticmethod]
+    fn draperie(base_radius: f64, wave_frequency: f64, amplitude: f64) -> Self {
+        RoseEngineConfig {
+            inner: BaseRoseEngineConfig::draperie(base_radius, wave_frequency, amplitude),
+        }
+    }
+    
+    /// Diamant (Diamond) pattern preset
+    #[staticmethod]
+    fn diamant(base_radius: f64, divisions: usize, amplitude: f64) -> Self {
+        RoseEngineConfig {
+            inner: BaseRoseEngineConfig::diamant(base_radius, divisions, amplitude),
+        }
+    }
+    
+    #[getter]
+    fn base_radius(&self) -> f64 {
+        self.inner.base_radius
+    }
+    
+    #[getter]
+    fn amplitude(&self) -> f64 {
+        self.inner.amplitude
+    }
+    
+    #[getter]
+    fn resolution(&self) -> usize {
+        self.inner.resolution
+    }
+    
+    fn __repr__(&self) -> String {
+        format!(
+            "RoseEngineConfig(base_radius={}, amplitude={}, resolution={})",
+            self.inner.base_radius,
+            self.inner.amplitude,
+            self.inner.resolution
+        )
+    }
+}
+
+/// Python wrapper for RoseEngineLathe
+#[pyclass]
+pub struct RoseEngineLathe {
+    pub(crate) inner: BaseRoseEngineLathe,
+}
+
+#[pymethods]
+impl RoseEngineLathe {
+    /// Create a new rose engine lathe
+    #[new]
+    fn new(config: PyRef<RoseEngineConfig>, bit: PyRef<CuttingBit>) -> PyResult<Self> {
+        BaseRoseEngineLathe::new(config.inner.clone(), bit.inner.clone())
+            .map(|inner| RoseEngineLathe { inner })
+            .map_err(|e| pyo3::exceptions::PyValueError::new_err(e.to_string()))
+    }
+    
+    /// Create a rose engine lathe with custom center position
+    #[staticmethod]
+    fn with_center(
+        config: PyRef<RoseEngineConfig>,
+        bit: PyRef<CuttingBit>,
+        center_x: f64,
+        center_y: f64,
+    ) -> PyResult<Self> {
+        BaseRoseEngineLathe::new_with_center(
+            config.inner.clone(),
+            bit.inner.clone(),
+            center_x,
+            center_y,
+        )
+        .map(|inner| RoseEngineLathe { inner })
+        .map_err(|e| pyo3::exceptions::PyValueError::new_err(e.to_string()))
+    }
+    
+    /// Generate the rose engine pattern
+    fn generate(&mut self) {
+        self.inner.generate();
+    }
+    
+    /// Export pattern as SVG
+    fn to_svg(&self, filename: &str) -> PyResult<()> {
+        self.inner.to_svg(filename)
+            .map_err(|e| pyo3::exceptions::PyIOError::new_err(e.to_string()))
+    }
+    
+    /// Export pattern as STL file
+    #[pyo3(signature = (filename, depth=0.1, base_thickness=2.0))]
+    fn to_stl(&self, filename: &str, depth: f64, base_thickness: f64) -> PyResult<()> {
+        let config = BaseExportConfig {
+            depth,
+            base_thickness,
+            tool_radius: 0.0,
+        };
+        self.inner.to_stl(filename, &config)
+            .map_err(|e| pyo3::exceptions::PyIOError::new_err(e.to_string()))
+    }
+    
+    /// Export pattern as STEP file
+    #[pyo3(signature = (filename, depth=0.1))]
+    fn to_step(&self, filename: &str, depth: f64) -> PyResult<()> {
+        let config = BaseExportConfig {
+            depth,
+            base_thickness: 2.0,
+            tool_radius: 0.0,
+        };
+        self.inner.to_step(filename, &config)
+            .map_err(|e| pyo3::exceptions::PyIOError::new_err(e.to_string()))
+    }
+    
+    fn __repr__(&self) -> String {
+        format!(
+            "RoseEngineLathe(center=({}, {}), base_radius={})",
+            self.inner.center_x,
+            self.inner.center_y,
+            self.inner.config.base_radius
+        )
+    }
+}

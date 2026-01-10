@@ -198,6 +198,48 @@ impl RoseEngineConfig {
         );
         config
     }
+    
+    /// Huit-Eight (Figure-Eight) pattern preset
+    /// Creates interlocking figure-eight loops
+    pub fn huit_eight(base_radius: f64, amplitude: f64) -> Self {
+        let mut config = RoseEngineConfig::new(base_radius, amplitude);
+        config.rosette = RosettePattern::HuitEight { lobes: 8 };
+        config.resolution = 1500; // Higher resolution for smooth curves
+        config
+    }
+    
+    /// Grain-de-Riz (Rice Grain) pattern preset
+    /// Creates elongated oval motifs arranged in rows
+    pub fn grain_de_riz(base_radius: f64, grain_size: f64, amplitude: f64) -> Self {
+        let mut config = RoseEngineConfig::new(base_radius, amplitude);
+        config.rosette = RosettePattern::GrainDeRiz {
+            grain_size,
+            rows: 12,
+        };
+        config.resolution = 2000; // Very high resolution for small grains
+        config
+    }
+    
+    /// Draperie (Drapery) pattern preset
+    /// Creates flowing wave-like folds resembling fabric
+    pub fn draperie(base_radius: f64, wave_frequency: f64, amplitude: f64) -> Self {
+        let mut config = RoseEngineConfig::new(base_radius, amplitude);
+        config.rosette = RosettePattern::Draperie {
+            frequency: wave_frequency,
+            depth_frequency: wave_frequency * 2.0,
+        };
+        config.resolution = 1500;
+        config
+    }
+    
+    /// Diamant (Diamond) pattern preset
+    /// Creates diamond/checkerboard pattern with intersecting lines
+    pub fn diamant(base_radius: f64, divisions: usize, amplitude: f64) -> Self {
+        let mut config = RoseEngineConfig::new(base_radius, amplitude);
+        config.rosette = RosettePattern::Diamant { divisions };
+        config.resolution = 2000; // High resolution for crisp diamonds
+        config
+    }
 }
 
 #[cfg(test)]

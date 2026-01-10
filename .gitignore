@@ -159,6 +159,7 @@ turtles/labextension
 target
 *.stl
 *.svg
+!examples/svg/*.svg
 *.step
 
 # Testing

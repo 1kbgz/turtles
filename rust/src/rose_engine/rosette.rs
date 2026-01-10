@@ -32,6 +32,34 @@ pub enum RosettePattern {
         petals: usize,
     },
     
+    /// Huit-Eight (Figure-Eight) - interlocking figure-eight pattern
+    HuitEight {
+        /// Number of lobes/figure-eights around the circle
+        lobes: usize,
+    },
+    
+    /// Grain-de-Riz (Rice Grain) - small elongated oval shapes in rows
+    GrainDeRiz {
+        /// Size of each grain (controls frequency)
+        grain_size: f64,
+        /// Number of grain rows
+        rows: usize,
+    },
+    
+    /// Draperie (Drapery) - flowing fabric/wave pattern
+    Draperie {
+        /// Wave frequency (number of waves)
+        frequency: f64,
+        /// Secondary modulation for depth effect
+        depth_frequency: f64,
+    },
+    
+    /// Diamant (Diamond) - geometric diamond/checkerboard pattern
+    Diamant {
+        /// Number of divisions (creates diamond grid)
+        divisions: usize,
+    },
+    
     /// Custom pattern defined by a function
     Custom {
         /// Function that takes angle (radians) and returns displacement (-1.0 to 1.0)
@@ -85,6 +113,40 @@ impl RosettePattern {
             RosettePattern::Epicycloid { petals } => {
                 // Rose curve: r = cos(n*θ)
                 (angle * (*petals as f64)).cos()
+            }
+            
+            RosettePattern::HuitEight { lobes } => {
+                // Figure-eight pattern: overlapping sinusoidal waves
+                // Use sin(n*θ) * cos(θ/2) for interlocking effect
+                let n = *lobes as f64;
+                (angle * n).sin() * (angle / 2.0).cos()
+            }
+            
+            RosettePattern::GrainDeRiz { grain_size, rows } => {
+                // Rice grain: small oval shapes in concentric rows
+                // Create pointed ovals using modulated sine wave
+                let row_angle = angle * (*rows as f64);
+                let grain_modulation = (angle / grain_size).sin();
+                // Combine row pattern with grain shape
+                row_angle.sin().abs() * grain_modulation
+            }
+            
+            RosettePattern::Draperie { frequency, depth_frequency } => {
+                // Drapery pattern: flowing waves with depth modulation
+                // Primary wave with secondary depth modulation
+                let wave = (angle * frequency).sin();
+                let depth = (angle * depth_frequency).cos();
+                wave * (0.5 + 0.5 * depth)
+            }
+            
+            RosettePattern::Diamant { divisions } => {
+                // Diamond pattern: checkerboard created by two perpendicular waves
+                // Use combination of sine waves at different frequencies
+                let n = *divisions as f64;
+                let wave1 = (angle * n).sin();
+                let wave2 = (angle * n + PI / 4.0).sin();
+                // Create sharp diamond intersections
+                (wave1.abs() + wave2.abs()) / 2.0 * 2.0 - 1.0
             }
             
             RosettePattern::Custom { table, samples } => {

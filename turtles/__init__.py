@@ -1,9 +1,16 @@
 __version__ = "0.1.0"
 
 # Import all classes from the Rust extension
-from .turtles import FlinqueLayer, WatchFace as RustWatchFace
+from .turtles import (
+    CuttingBit,
+    FlinqueLayer,
+    RoseEngineConfig,
+    RoseEngineLathe,
+    RosettePattern,
+    WatchFace as RustWatchFace,
+)
 
-__all__ = ("WatchFace",)
+__all__ = ("WatchFace", "RoseEngineLathe", "RoseEngineConfig", "CuttingBit", "RosettePattern")
 
 
 class WatchFace:
