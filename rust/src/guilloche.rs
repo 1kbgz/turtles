@@ -1,6 +1,7 @@
 use crate::common::{validate_radius, ExportConfig, Point2D, SpirographError};
 use crate::diamant::{DiamantConfig, DiamantLayer};
 use crate::flinque::{FlinqueConfig, FlinqueLayer};
+use crate::limacon::LimaconLayer;
 use crate::spirograph::{HorizontalSpirograph, SphericalSpirograph, VerticalSpirograph};
 
 /// Enum to hold different types of spirograph patterns
@@ -61,6 +62,7 @@ pub struct GuillochePattern {
     spirograph_layers: Vec<SpirographLayer>,
     flinque_layers: Vec<FlinqueLayer>,
     diamant_layers: Vec<DiamantLayer>,
+    limacon_layers: Vec<LimaconLayer>,
 }
 
 impl GuillochePattern {
@@ -73,6 +75,7 @@ impl GuillochePattern {
             spirograph_layers: Vec::new(),
             flinque_layers: Vec::new(),
             diamant_layers: Vec::new(),
+            limacon_layers: Vec::new(),
         })
     }
 
@@ -171,6 +174,43 @@ impl GuillochePattern {
         Ok(())
     }
 
+    /// Add a limaçon pattern layer
+    pub fn add_limacon_layer(&mut self, limacon: LimaconLayer) {
+        self.limacon_layers.push(limacon);
+    }
+
+    /// Add a limaçon layer positioned at a given angle and distance from center
+    /// angle is in radians, distance is in mm
+    pub fn add_limacon_at_polar(
+        &mut self,
+        config: crate::limacon::LimaconConfig,
+        angle: f64,
+        distance: f64,
+    ) -> Result<(), SpirographError> {
+        let limacon = LimaconLayer::new_at_polar(config, angle, distance)?;
+        self.limacon_layers.push(limacon);
+        Ok(())
+    }
+
+    /// Add a limaçon layer positioned at a clock position (like hour hand)
+    ///
+    /// # Arguments
+    /// * `config` - Limaçon configuration
+    /// * `hour` - Hour position (1-12, where 12 is at top)
+    /// * `minute` - Minute position (0-59)
+    /// * `distance` - Distance from center of watch face
+    pub fn add_limacon_at_clock(
+        &mut self,
+        config: crate::limacon::LimaconConfig,
+        hour: u32,
+        minute: u32,
+        distance: f64,
+    ) -> Result<(), SpirographError> {
+        let limacon = LimaconLayer::new_at_clock(config, hour, minute, distance)?;
+        self.limacon_layers.push(limacon);
+        Ok(())
+    }
+
     /// Generate all layers
     pub fn generate(&mut self) {
         for layer in &mut self.spirograph_layers {
@@ -182,11 +222,17 @@ impl GuillochePattern {
         for layer in &mut self.diamant_layers {
             layer.generate();
         }
+        for layer in &mut self.limacon_layers {
+            layer.generate();
+        }
     }
 
-    /// Get total layer count (spirographs + flinqué + diamant)
+    /// Get total layer count (spirographs + flinqué + diamant + limaçon)
     pub fn layer_count(&self) -> usize {
-        self.spirograph_layers.len() + self.flinque_layers.len() + self.diamant_layers.len()
+        self.spirograph_layers.len()
+            + self.flinque_layers.len()
+            + self.diamant_layers.len()
+            + self.limacon_layers.len()
     }
 
     /// Get all spirograph layer points (for rendering)
@@ -205,6 +251,11 @@ impl GuillochePattern {
     /// Get all diamant layer lines (for rendering)
     pub fn diamant_lines(&self) -> Vec<&Vec<Vec<Point2D>>> {
         self.diamant_layers.iter().map(|d| d.lines()).collect()
+    }
+
+    /// Get all limaçon layer lines (for rendering)
+    pub fn limacon_lines(&self) -> Vec<&Vec<Vec<Point2D>>> {
+        self.limacon_layers.iter().map(|l| l.lines()).collect()
     }
 
     /// Export all layers to separate files with the given base name

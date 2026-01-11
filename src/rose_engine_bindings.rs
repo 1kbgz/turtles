@@ -24,7 +24,7 @@ impl RosettePattern {
             inner: BaseRosettePattern::Circular,
         }
     }
-    
+
     /// Create an elliptical pattern
     #[staticmethod]
     #[pyo3(signature = (eccentricity, rotation=0.0))]
@@ -33,7 +33,7 @@ impl RosettePattern {
             inner: BaseRosettePattern::Elliptical { eccentricity, rotation },
         }
     }
-    
+
     /// Create a sinusoidal wave pattern
     #[staticmethod]
     fn sinusoidal(frequency: f64) -> Self {
@@ -41,7 +41,7 @@ impl RosettePattern {
             inner: BaseRosettePattern::Sinusoidal { frequency },
         }
     }
-    
+
     /// Create a multi-lobe rosette pattern
     #[staticmethod]
     fn multi_lobe(lobes: usize) -> Self {
@@ -49,7 +49,7 @@ impl RosettePattern {
             inner: BaseRosettePattern::MultiLobe { lobes },
         }
     }
-    
+
     /// Create an epicycloid/rose curve pattern
     #[staticmethod]
     fn epicycloid(petals: usize) -> Self {
@@ -57,7 +57,7 @@ impl RosettePattern {
             inner: BaseRosettePattern::Epicycloid { petals },
         }
     }
-    
+
     /// Create a Huit-Eight (Figure-Eight) pattern
     #[staticmethod]
     fn huit_eight(lobes: usize) -> Self {
@@ -65,7 +65,7 @@ impl RosettePattern {
             inner: BaseRosettePattern::HuitEight { lobes },
         }
     }
-    
+
     /// Create a Grain-de-Riz (Rice Grain) pattern
     #[staticmethod]
     fn grain_de_riz(grain_size: f64, rows: usize) -> Self {
@@ -73,7 +73,7 @@ impl RosettePattern {
             inner: BaseRosettePattern::GrainDeRiz { grain_size, rows },
         }
     }
-    
+
     /// Create a Draperie (Drapery) pattern
     #[staticmethod]
     fn draperie(frequency: f64, depth_frequency: f64) -> Self {
@@ -81,7 +81,7 @@ impl RosettePattern {
             inner: BaseRosettePattern::Draperie { frequency, depth_frequency },
         }
     }
-    
+
     /// Create a Diamant (Diamond) pattern
     #[staticmethod]
     fn diamant(divisions: usize) -> Self {
@@ -89,7 +89,7 @@ impl RosettePattern {
             inner: BaseRosettePattern::Diamant { divisions },
         }
     }
-    
+
     fn __repr__(&self) -> String {
         match &self.inner {
             BaseRosettePattern::Circular => "RosettePattern.circular()".to_string(),
@@ -140,7 +140,7 @@ impl CuttingBit {
             inner: BaseCuttingBit::v_shaped(angle, width),
         }
     }
-    
+
     /// Create a flat cutting bit
     #[staticmethod]
     fn flat(width: f64, depth: f64) -> Self {
@@ -148,7 +148,7 @@ impl CuttingBit {
             inner: BaseCuttingBit::flat(width, depth),
         }
     }
-    
+
     /// Create a round/ball cutting bit
     #[staticmethod]
     fn round(diameter: f64) -> Self {
@@ -156,7 +156,7 @@ impl CuttingBit {
             inner: BaseCuttingBit::round(diameter),
         }
     }
-    
+
     /// Create an elliptical cutting bit
     #[staticmethod]
     fn elliptical(width: f64, aspect_ratio: f64) -> Self {
@@ -164,17 +164,17 @@ impl CuttingBit {
             inner: BaseCuttingBit::elliptical(width, aspect_ratio),
         }
     }
-    
+
     #[getter]
     fn width(&self) -> f64 {
         self.inner.width
     }
-    
+
     #[getter]
     fn depth(&self) -> f64 {
         self.inner.depth
     }
-    
+
     fn __repr__(&self) -> String {
         format!(
             "CuttingBit(width={}, depth={})",
@@ -200,27 +200,27 @@ impl RoseEngineConfig {
             inner: BaseRoseEngineConfig::new(base_radius, amplitude),
         }
     }
-    
+
     /// Set the rosette pattern
     fn set_rosette(&mut self, pattern: RosettePattern) {
         self.inner.rosette = pattern.inner;
     }
-    
+
     /// Set the resolution (number of points)
     fn set_resolution(&mut self, resolution: usize) {
         self.inner.resolution = resolution;
     }
-    
+
     /// Add a secondary rosette for compound motion
     fn with_secondary_rosette(&mut self, rosette: RosettePattern, amplitude: f64) {
         self.inner.with_secondary_rosette(rosette.inner, amplitude);
     }
-    
+
     /// Enable depth modulation
     fn with_depth_modulation(&mut self, amplitude: f64, frequency: f64) {
         self.inner.with_depth_modulation(amplitude, frequency);
     }
-    
+
     /// Classic multi-lobe pattern preset
     #[staticmethod]
     fn classic_multi_lobe(base_radius: f64, lobes: usize, amplitude: f64) -> Self {
@@ -228,7 +228,7 @@ impl RoseEngineConfig {
             inner: BaseRoseEngineConfig::classic_multi_lobe(base_radius, lobes, amplitude),
         }
     }
-    
+
     /// Sunburst pattern preset
     #[staticmethod]
     fn sunburst(base_radius: f64, rays: usize, amplitude: f64) -> Self {
@@ -236,7 +236,7 @@ impl RoseEngineConfig {
             inner: BaseRoseEngineConfig::sunburst(base_radius, rays, amplitude),
         }
     }
-    
+
     /// Wave pattern preset
     #[staticmethod]
     fn wave(base_radius: f64, frequency: f64, amplitude: f64) -> Self {
@@ -244,7 +244,7 @@ impl RoseEngineConfig {
             inner: BaseRoseEngineConfig::wave(base_radius, frequency, amplitude),
         }
     }
-    
+
     /// Rose curve pattern preset
     #[staticmethod]
     fn rose_curve(base_radius: f64, petals: usize, amplitude: f64) -> Self {
@@ -252,7 +252,7 @@ impl RoseEngineConfig {
             inner: BaseRoseEngineConfig::rose_curve(base_radius, petals, amplitude),
         }
     }
-    
+
     /// Compound pattern preset
     #[staticmethod]
     fn compound(
@@ -272,7 +272,7 @@ impl RoseEngineConfig {
             ),
         }
     }
-    
+
     /// Huit-Eight (Figure-Eight) pattern preset
     #[staticmethod]
     fn huit_eight(base_radius: f64, amplitude: f64) -> Self {
@@ -280,7 +280,7 @@ impl RoseEngineConfig {
             inner: BaseRoseEngineConfig::huit_eight(base_radius, amplitude),
         }
     }
-    
+
     /// Grain-de-Riz (Rice Grain) pattern preset
     #[staticmethod]
     fn grain_de_riz(base_radius: f64, grain_size: f64, amplitude: f64) -> Self {
@@ -288,7 +288,7 @@ impl RoseEngineConfig {
             inner: BaseRoseEngineConfig::grain_de_riz(base_radius, grain_size, amplitude),
         }
     }
-    
+
     /// Draperie (Drapery) pattern preset
     #[staticmethod]
     fn draperie(base_radius: f64, wave_frequency: f64, amplitude: f64) -> Self {
@@ -296,7 +296,7 @@ impl RoseEngineConfig {
             inner: BaseRoseEngineConfig::draperie(base_radius, wave_frequency, amplitude),
         }
     }
-    
+
     /// Diamant (Diamond) pattern preset
     #[staticmethod]
     fn diamant(base_radius: f64, divisions: usize, amplitude: f64) -> Self {
@@ -304,22 +304,22 @@ impl RoseEngineConfig {
             inner: BaseRoseEngineConfig::diamant(base_radius, divisions, amplitude),
         }
     }
-    
+
     #[getter]
     fn base_radius(&self) -> f64 {
         self.inner.base_radius
     }
-    
+
     #[getter]
     fn amplitude(&self) -> f64 {
         self.inner.amplitude
     }
-    
+
     #[getter]
     fn resolution(&self) -> usize {
         self.inner.resolution
     }
-    
+
     fn __repr__(&self) -> String {
         format!(
             "RoseEngineConfig(base_radius={}, amplitude={}, resolution={})",
@@ -345,7 +345,7 @@ impl RoseEngineLathe {
             .map(|inner| RoseEngineLathe { inner })
             .map_err(|e| pyo3::exceptions::PyValueError::new_err(e.to_string()))
     }
-    
+
     /// Create a rose engine lathe with custom center position
     #[staticmethod]
     fn with_center(
@@ -363,18 +363,18 @@ impl RoseEngineLathe {
         .map(|inner| RoseEngineLathe { inner })
         .map_err(|e| pyo3::exceptions::PyValueError::new_err(e.to_string()))
     }
-    
+
     /// Generate the rose engine pattern
     fn generate(&mut self) {
         self.inner.generate();
     }
-    
+
     /// Export pattern as SVG
     fn to_svg(&self, filename: &str) -> PyResult<()> {
         self.inner.to_svg(filename)
             .map_err(|e| pyo3::exceptions::PyIOError::new_err(e.to_string()))
     }
-    
+
     /// Export pattern as STL file
     #[pyo3(signature = (filename, depth=0.1, base_thickness=2.0))]
     fn to_stl(&self, filename: &str, depth: f64, base_thickness: f64) -> PyResult<()> {
@@ -386,7 +386,7 @@ impl RoseEngineLathe {
         self.inner.to_stl(filename, &config)
             .map_err(|e| pyo3::exceptions::PyIOError::new_err(e.to_string()))
     }
-    
+
     /// Export pattern as STEP file
     #[pyo3(signature = (filename, depth=0.1))]
     fn to_step(&self, filename: &str, depth: f64) -> PyResult<()> {
@@ -398,7 +398,7 @@ impl RoseEngineLathe {
         self.inner.to_step(filename, &config)
             .map_err(|e| pyo3::exceptions::PyIOError::new_err(e.to_string()))
     }
-    
+
     fn __repr__(&self) -> String {
         format!(
             "RoseEngineLathe(center=({}, {}), base_radius={})",
@@ -456,7 +456,7 @@ impl RoseEngineLatheRun {
         .map(|inner| RoseEngineLatheRun { inner })
         .map_err(|e| pyo3::exceptions::PyValueError::new_err(e.to_string()))
     }
-    
+
     /// Create a multi-pass rose engine lathe run with custom center position
     #[staticmethod]
     #[pyo3(signature = (config, bit, num_passes, segments_per_pass=24, center_x=0.0, center_y=0.0))]
@@ -479,24 +479,34 @@ impl RoseEngineLatheRun {
         .map(|inner| RoseEngineLatheRun { inner })
         .map_err(|e| pyo3::exceptions::PyValueError::new_err(e.to_string()))
     }
-    
+
     /// Generate all passes of the rose engine pattern
     fn generate(&mut self) {
         self.inner.generate();
     }
-    
+
     /// Export combined pattern as SVG
     fn to_svg(&self, filename: &str) -> PyResult<()> {
         self.inner.to_svg(filename)
             .map_err(|e| pyo3::exceptions::PyIOError::new_err(e.to_string()))
     }
-    
+
     /// Get the number of passes
     #[getter]
     fn num_passes(&self) -> usize {
         self.inner.num_passes()
     }
-    
+
+    /// Get the generated pattern lines as a list of point lists
+    /// Each line is a list of (x, y) tuples
+    fn get_lines(&self) -> Vec<Vec<(f64, f64)>> {
+        self.inner
+            .lines()
+            .iter()
+            .map(|line| line.iter().map(|p| (p.x, p.y)).collect())
+            .collect()
+    }
+
     fn __repr__(&self) -> String {
         format!(
             "RoseEngineLatheRun(center=({}, {}), passes={})",

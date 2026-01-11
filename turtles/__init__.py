@@ -5,6 +5,7 @@ from .turtles import (
     CuttingBit,
     DiamantLayer,
     FlinqueLayer,
+    LimaconLayer,
     RoseEngineConfig,
     RoseEngineLathe,
     RoseEngineLatheRun,
@@ -21,6 +22,7 @@ __all__ = (
     "RosettePattern",
     "DiamantLayer",
     "FlinqueLayer",
+    "LimaconLayer",
 )
 
 
@@ -187,12 +189,48 @@ class WatchFace:
             resolution=resolution,
         )
 
+    def add_limacon(
+        self,
+        num_curves: int = 72,
+        base_radius: float = 20.0,
+        amplitude: float = 20.0,
+        hour: int = 12,
+        minute: int = 0,
+        distance: float = 0.0,
+        resolution: int = 360,
+    ):
+        """Add a limaçon guilloché pattern.
+
+        The limaçon pattern is formed using limaçon curves that are tangent to the center,
+        rotated around the center. The overlapping curves create intricate patterns.
+
+        Args:
+            num_curves: Number of limaçon curves to draw (more = denser pattern).
+            base_radius: Base radius of the limaçon curves.
+            amplitude: Amplitude of the limaçon curves.
+            hour: Hour position for center (1-12, default 12 = centered).
+            minute: Minute position for center (0-59).
+            distance: Distance from center (0 = centered on watch face).
+            resolution: Number of points per curve.
+        """
+        self._watch_face.add_limacon_at_clock(
+            num_curves=num_curves,
+            base_radius=base_radius,
+            amplitude=amplitude,
+            hour=hour,
+            minute=minute,
+            distance=distance,
+            resolution=resolution,
+        )
+
     def add(self, layer):
-        """Add a spirograph, flinque, or diamant layer."""
+        """Add a spirograph, flinque, diamant, or limacon layer."""
         if isinstance(layer, FlinqueLayer):
             self._watch_face.add_flinque_layer(layer)
         elif isinstance(layer, DiamantLayer):
             self._watch_face.add_diamant_layer(layer)
+        elif isinstance(layer, LimaconLayer):
+            self._watch_face.add_limacon_layer(layer)
         else:
             self._watch_face.add_layer(layer)
 

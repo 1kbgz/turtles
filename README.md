@@ -19,6 +19,10 @@ A library for generating spirograph and guilloché patterns.
 
 <img src="https://raw.githubusercontent.com/1kbgz/turtles/refs/heads/main/docs/img/diamant.png" width=500>
 
+### Limaçon
+
+<img src="https://raw.githubusercontent.com/1kbgz/turtles/refs/heads/main/docs/img/limacon.png" width=500>
+
 ### Export Formats
 
 - **SVG** - 2D vector output for laser engraving and visualization

@@ -2,12 +2,14 @@ use pyo3::prelude::*;
 
 mod diamant_bindings;
 mod guilloche_bindings;
+mod limacon_bindings;
 mod rose_engine_bindings;
 mod spirograph_bindings;
 mod watch_face_bindings;
 
 pub use diamant_bindings::DiamantLayer;
 pub use guilloche_bindings::{FlinqueLayer, GuillochePattern};
+pub use limacon_bindings::LimaconLayer;
 pub use rose_engine_bindings::{CuttingBit, RoseEngineConfig, RoseEngineLathe, RoseEngineLatheRun, RosettePattern};
 pub use spirograph_bindings::{HorizontalSpirograph, SphericalSpirograph, VerticalSpirograph};
 pub use watch_face_bindings::WatchFace;
@@ -27,6 +29,9 @@ fn turtles(_py: Python, m: &Bound<PyModule>) -> PyResult<()> {
 
     // Diamant (diamond) pattern layer
     m.add_class::<DiamantLayer>().unwrap();
+
+    // Limaçon pattern layer
+    m.add_class::<LimaconLayer>().unwrap();
 
     // Watch face
     m.add_class::<WatchFace>().unwrap();
