@@ -3,8 +3,8 @@
 Diamant (Diamond) Guilloché Pattern Example
 
 This example creates a diamant guilloché pattern using multi-lobe modulation
-with many overlapping passes, creating intersecting lines that form
-diamond/checkerboard shapes.
+with many overlapping segmented passes, creating intersecting lines that form
+diamond/checkerboard shapes with a mesh-like appearance.
 """
 
 from turtles import RoseEngineLatheRun, RoseEngineConfig, CuttingBit, RosettePattern
@@ -20,14 +20,15 @@ def main():
     # Create a fine V-shaped cutting bit
     bit = CuttingBit.v_shaped(angle=30.0, width=0.025)
     
-    # Create multi-pass run - number of passes should create diamond grid
+    # Create multi-pass run with segmentation for diamond mesh grid
     # Using same number as lobes creates nice diamond intersections
-    run = RoseEngineLatheRun(config, bit, num_passes=36)
+    run = RoseEngineLatheRun(config, bit, num_passes=36, segments_per_pass=24)
     run.generate()
     
     # Export to SVG
     run.to_svg("examples/svg/diamant.svg")
     print("Generated examples/svg/diamant.svg")
+    print(f"  Pattern: Segmented with {36 * 24} individual arc segments")
 
 
 if __name__ == "__main__":

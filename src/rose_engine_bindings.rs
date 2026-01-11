@@ -423,6 +423,7 @@ impl RoseEngineLatheRun {
     /// * `config` - Base rose engine configuration
     /// * `bit` - Cutting bit configuration
     /// * `num_passes` - Number of rotational passes (typically 8-24)
+    /// * `segments_per_pass` - Number of arc segments per pass (default 24, creates gaps)
     ///
     /// # Example
     /// ```python
@@ -432,20 +433,25 @@ impl RoseEngineLatheRun {
     /// config.set_rosette(RosettePattern.multi_lobe(12))
     /// bit = CuttingBit.v_shaped(angle=30.0, width=0.5)
     ///
-    /// run = RoseEngineLatheRun(config, bit, num_passes=12)
+    /// run = RoseEngineLatheRun(config, bit, num_passes=12, segments_per_pass=24)
     /// run.generate()
     /// run.to_svg("pattern.svg")
     /// ```
     #[new]
+    #[pyo3(signature = (config, bit, num_passes, segments_per_pass=24))]
     fn new(
         config: PyRef<RoseEngineConfig>,
         bit: PyRef<CuttingBit>,
         num_passes: usize,
+        segments_per_pass: usize,
     ) -> PyResult<Self> {
-        BaseRoseEngineLatheRun::new(
+        BaseRoseEngineLatheRun::new_with_segments(
             config.inner.clone(),
             bit.inner.clone(),
             num_passes,
+            segments_per_pass,
+            0.0,
+            0.0,
         )
         .map(|inner| RoseEngineLatheRun { inner })
         .map_err(|e| pyo3::exceptions::PyValueError::new_err(e.to_string()))
@@ -453,17 +459,20 @@ impl RoseEngineLatheRun {
     
     /// Create a multi-pass rose engine lathe run with custom center position
     #[staticmethod]
+    #[pyo3(signature = (config, bit, num_passes, segments_per_pass=24, center_x=0.0, center_y=0.0))]
     fn with_center(
         config: PyRef<RoseEngineConfig>,
         bit: PyRef<CuttingBit>,
         num_passes: usize,
+        segments_per_pass: usize,
         center_x: f64,
         center_y: f64,
     ) -> PyResult<Self> {
-        BaseRoseEngineLatheRun::new_with_center(
+        BaseRoseEngineLatheRun::new_with_segments(
             config.inner.clone(),
             bit.inner.clone(),
             num_passes,
+            segments_per_pass,
             center_x,
             center_y,
         )
