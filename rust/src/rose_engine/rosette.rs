@@ -5,7 +5,7 @@ use std::f64::consts::PI;
 pub enum RosettePattern {
     /// Simple circular pattern (no modulation)
     Circular,
-    
+
     /// Elliptical pattern with major and minor axis
     Elliptical {
         /// Ratio of major axis to minor axis
@@ -13,25 +13,53 @@ pub enum RosettePattern {
         /// Rotation angle of the ellipse in radians
         rotation: f64,
     },
-    
+
     /// Sinusoidal wave pattern
     Sinusoidal {
         /// Number of wave cycles around the circle
         frequency: f64,
     },
-    
+
     /// Multi-lobe rosette (classic rose engine pattern)
     MultiLobe {
         /// Number of lobes/petals
         lobes: usize,
     },
-    
+
     /// Epicycloid/hypocycloid mathematical rose curve
     Epicycloid {
         /// Number of petals (for rose curve r = cos(n*θ))
         petals: usize,
     },
-    
+
+    /// Huit-Eight (Figure-Eight) - interlocking figure-eight pattern
+    HuitEight {
+        /// Number of lobes/figure-eights around the circle
+        lobes: usize,
+    },
+
+    /// Grain-de-Riz (Rice Grain) - small elongated oval shapes in rows
+    GrainDeRiz {
+        /// Size of each grain (controls frequency)
+        grain_size: f64,
+        /// Number of grain rows
+        rows: usize,
+    },
+
+    /// Draperie (Drapery) - flowing fabric/wave pattern
+    Draperie {
+        /// Wave frequency (number of waves)
+        frequency: f64,
+        /// Secondary modulation for depth effect
+        depth_frequency: f64,
+    },
+
+    /// Diamant (Diamond) - geometric diamond/checkerboard pattern
+    Diamant {
+        /// Number of divisions (creates diamond grid)
+        divisions: usize,
+    },
+
     /// Custom pattern defined by a function
     Custom {
         /// Function that takes angle (radians) and returns displacement (-1.0 to 1.0)
@@ -54,39 +82,77 @@ impl RosettePattern {
     pub fn displacement(&self, angle: f64) -> f64 {
         match self {
             RosettePattern::Circular => 0.0,
-            
-            RosettePattern::Elliptical { eccentricity, rotation } => {
+
+            RosettePattern::Elliptical {
+                eccentricity,
+                rotation,
+            } => {
                 // Ellipse formula: r(θ) = a*b / sqrt((b*cos(θ))² + (a*sin(θ))²)
                 // We want displacement, so normalize to get variation from mean
                 let rotated_angle = angle - rotation;
                 let a = 1.0; // major axis (normalized)
                 let b = 1.0 / eccentricity; // minor axis
-                
+
                 let cos_a = rotated_angle.cos();
                 let sin_a = rotated_angle.sin();
-                
+
                 let r = (a * b) / ((b * cos_a).powi(2) + (a * sin_a).powi(2)).sqrt();
-                
+
                 // Normalize so the mean is 0 and range is roughly -1 to 1
                 (r - 1.0) * eccentricity
             }
-            
-            RosettePattern::Sinusoidal { frequency } => {
-                (angle * frequency).sin()
-            }
-            
+
+            RosettePattern::Sinusoidal { frequency } => (angle * frequency).sin(),
+
             RosettePattern::MultiLobe { lobes } => {
                 // Multi-lobe pattern: creates pointed petals
                 // Use abs(sin(n*θ/2)) for n petals
                 let phase = angle * (*lobes as f64) / 2.0;
                 phase.sin().abs() * 2.0 - 1.0 // Scale to -1 to 1
             }
-            
+
             RosettePattern::Epicycloid { petals } => {
                 // Rose curve: r = cos(n*θ)
                 (angle * (*petals as f64)).cos()
             }
-            
+
+            RosettePattern::HuitEight { lobes } => {
+                // Figure-eight pattern: overlapping sinusoidal waves
+                // Use sin(n*θ) * cos(θ/2) for interlocking effect
+                let n = *lobes as f64;
+                (angle * n).sin() * (angle / 2.0).cos()
+            }
+
+            RosettePattern::GrainDeRiz { grain_size, rows } => {
+                // Rice grain: small oval shapes in concentric rows
+                // Create pointed ovals using modulated sine wave
+                let row_angle = angle * (*rows as f64);
+                let grain_modulation = (angle / grain_size).sin();
+                // Combine row pattern with grain shape
+                row_angle.sin().abs() * grain_modulation
+            }
+
+            RosettePattern::Draperie {
+                frequency,
+                depth_frequency,
+            } => {
+                // Drapery pattern: flowing waves with depth modulation
+                // Primary wave with secondary depth modulation
+                let wave = (angle * frequency).sin();
+                let depth = (angle * depth_frequency).cos();
+                wave * (0.5 + 0.5 * depth)
+            }
+
+            RosettePattern::Diamant { divisions } => {
+                // Diamond pattern: checkerboard created by two perpendicular waves
+                // Use combination of sine waves at different frequencies
+                let n = *divisions as f64;
+                let wave1 = (angle * n).sin();
+                let wave2 = (angle * n + PI / 4.0).sin();
+                // Create sharp diamond intersections
+                (wave1.abs() + wave2.abs()) / 2.0 * 2.0 - 1.0
+            }
+
             RosettePattern::Custom { table, samples } => {
                 // Interpolate from lookup table
                 let normalized_angle = angle.rem_euclid(2.0 * PI) / (2.0 * PI);
@@ -94,13 +160,13 @@ impl RosettePattern {
                 let index = index_f.floor() as usize % *samples;
                 let next_index = (index + 1) % *samples;
                 let t = index_f - index_f.floor();
-                
+
                 // Linear interpolation
                 table[index] * (1.0 - t) + table[next_index] * t
             }
         }
     }
-    
+
     /// Create a custom rosette pattern from a function
     ///
     /// # Arguments
@@ -110,14 +176,14 @@ impl RosettePattern {
     /// # Example
     /// ```
     /// use turtles::rose_engine::RosettePattern;
-    /// 
+    ///
     /// // Create a custom sawtooth pattern
     /// let pattern = RosettePattern::from_function(
     ///     |angle| (angle / std::f64::consts::PI) % 2.0 - 1.0,
     ///     500
     /// );
     /// ```
-    pub fn from_function<F>(func: F, samples: usize) -> Self 
+    pub fn from_function<F>(func: F, samples: usize) -> Self
     where
         F: Fn(f64) -> f64,
     {
@@ -126,7 +192,7 @@ impl RosettePattern {
             let angle = (i as f64) * 2.0 * PI / (samples as f64);
             table.push(func(angle));
         }
-        
+
         RosettePattern::Custom { table, samples }
     }
 }
@@ -140,7 +206,7 @@ impl Default for RosettePattern {
 #[cfg(test)]
 mod tests {
     use super::*;
-    
+
     #[test]
     fn test_circular_pattern() {
         let pattern = RosettePattern::Circular;
@@ -148,7 +214,7 @@ mod tests {
         assert_eq!(pattern.displacement(PI), 0.0);
         assert_eq!(pattern.displacement(PI / 2.0), 0.0);
     }
-    
+
     #[test]
     fn test_sinusoidal_pattern() {
         let pattern = RosettePattern::Sinusoidal { frequency: 1.0 };
@@ -156,7 +222,7 @@ mod tests {
         assert!((pattern.displacement(PI / 2.0) - 1.0).abs() < 0.0001);
         assert!(pattern.displacement(PI).abs() < 0.0001);
     }
-    
+
     #[test]
     fn test_multi_lobe_pattern() {
         let pattern = RosettePattern::MultiLobe { lobes: 6 };
@@ -167,7 +233,7 @@ mod tests {
         // At PI/6 we should be near a peak
         assert!(d_half > 0.5);
     }
-    
+
     #[test]
     fn test_epicycloid_pattern() {
         let pattern = RosettePattern::Epicycloid { petals: 5 };
@@ -175,7 +241,7 @@ mod tests {
         // At PI/5, cos(5*PI/5) = cos(PI) = -1
         assert!((pattern.displacement(PI / 5.0) + 1.0).abs() < 0.0001);
     }
-    
+
     #[test]
     fn test_custom_pattern() {
         let pattern = RosettePattern::from_function(|angle| angle.sin(), 100);
@@ -183,7 +249,7 @@ mod tests {
         let d_half = pattern.displacement(PI / 2.0);
         assert!((d_half - 1.0).abs() < 0.1);
     }
-    
+
     #[test]
     fn test_default_pattern() {
         let pattern = RosettePattern::default();

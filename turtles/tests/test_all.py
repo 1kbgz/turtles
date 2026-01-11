@@ -166,3 +166,181 @@ def test_watch_top_level():
     with tempfile.TemporaryDirectory() as tmpdir:
         svg_path = os.path.join(tmpdir, "guilloche_pattern.svg")
         wf.to_svg(svg_path)
+
+
+def test_rose_engine_config():
+    """Test RoseEngineConfig creation and presets"""
+    from turtles import RoseEngineConfig
+
+    # Test basic config
+    config = RoseEngineConfig(base_radius=20.0, amplitude=2.0)
+    assert config.base_radius == 20.0
+    assert config.amplitude == 2.0
+    assert config.resolution == 1000
+
+    # Test preset configs
+    config_huit = RoseEngineConfig.huit_eight(base_radius=20.0, amplitude=2.0)
+    assert config_huit.base_radius == 20.0
+
+    config_grain = RoseEngineConfig.grain_de_riz(base_radius=20.0, grain_size=1.0, amplitude=1.5)
+    assert config_grain.base_radius == 20.0
+
+    config_drap = RoseEngineConfig.draperie(base_radius=20.0, wave_frequency=6.0, amplitude=2.0)
+    assert config_drap.base_radius == 20.0
+
+    config_dia = RoseEngineConfig.diamant(base_radius=20.0, divisions=12, amplitude=1.5)
+    assert config_dia.base_radius == 20.0
+
+
+def test_rosette_pattern():
+    """Test RosettePattern creation"""
+    from turtles import RosettePattern
+
+    # Test different pattern types
+    circular = RosettePattern.circular()
+    assert circular is not None
+
+    sinusoidal = RosettePattern.sinusoidal(frequency=5.0)
+    assert sinusoidal is not None
+
+    multi_lobe = RosettePattern.multi_lobe(lobes=8)
+    assert multi_lobe is not None
+
+    huit_eight = RosettePattern.huit_eight(lobes=8)
+    assert huit_eight is not None
+
+    grain_de_riz = RosettePattern.grain_de_riz(grain_size=1.0, rows=12)
+    assert grain_de_riz is not None
+
+    draperie = RosettePattern.draperie(frequency=6.0, depth_frequency=12.0)
+    assert draperie is not None
+
+    diamant = RosettePattern.diamant(divisions=12)
+    assert diamant is not None
+
+
+def test_cutting_bit():
+    """Test CuttingBit creation"""
+    from turtles import CuttingBit
+
+    # Test different bit types
+    v_bit = CuttingBit.v_shaped(angle=30.0, width=0.5)
+    assert v_bit.width == 0.5
+    assert v_bit.depth > 0.0
+
+    flat_bit = CuttingBit.flat(width=1.0, depth=0.5)
+    assert flat_bit.width == 1.0
+    assert flat_bit.depth == 0.5
+
+    round_bit = CuttingBit.round(diameter=2.0)
+    assert round_bit.width == 2.0
+    assert round_bit.depth == 1.0
+
+
+def test_rose_engine_lathe():
+    """Test RoseEngineLathe creation and generation"""
+    from turtles import CuttingBit, RoseEngineConfig, RoseEngineLathe
+
+    config = RoseEngineConfig(base_radius=20.0, amplitude=2.0)
+    bit = CuttingBit.v_shaped(angle=30.0, width=0.5)
+    lathe = RoseEngineLathe(config, bit)
+
+    assert lathe is not None
+
+    # Generate the pattern
+    lathe.generate()
+
+
+def test_rose_engine_svg_export():
+    """Test rose engine SVG export"""
+    from turtles import CuttingBit, RoseEngineConfig, RoseEngineLathe
+
+    with tempfile.TemporaryDirectory() as tmpdir:
+        config = RoseEngineConfig.huit_eight(base_radius=20.0, amplitude=2.0)
+        bit = CuttingBit.v_shaped(angle=30.0, width=0.5)
+        lathe = RoseEngineLathe(config, bit)
+        lathe.generate()
+
+        svg_path = os.path.join(tmpdir, "rose_pattern.svg")
+        lathe.to_svg(svg_path)
+
+        assert os.path.exists(svg_path)
+        assert os.path.getsize(svg_path) > 0
+
+
+def test_rose_engine_patterns():
+    """Test all rose engine pattern presets"""
+    from turtles import CuttingBit, RoseEngineConfig, RoseEngineLathe
+
+    bit = CuttingBit.v_shaped(angle=30.0, width=0.5)
+
+    # Test each pattern preset
+    patterns = [
+        RoseEngineConfig.huit_eight(base_radius=20.0, amplitude=2.0),
+        RoseEngineConfig.grain_de_riz(base_radius=20.0, grain_size=1.0, amplitude=1.5),
+        RoseEngineConfig.draperie(base_radius=20.0, wave_frequency=6.0, amplitude=2.0),
+        RoseEngineConfig.diamant(base_radius=20.0, divisions=12, amplitude=1.5),
+    ]
+
+    for config in patterns:
+        lathe = RoseEngineLathe(config, bit)
+        lathe.generate()
+        assert lathe is not None
+
+
+def test_rose_engine_lathe_run():
+    """Test multi-pass rose engine lathe run"""
+    import os
+    import tempfile
+
+    from turtles import CuttingBit, RoseEngineConfig, RoseEngineLatheRun, RosettePattern
+
+    # Create a config
+    config = RoseEngineConfig(base_radius=20.0, amplitude=2.0)
+    config.set_rosette(RosettePattern.multi_lobe(12))
+
+    # Create cutting bit
+    bit = CuttingBit.v_shaped(angle=30.0, width=0.5)
+
+    # Test creation
+    run = RoseEngineLatheRun(config, bit, num_passes=8)
+    assert run is not None
+    assert run.num_passes == 8
+
+    # Test generation
+    run.generate()
+
+    # Test SVG export
+    with tempfile.NamedTemporaryFile(mode="w", suffix=".svg", delete=False) as f:
+        svg_path = f.name
+
+    try:
+        run.to_svg(svg_path)
+        assert os.path.exists(svg_path)
+        assert os.path.getsize(svg_path) > 0
+    finally:
+        if os.path.exists(svg_path):
+            os.unlink(svg_path)
+
+
+def test_rose_engine_lathe_run_patterns():
+    """Test multi-pass rose engine with different patterns"""
+    from turtles import CuttingBit, RoseEngineConfig, RoseEngineLatheRun, RosettePattern
+
+    bit = CuttingBit.v_shaped(angle=30.0, width=0.1)
+
+    # Test different rosette patterns
+    patterns = [
+        RosettePattern.huit_eight(lobes=8),
+        RosettePattern.grain_de_riz(grain_size=1.0, rows=12),
+        RosettePattern.draperie(frequency=6.0, depth_frequency=3.0),
+        RosettePattern.diamant(divisions=12),
+    ]
+
+    for pattern in patterns:
+        config = RoseEngineConfig(base_radius=20.0, amplitude=2.0)
+        config.set_rosette(pattern)
+
+        run = RoseEngineLatheRun(config, bit, num_passes=12)
+        run.generate()
+        assert run.num_passes == 12

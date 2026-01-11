@@ -1,4 +1,5 @@
 use crate::common::{ExportConfig, Point2D, SpirographError};
+use crate::diamant::{DiamantConfig, DiamantLayer};
 use crate::flinque::{FlinqueConfig, FlinqueLayer};
 use crate::guilloche::GuillochePattern;
 use crate::spirograph::{HorizontalSpirograph, SphericalSpirograph, VerticalSpirograph};
@@ -159,6 +160,23 @@ impl WatchFace {
             .add_flinque_at_clock(radius, config, hour, minute, distance)
     }
 
+    /// Add a diamant (diamond pattern) layer
+    pub fn add_diamant_layer(&mut self, diamant: DiamantLayer) {
+        self.guilloche.add_diamant_layer(diamant);
+    }
+
+    /// Add a diamant layer at a clock position
+    pub fn add_diamant_at_clock(
+        &mut self,
+        config: DiamantConfig,
+        hour: u32,
+        minute: u32,
+        distance: f64,
+    ) -> Result<(), SpirographError> {
+        self.guilloche
+            .add_diamant_at_clock(config, hour, minute, distance)
+    }
+
     /// Generate all layers
     pub fn generate(&mut self) {
         self.guilloche.generate();
@@ -249,6 +267,30 @@ impl WatchFace {
             }
         }
 
+        // Render diamant layers from guilloche
+        for circle_lines in self.get_diamant_lines() {
+            for circle_points in circle_lines {
+                if circle_points.is_empty() {
+                    continue;
+                }
+
+                let mut data = Data::new().move_to((circle_points[0].x, circle_points[0].y));
+                for point in circle_points.iter().skip(1) {
+                    data = data.line_to((point.x, point.y));
+                }
+
+                let path = Path::new()
+                    .set("fill", "none")
+                    .set("stroke", "#1a1a1a")
+                    .set("stroke-width", 0.03)
+                    .set("stroke-linecap", "round")
+                    .set("stroke-linejoin", "round")
+                    .set("d", data);
+
+                document = document.add(path);
+            }
+        }
+
         // Add outer bezel ring if configured
         if let Some(ref bezel) = self.bezel_config {
             let bezel_circle = Circle::new()
@@ -292,6 +334,10 @@ impl WatchFace {
 
     fn get_flinque_lines(&self) -> Vec<&Vec<Vec<Point2D>>> {
         self.guilloche.flinque_lines()
+    }
+
+    fn get_diamant_lines(&self) -> Vec<&Vec<Vec<Point2D>>> {
+        self.guilloche.diamant_lines()
     }
 }
 

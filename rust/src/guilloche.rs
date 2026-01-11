@@ -1,4 +1,5 @@
 use crate::common::{validate_radius, ExportConfig, Point2D, SpirographError};
+use crate::diamant::{DiamantConfig, DiamantLayer};
 use crate::flinque::{FlinqueConfig, FlinqueLayer};
 use crate::spirograph::{HorizontalSpirograph, SphericalSpirograph, VerticalSpirograph};
 
@@ -59,6 +60,7 @@ pub struct GuillochePattern {
     pub radius: f64,
     spirograph_layers: Vec<SpirographLayer>,
     flinque_layers: Vec<FlinqueLayer>,
+    diamant_layers: Vec<DiamantLayer>,
 }
 
 impl GuillochePattern {
@@ -70,6 +72,7 @@ impl GuillochePattern {
             radius,
             spirograph_layers: Vec::new(),
             flinque_layers: Vec::new(),
+            diamant_layers: Vec::new(),
         })
     }
 
@@ -131,6 +134,43 @@ impl GuillochePattern {
         Ok(())
     }
 
+    /// Add a diamant (diamond pattern) layer
+    pub fn add_diamant_layer(&mut self, diamant: DiamantLayer) {
+        self.diamant_layers.push(diamant);
+    }
+
+    /// Add a diamant layer positioned at a given angle and distance from center
+    /// angle is in radians, distance is in mm
+    pub fn add_diamant_at_polar(
+        &mut self,
+        config: DiamantConfig,
+        angle: f64,
+        distance: f64,
+    ) -> Result<(), SpirographError> {
+        let diamant = DiamantLayer::new_at_polar(config, angle, distance)?;
+        self.diamant_layers.push(diamant);
+        Ok(())
+    }
+
+    /// Add a diamant layer positioned at a clock position (like hour hand)
+    ///
+    /// # Arguments
+    /// * `config` - Diamant configuration
+    /// * `hour` - Hour position (1-12, where 12 is at top)
+    /// * `minute` - Minute position (0-59)
+    /// * `distance` - Distance from center of watch face
+    pub fn add_diamant_at_clock(
+        &mut self,
+        config: DiamantConfig,
+        hour: u32,
+        minute: u32,
+        distance: f64,
+    ) -> Result<(), SpirographError> {
+        let diamant = DiamantLayer::new_at_clock(config, hour, minute, distance)?;
+        self.diamant_layers.push(diamant);
+        Ok(())
+    }
+
     /// Generate all layers
     pub fn generate(&mut self) {
         for layer in &mut self.spirograph_layers {
@@ -139,11 +179,14 @@ impl GuillochePattern {
         for layer in &mut self.flinque_layers {
             layer.generate();
         }
+        for layer in &mut self.diamant_layers {
+            layer.generate();
+        }
     }
 
-    /// Get total layer count (spirographs + flinqué)
+    /// Get total layer count (spirographs + flinqué + diamant)
     pub fn layer_count(&self) -> usize {
-        self.spirograph_layers.len() + self.flinque_layers.len()
+        self.spirograph_layers.len() + self.flinque_layers.len() + self.diamant_layers.len()
     }
 
     /// Get all spirograph layer points (for rendering)
@@ -159,13 +202,21 @@ impl GuillochePattern {
         self.flinque_layers.iter().map(|f| f.lines()).collect()
     }
 
+    /// Get all diamant layer lines (for rendering)
+    pub fn diamant_lines(&self) -> Vec<&Vec<Vec<Point2D>>> {
+        self.diamant_layers.iter().map(|d| d.lines()).collect()
+    }
+
     /// Export all layers to separate files with the given base name
     pub fn export_all(
         &self,
         base_name: &str,
         config: &ExportConfig,
     ) -> Result<(), SpirographError> {
-        if self.spirograph_layers.is_empty() && self.flinque_layers.is_empty() {
+        if self.spirograph_layers.is_empty()
+            && self.flinque_layers.is_empty()
+            && self.diamant_layers.is_empty()
+        {
             return Err(SpirographError::ExportError(
                 "No layers to export. Add layers first.".to_string(),
             ));
@@ -255,6 +306,30 @@ impl GuillochePattern {
 
                 let mut data = Data::new().move_to((wave_points[0].x, wave_points[0].y));
                 for point in wave_points.iter().skip(1) {
+                    data = data.line_to((point.x, point.y));
+                }
+
+                let path = Path::new()
+                    .set("fill", "none")
+                    .set("stroke", "#1a1a1a")
+                    .set("stroke-width", 0.03)
+                    .set("stroke-linecap", "round")
+                    .set("stroke-linejoin", "round")
+                    .set("d", data);
+
+                document = document.add(path);
+            }
+        }
+
+        // Render diamant layers
+        for diamant_layer in &self.diamant_layers {
+            for circle_points in diamant_layer.lines() {
+                if circle_points.is_empty() {
+                    continue;
+                }
+
+                let mut data = Data::new().move_to((circle_points[0].x, circle_points[0].y));
+                for point in circle_points.iter().skip(1) {
                     data = data.line_to((point.x, point.y));
                 }
 

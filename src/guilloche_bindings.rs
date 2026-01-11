@@ -1,5 +1,7 @@
 use pyo3::prelude::*;
 use turtles::{
+    DiamantConfig as BaseDiamantConfig,
+    DiamantLayer as BaseDiamantLayer,
     GuillochePattern as BaseGuillochePattern,
     FlinqueConfig as BaseFlinqueConfig,
     FlinqueLayer as BaseFlinqueLayer,
@@ -9,6 +11,7 @@ use turtles::{
     ExportConfig as BaseExportConfig,
 };
 
+use crate::diamant_bindings::DiamantLayer;
 use crate::spirograph_bindings::{HorizontalSpirograph, VerticalSpirograph, SphericalSpirograph};
 
 /// Python wrapper for FlinqueLayer - a radial sunburst engine-turned pattern
@@ -283,6 +286,180 @@ impl GuillochePattern {
             inner_radius_ratio,
         };
         self.inner.add_flinque_at_clock(radius, config, hour, minute, distance)
+            .map_err(|e| pyo3::exceptions::PyValueError::new_err(e.to_string()))
+    }
+
+    /// Add a spirograph layer positioned at a given angle and distance from origin
+    ///
+    /// # Arguments
+    /// * `spiro_type` - Type of spirograph: "horizontal", "vertical", or "spherical"
+    /// * `outer_radius` - Outer circle radius
+    /// * `radius_ratio` - Inner/outer radius ratio
+    /// * `point_distance` - Drawing point distance
+    /// * `rotations` - Number of rotations
+    /// * `resolution` - Points per revolution
+    /// * `angle` - Angle in radians from positive x-axis
+    /// * `distance` - Distance from center
+    /// * `wave_amplitude` - Vertical wave amplitude (for vertical spirograph)
+    /// * `wave_frequency` - Vertical wave frequency (for vertical spirograph)
+    /// * `dome_height` - Height of dome (for spherical spirograph)
+    #[pyo3(signature = (spiro_type, outer_radius, radius_ratio, point_distance, rotations, resolution, angle, distance, wave_amplitude=1.0, wave_frequency=5.0, dome_height=5.0))]
+    fn add_layer_at_polar(
+        &mut self,
+        spiro_type: &str,
+        outer_radius: f64,
+        radius_ratio: f64,
+        point_distance: f64,
+        rotations: usize,
+        resolution: usize,
+        angle: f64,
+        distance: f64,
+        wave_amplitude: f64,
+        wave_frequency: f64,
+        dome_height: f64,
+    ) -> PyResult<()> {
+        match spiro_type.to_lowercase().as_str() {
+            "horizontal" => {
+                let spiro = BaseHorizontalSpirograph::new_at_polar(
+                    outer_radius, radius_ratio, point_distance, rotations, resolution, angle, distance
+                ).map_err(|e| pyo3::exceptions::PyValueError::new_err(e.to_string()))?;
+                self.inner.add_horizontal_layer(spiro);
+            }
+            "vertical" => {
+                let spiro = BaseVerticalSpirograph::new_at_polar(
+                    outer_radius, radius_ratio, point_distance, rotations, resolution, wave_amplitude, wave_frequency, angle, distance
+                ).map_err(|e| pyo3::exceptions::PyValueError::new_err(e.to_string()))?;
+                self.inner.add_vertical_layer(spiro);
+            }
+            "spherical" => {
+                let spiro = BaseSphericalSpirograph::new_at_polar(
+                    outer_radius, radius_ratio, point_distance, rotations, resolution, dome_height, angle, distance
+                ).map_err(|e| pyo3::exceptions::PyValueError::new_err(e.to_string()))?;
+                self.inner.add_spherical_layer(spiro);
+            }
+            _ => {
+                return Err(pyo3::exceptions::PyValueError::new_err(
+                    "spiro_type must be 'horizontal', 'vertical', or 'spherical'"
+                ));
+            }
+        }
+        Ok(())
+    }
+
+    /// Add a spirograph layer positioned at a clock position (like hour hand)
+    ///
+    /// # Arguments
+    /// * `spiro_type` - Type of spirograph: "horizontal", "vertical", or "spherical"
+    /// * `outer_radius` - Outer circle radius
+    /// * `radius_ratio` - Inner/outer radius ratio
+    /// * `point_distance` - Drawing point distance
+    /// * `rotations` - Number of rotations
+    /// * `resolution` - Points per revolution
+    /// * `hour` - Hour position (1-12, where 12 is at top)
+    /// * `minute` - Minute position (0-59)
+    /// * `distance` - Distance from center
+    /// * `wave_amplitude` - Vertical wave amplitude (for vertical spirograph)
+    /// * `wave_frequency` - Vertical wave frequency (for vertical spirograph)
+    /// * `dome_height` - Height of dome (for spherical spirograph)
+    #[pyo3(signature = (spiro_type, outer_radius, radius_ratio, point_distance, rotations, resolution, hour, minute, distance, wave_amplitude=1.0, wave_frequency=5.0, dome_height=5.0))]
+    fn add_layer_at_clock(
+        &mut self,
+        spiro_type: &str,
+        outer_radius: f64,
+        radius_ratio: f64,
+        point_distance: f64,
+        rotations: usize,
+        resolution: usize,
+        hour: u32,
+        minute: u32,
+        distance: f64,
+        wave_amplitude: f64,
+        wave_frequency: f64,
+        dome_height: f64,
+    ) -> PyResult<()> {
+        match spiro_type.to_lowercase().as_str() {
+            "horizontal" => {
+                let spiro = BaseHorizontalSpirograph::new_at_clock(
+                    outer_radius, radius_ratio, point_distance, rotations, resolution, hour, minute, distance
+                ).map_err(|e| pyo3::exceptions::PyValueError::new_err(e.to_string()))?;
+                self.inner.add_horizontal_layer(spiro);
+            }
+            "vertical" => {
+                let spiro = BaseVerticalSpirograph::new_at_clock(
+                    outer_radius, radius_ratio, point_distance, rotations, resolution, wave_amplitude, wave_frequency, hour, minute, distance
+                ).map_err(|e| pyo3::exceptions::PyValueError::new_err(e.to_string()))?;
+                self.inner.add_vertical_layer(spiro);
+            }
+            "spherical" => {
+                let spiro = BaseSphericalSpirograph::new_at_clock(
+                    outer_radius, radius_ratio, point_distance, rotations, resolution, dome_height, hour, minute, distance
+                ).map_err(|e| pyo3::exceptions::PyValueError::new_err(e.to_string()))?;
+                self.inner.add_spherical_layer(spiro);
+            }
+            _ => {
+                return Err(pyo3::exceptions::PyValueError::new_err(
+                    "spiro_type must be 'horizontal', 'vertical', or 'spherical'"
+                ));
+            }
+        }
+        Ok(())
+    }
+
+    /// Add a diamant (diamond pattern) layer to the pattern
+    fn add_diamant_layer(&mut self, diamant: &DiamantLayer) -> PyResult<()> {
+        let new_layer = BaseDiamantLayer::new_with_center(
+            diamant.inner.config.clone(),
+            diamant.inner.center_x,
+            diamant.inner.center_y,
+        ).map_err(|e| pyo3::exceptions::PyValueError::new_err(e.to_string()))?;
+        self.inner.add_diamant_layer(new_layer);
+        Ok(())
+    }
+
+    /// Add a diamant layer positioned at a given angle and distance from origin
+    #[pyo3(signature = (num_circles, circle_radius, angle, distance, resolution=360))]
+    fn add_diamant_at_polar(
+        &mut self,
+        num_circles: usize,
+        circle_radius: f64,
+        angle: f64,
+        distance: f64,
+        resolution: usize,
+    ) -> PyResult<()> {
+        let config = BaseDiamantConfig {
+            num_circles,
+            circle_radius,
+            resolution,
+        };
+        self.inner.add_diamant_at_polar(config, angle, distance)
+            .map_err(|e| pyo3::exceptions::PyValueError::new_err(e.to_string()))
+    }
+
+    /// Add a diamant layer positioned at a clock position (like hour hand)
+    ///
+    /// # Arguments
+    /// * `num_circles` - Number of circles to draw
+    /// * `circle_radius` - Radius of each individual circle
+    /// * `hour` - Hour position (1-12, where 12 is at top)
+    /// * `minute` - Minute position (0-59)
+    /// * `distance` - Distance from center of watch face to the subdial center
+    /// * `resolution` - Number of points per circle (default: 360)
+    #[pyo3(signature = (num_circles, circle_radius, hour, minute, distance, resolution=360))]
+    fn add_diamant_at_clock(
+        &mut self,
+        num_circles: usize,
+        circle_radius: f64,
+        hour: u32,
+        minute: u32,
+        distance: f64,
+        resolution: usize,
+    ) -> PyResult<()> {
+        let config = BaseDiamantConfig {
+            num_circles,
+            circle_radius,
+            resolution,
+        };
+        self.inner.add_diamant_at_clock(config, hour, minute, distance)
             .map_err(|e| pyo3::exceptions::PyValueError::new_err(e.to_string()))
     }
 
