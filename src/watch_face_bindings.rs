@@ -6,6 +6,8 @@ use turtles::{
     FlinqueConfig as BaseFlinqueConfig,
     FlinqueLayer as BaseFlinqueLayer,
     HorizontalSpirograph as BaseHorizontalSpirograph,
+    LimaconConfig as BaseLimaconConfig,
+    LimaconLayer as BaseLimaconLayer,
     SphericalSpirograph as BaseSphericalSpirograph,
     VerticalSpirograph as BaseVerticalSpirograph,
     WatchFace as BaseWatchFace,
@@ -13,6 +15,7 @@ use turtles::{
 
 use crate::diamant_bindings::DiamantLayer;
 use crate::guilloche_bindings::FlinqueLayer;
+use crate::limacon_bindings::LimaconLayer;
 use crate::spirograph_bindings::{HorizontalSpirograph, SphericalSpirograph, VerticalSpirograph};
 
 /// Python wrapper for WatchFace
@@ -240,6 +243,41 @@ impl WatchFace {
         };
         self.inner
             .add_diamant_at_clock(config, hour, minute, distance)
+            .map_err(|e| pyo3::exceptions::PyValueError::new_err(e.to_string()))
+    }
+
+    /// Add a limaçon pattern layer
+    fn add_limacon_layer(&mut self, limacon: &LimaconLayer) -> PyResult<()> {
+        let new_layer = BaseLimaconLayer::new_with_center(
+            limacon.inner.config.clone(),
+            limacon.inner.center_x,
+            limacon.inner.center_y,
+        )
+        .map_err(|e| pyo3::exceptions::PyValueError::new_err(e.to_string()))?;
+        self.inner.add_limacon_layer(new_layer);
+        Ok(())
+    }
+
+    /// Add a limaçon layer positioned at a clock position
+    #[pyo3(signature = (num_curves, base_radius, amplitude, hour, minute, distance, resolution=360))]
+    fn add_limacon_at_clock(
+        &mut self,
+        num_curves: usize,
+        base_radius: f64,
+        amplitude: f64,
+        hour: u32,
+        minute: u32,
+        distance: f64,
+        resolution: usize,
+    ) -> PyResult<()> {
+        let config = BaseLimaconConfig {
+            num_curves,
+            base_radius,
+            amplitude,
+            resolution,
+        };
+        self.inner
+            .add_limacon_at_clock(config, hour, minute, distance)
             .map_err(|e| pyo3::exceptions::PyValueError::new_err(e.to_string()))
     }
 

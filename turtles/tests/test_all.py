@@ -344,3 +344,71 @@ def test_rose_engine_lathe_run_patterns():
         run = RoseEngineLatheRun(config, bit, num_passes=12)
         run.generate()
         assert run.num_passes == 12
+
+
+def test_limacon_layer():
+    """Test LimaconLayer creation and generation"""
+    from turtles import LimaconLayer
+
+    # Create a limaçon layer
+    layer = LimaconLayer(num_curves=24, base_radius=20.0, amplitude=20.0, resolution=360)
+    assert layer is not None
+    assert layer.num_curves == 24
+    assert layer.base_radius == 20.0
+    assert layer.amplitude == 20.0
+
+    # Generate the pattern
+    layer.generate()
+
+    # Get the lines
+    lines = layer.get_lines()
+    assert len(lines) == 24
+    assert len(lines[0]) == 361  # resolution + 1 for closed curve
+
+
+def test_limacon_matches_rose_engine():
+    """Test that LimaconLayer produces identical output to RoseEngineLatheRun with sinusoidal frequency=1"""
+    from turtles import CuttingBit, LimaconLayer, RoseEngineConfig, RoseEngineLatheRun, RosettePattern
+
+    # Parameters for comparison
+    num_curves = 12
+    base_radius = 20.0
+    amplitude = 20.0
+    resolution = 360
+
+    # Create LimaconLayer
+    limacon = LimaconLayer(
+        num_curves=num_curves,
+        base_radius=base_radius,
+        amplitude=amplitude,
+        resolution=resolution,
+    )
+    limacon.generate()
+
+    # Create equivalent RoseEngineLatheRun with sinusoidal frequency=1
+    config = RoseEngineConfig(base_radius=base_radius, amplitude=amplitude)
+    config.set_rosette(RosettePattern.sinusoidal(frequency=1.0))
+    config.set_resolution(resolution)
+
+    bit = CuttingBit.v_shaped(angle=30.0, width=0.02)
+    # segments_per_pass=1 means complete shapes without gaps
+    rose_run = RoseEngineLatheRun(config, bit, num_passes=num_curves, segments_per_pass=1)
+    rose_run.generate()
+
+    # Get lines from both
+    limacon_lines = limacon.get_lines()
+    rose_lines = rose_run.get_lines()
+
+    # Both should have the same number of curves
+    assert len(limacon_lines) == len(rose_lines), f"LimaconLayer has {len(limacon_lines)} curves, RoseEngineLatheRun has {len(rose_lines)} curves"
+
+    # Each curve should have the same number of points
+    for i, (lim_curve, rose_curve) in enumerate(zip(limacon_lines, rose_lines)):
+        assert len(lim_curve) == len(rose_curve), (
+            f"Curve {i}: LimaconLayer has {len(lim_curve)} points, RoseEngineLatheRun has {len(rose_curve)} points"
+        )
+
+        # Compare all points - they should be identical (within floating point tolerance)
+        for j, (lim_pt, rose_pt) in enumerate(zip(lim_curve, rose_curve)):
+            dist = ((lim_pt[0] - rose_pt[0]) ** 2 + (lim_pt[1] - rose_pt[1]) ** 2) ** 0.5
+            assert dist < 1e-10, f"Point {i},{j} differs: limacon=({lim_pt[0]}, {lim_pt[1]}), rose=({rose_pt[0]}, {rose_pt[1]}), dist={dist}"

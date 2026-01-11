@@ -128,6 +128,10 @@ impl RoseEngineLatheRun {
     /// This creates multiple lathe passes, each rotated by an equal angular increment.
     /// Each pass is segmented into multiple arcs with gaps to create the characteristic
     /// guilloché mesh appearance.
+    ///
+    /// For patterns like diamant (sinusoidal with frequency=1), rotating the phase
+    /// rotates the entire circle around the center, creating the overlapping circles
+    /// pattern. For multi-lobe patterns, rotating the phase rotates the pattern itself.
     pub fn generate(&mut self) {
         self.passes.clear();
         self.segmented_lines.clear();
@@ -137,10 +141,12 @@ impl RoseEngineLatheRun {
         for i in 0..self.num_passes {
             let rotation = (i as f64) * rotation_step;
 
-            // Create a config for this pass with rotated start/end angles
+            // Create a config for this pass with rotated phase
+            // Rotating the phase (not start/end angles) rotates the entire pattern
+            // around the center. For a sinusoidal pattern with frequency=1, this
+            // rotates the offset circle around the origin, creating the diamant pattern.
             let mut pass_config = self.base_config.clone();
-            pass_config.start_angle = rotation;
-            pass_config.end_angle = rotation + 2.0 * PI;
+            pass_config.phase = self.base_config.phase + rotation;
 
             // Create and generate the lathe for this pass
             if let Ok(mut lathe) = RoseEngineLathe::new_with_center(
@@ -170,6 +176,12 @@ impl RoseEngineLatheRun {
     /// Segment a complete circular path into multiple arcs with gaps
     fn segment_path(&mut self, path: &[Point2D]) {
         if path.is_empty() || self.segments_per_pass == 0 {
+            return;
+        }
+
+        // Special case: segments_per_pass=1 means draw the complete path without gaps
+        if self.segments_per_pass == 1 {
+            self.segmented_lines.push(path.to_vec());
             return;
         }
 
@@ -270,5 +282,10 @@ impl RoseEngineLatheRun {
     /// Get reference to individual passes
     pub fn passes(&self) -> &[RoseEngineLathe] {
         &self.passes
+    }
+
+    /// Get reference to the segmented lines (the generated pattern curves)
+    pub fn lines(&self) -> &Vec<Vec<Point2D>> {
+        &self.segmented_lines
     }
 }

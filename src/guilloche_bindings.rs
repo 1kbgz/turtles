@@ -5,6 +5,8 @@ use turtles::{
     GuillochePattern as BaseGuillochePattern,
     FlinqueConfig as BaseFlinqueConfig,
     FlinqueLayer as BaseFlinqueLayer,
+    LimaconConfig as BaseLimaconConfig,
+    LimaconLayer as BaseLimaconLayer,
     HorizontalSpirograph as BaseHorizontalSpirograph,
     VerticalSpirograph as BaseVerticalSpirograph,
     SphericalSpirograph as BaseSphericalSpirograph,
@@ -12,6 +14,7 @@ use turtles::{
 };
 
 use crate::diamant_bindings::DiamantLayer;
+use crate::limacon_bindings::LimaconLayer;
 use crate::spirograph_bindings::{HorizontalSpirograph, VerticalSpirograph, SphericalSpirograph};
 
 /// Python wrapper for FlinqueLayer - a radial sunburst engine-turned pattern
@@ -460,6 +463,60 @@ impl GuillochePattern {
             resolution,
         };
         self.inner.add_diamant_at_clock(config, hour, minute, distance)
+            .map_err(|e| pyo3::exceptions::PyValueError::new_err(e.to_string()))
+    }
+
+    /// Add a limacon (limaçon pattern) layer to the pattern
+    fn add_limacon_layer(&mut self, limacon: &LimaconLayer) -> PyResult<()> {
+        let new_layer = BaseLimaconLayer::new_with_center(
+            limacon.inner.config.clone(),
+            limacon.inner.center_x,
+            limacon.inner.center_y,
+        ).map_err(|e| pyo3::exceptions::PyValueError::new_err(e.to_string()))?;
+        self.inner.add_limacon_layer(new_layer);
+        Ok(())
+    }
+
+    /// Add a limacon layer positioned at a given angle and distance from origin
+    #[pyo3(signature = (num_curves, base_radius, amplitude, angle, distance, resolution=360))]
+    fn add_limacon_at_polar(
+        &mut self,
+        num_curves: usize,
+        base_radius: f64,
+        amplitude: f64,
+        angle: f64,
+        distance: f64,
+        resolution: usize,
+    ) -> PyResult<()> {
+        let config = BaseLimaconConfig {
+            num_curves,
+            base_radius,
+            amplitude,
+            resolution,
+        };
+        self.inner.add_limacon_at_polar(config, angle, distance)
+            .map_err(|e| pyo3::exceptions::PyValueError::new_err(e.to_string()))
+    }
+
+    /// Add a limacon layer positioned at a clock position (like hour hand)
+    #[pyo3(signature = (num_curves, base_radius, amplitude, hour, minute, distance, resolution=360))]
+    fn add_limacon_at_clock(
+        &mut self,
+        num_curves: usize,
+        base_radius: f64,
+        amplitude: f64,
+        hour: u32,
+        minute: u32,
+        distance: f64,
+        resolution: usize,
+    ) -> PyResult<()> {
+        let config = BaseLimaconConfig {
+            num_curves,
+            base_radius,
+            amplitude,
+            resolution,
+        };
+        self.inner.add_limacon_at_clock(config, hour, minute, distance)
             .map_err(|e| pyo3::exceptions::PyValueError::new_err(e.to_string()))
     }
 

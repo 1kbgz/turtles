@@ -6,6 +6,8 @@ pub mod diamant;
 pub mod flinque;
 // Spirograph and guilloche pattern generation modules
 pub mod guilloche;
+// Limaçon pattern generation
+pub mod limacon;
 pub mod spirograph;
 // Rose engine lathe module
 pub mod rose_engine;
@@ -20,6 +22,7 @@ pub use common::{
 pub use diamant::{DiamantConfig, DiamantLayer};
 pub use flinque::{FlinqueConfig, FlinqueLayer};
 pub use guilloche::GuillochePattern;
+pub use limacon::{LimaconConfig, LimaconLayer};
 pub use rose_engine::{
     Arc, BitShape, CuttingBit, RenderedOutput, RoseEngineConfig, RoseEngineLathe,
     RoseEngineLatheRun, RosettePattern, ToolPathOutput,
