@@ -47,6 +47,11 @@ pub enum RosettePattern {
     },
 
     /// Draperie (Drapery) - flowing fabric/wave pattern
+    /// Creates overlapping undulating circular curves resembling draped fabric.
+    /// Uses additive combination of two sinusoidal waves at different frequencies
+    /// to produce interference patterns. When used with RoseEngineLatheRun for
+    /// multi-pass generation, the phase-rotated passes create the characteristic
+    /// wavey circular guilloché pattern seen in fine watchmaking.
     Draperie {
         /// Wave frequency (number of waves)
         frequency: f64,
@@ -137,10 +142,15 @@ impl RosettePattern {
                 depth_frequency,
             } => {
                 // Drapery pattern: flowing waves with depth modulation
-                // Primary wave with secondary depth modulation
-                let wave = (angle * frequency).sin();
-                let depth = (angle * depth_frequency).cos();
-                wave * (0.5 + 0.5 * depth)
+                // Primary wave creates the undulating circle shape
+                // Secondary depth modulation adds the "gathered fabric" depth variation
+                // Together with multi-pass rotation in RoseEngineLatheRun,
+                // this creates overlapping wavy circles resembling draped fabric
+                let primary = (angle * frequency).sin();
+                let secondary = (angle * depth_frequency).sin();
+                // Combine both waves additively for richer undulation
+                // The two frequencies create interference patterns that look like fabric folds
+                0.6 * primary + 0.4 * secondary
             }
 
             RosettePattern::Diamant { divisions } => {
@@ -249,6 +259,108 @@ mod tests {
         let d_half = pattern.displacement(PI / 2.0);
         assert!((d_half - 1.0).abs() < 0.1);
     }
+
+    #[test]
+    fn test_draperie_pattern_range() {
+        // Verify displacement values stay within [-1.0, 1.0] for various angles
+        let pattern = RosettePattern::Draperie {
+            frequency: 6.0,
+            depth_frequency: 12.0,
+        };
+        
+        // Test various angles
+        for i in 0..100 {
+            let angle = (i as f64) * 2.0 * PI / 100.0;
+            let displacement = pattern.displacement(angle);
+            assert!(
+                displacement >= -1.0 && displacement <= 1.0,
+                "Displacement {} at angle {} is out of range [-1.0, 1.0]",
+                displacement,
+                angle
+            );
+        }
+    }
+
+    #[test]
+    fn test_draperie_pattern_not_constant() {
+        // Verify the pattern is not flat (produces varying displacement across angles)
+        let pattern = RosettePattern::Draperie {
+            frequency: 6.0,
+            depth_frequency: 12.0,
+        };
+        
+        let d0 = pattern.displacement(0.0);
+        let mut found_different = false;
+        
+        for i in 1..100 {
+            let angle = (i as f64) * 2.0 * PI / 100.0;
+            let displacement = pattern.displacement(angle);
+            if (displacement - d0).abs() > 0.01 {
+                found_different = true;
+                break;
+            }
+        }
+        
+        assert!(found_different, "Pattern should vary across different angles");
+    }
+
+    #[test]
+    fn test_draperie_pattern_symmetry() {
+        // Verify the additive wave formula properties
+        let pattern = RosettePattern::Draperie {
+            frequency: 6.0,
+            depth_frequency: 12.0,
+        };
+        
+        // At angle=0, both sin terms are 0, so displacement should be 0
+        let d0 = pattern.displacement(0.0);
+        assert!(
+            d0.abs() < 0.0001,
+            "At angle 0, displacement should be ~0, got {}",
+            d0
+        );
+        
+        // Verify additive formula: 0.6 * sin(6*angle) + 0.4 * sin(12*angle)
+        let angle = PI / 6.0;
+        let expected = 0.6 * (6.0 * angle).sin() + 0.4 * (12.0 * angle).sin();
+        let actual = pattern.displacement(angle);
+        assert!(
+            (actual - expected).abs() < 0.0001,
+            "Expected {}, got {}",
+            expected,
+            actual
+        );
+    }
+
+    #[test]
+    fn test_draperie_pattern_frequency_effect() {
+        // Verify that different frequency values produce different displacement curves
+        let pattern1 = RosettePattern::Draperie {
+            frequency: 6.0,
+            depth_frequency: 12.0,
+        };
+        let pattern2 = RosettePattern::Draperie {
+            frequency: 3.0,
+            depth_frequency: 6.0,
+        };
+        
+        let mut found_different = false;
+        for i in 1..50 {
+            let angle = (i as f64) * 2.0 * PI / 50.0;
+            let d1 = pattern1.displacement(angle);
+            let d2 = pattern2.displacement(angle);
+            if (d1 - d2).abs() > 0.01 {
+                found_different = true;
+                break;
+            }
+        }
+        
+        assert!(
+            found_different,
+            "Different frequencies should produce different displacement patterns"
+        );
+    }
+
 
     #[test]
     fn test_default_pattern() {

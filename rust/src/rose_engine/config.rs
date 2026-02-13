@@ -225,7 +225,9 @@ impl RoseEngineConfig {
     }
 
     /// Draperie (Drapery) pattern preset
-    /// Creates flowing wave-like folds resembling fabric
+    /// Creates flowing wave-like folds resembling fabric through overlapping
+    /// undulating circles. Best used with RoseEngineLatheRun with 16-24 passes
+    /// and segments_per_pass=1 for the classic draperie guilloché appearance.
     pub fn draperie(base_radius: f64, wave_frequency: f64, amplitude: f64) -> Self {
         let mut config = RoseEngineConfig::new(base_radius, amplitude);
         config.rosette = RosettePattern::Draperie {
@@ -320,5 +322,28 @@ mod tests {
         let config = RoseEngineConfig::compound(20.0, 8, 2.0, 3.0, 1.0);
         assert!(config.secondary_rosette.is_some());
         assert_eq!(config.secondary_amplitude, 1.0);
+    }
+
+    #[test]
+    fn test_preset_draperie() {
+        // Verify that RoseEngineConfig::draperie() creates correct config
+        let wave_frequency = 6.0;
+        let config = RoseEngineConfig::draperie(20.0, wave_frequency, 2.0);
+        
+        assert_eq!(config.base_radius, 20.0);
+        assert_eq!(config.amplitude, 2.0);
+        assert_eq!(config.resolution, 1500);
+        
+        // Verify it's a Draperie pattern with correct frequencies
+        match config.rosette {
+            RosettePattern::Draperie {
+                frequency,
+                depth_frequency,
+            } => {
+                assert_eq!(frequency, wave_frequency);
+                assert_eq!(depth_frequency, wave_frequency * 2.0);
+            }
+            _ => panic!("Should be Draperie pattern"),
+        }
     }
 }
