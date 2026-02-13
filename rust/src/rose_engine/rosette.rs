@@ -146,11 +146,11 @@ impl RosettePattern {
                 // Secondary depth modulation adds the "gathered fabric" depth variation
                 // Together with multi-pass rotation in RoseEngineLatheRun,
                 // this creates overlapping wavy circles resembling draped fabric
-                let primary = (angle * frequency).sin();
-                let secondary = (angle * depth_frequency).sin();
+                let primary_wave = (angle * frequency).sin();
+                let depth_wave = (angle * depth_frequency).sin();
                 // Combine both waves additively for richer undulation
                 // The two frequencies create interference patterns that look like fabric folds
-                0.6 * primary + 0.4 * secondary
+                0.6 * primary_wave + 0.4 * depth_wave
             }
 
             RosettePattern::Diamant { divisions } => {

@@ -481,10 +481,13 @@ def test_draperie_multi_pass_creates_wavey_circles():
         curve2 = lines[1]
 
         # Calculate distance between corresponding points
+        # Minimum meaningful difference threshold: points should differ by at least 0.01mm
+        # on average to indicate phase rotation is creating distinct curves
+        MIN_CURVE_DIFFERENCE = 0.01
         total_diff = 0.0
         for pt1, pt2 in zip(curve1[:10], curve2[:10]):  # Check first 10 points
             dist = ((pt1[0] - pt2[0]) ** 2 + (pt1[1] - pt2[1]) ** 2) ** 0.5
             total_diff += dist
 
         avg_diff = total_diff / 10.0
-        assert avg_diff > 0.01, "Different passes should create different curves due to phase rotation"
+        assert avg_diff > MIN_CURVE_DIFFERENCE, "Different passes should create different curves due to phase rotation"
