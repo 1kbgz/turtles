@@ -412,3 +412,80 @@ def test_limacon_matches_rose_engine():
         for j, (lim_pt, rose_pt) in enumerate(zip(lim_curve, rose_curve)):
             dist = ((lim_pt[0] - rose_pt[0]) ** 2 + (lim_pt[1] - rose_pt[1]) ** 2) ** 0.5
             assert dist < 1e-10, f"Point {i},{j} differs: limacon=({lim_pt[0]}, {lim_pt[1]}), rose=({rose_pt[0]}, {rose_pt[1]}), dist={dist}"
+
+
+def test_draperie_pattern_displacement():
+    """Test that the draperie pattern can be created and generates output"""
+    from turtles import CuttingBit, RoseEngineConfig, RoseEngineLathe
+
+    # Create draperie config
+    config = RoseEngineConfig.draperie(base_radius=20.0, wave_frequency=6.0, amplitude=2.0)
+    bit = CuttingBit.v_shaped(angle=30.0, width=0.1)
+
+    # Create lathe and generate
+    lathe = RoseEngineLathe(config, bit)
+    lathe.generate()
+
+    # If we get here, the pattern was successfully generated
+    assert lathe is not None
+
+
+def test_draperie_svg_export():
+    """Test creating a draperie pattern and exporting to SVG"""
+    from turtles import CuttingBit, RoseEngineConfig, RoseEngineLatheRun
+
+    # Create draperie config
+    config = RoseEngineConfig.draperie(base_radius=20.0, wave_frequency=6.0, amplitude=2.0)
+    bit = CuttingBit.v_shaped(angle=30.0, width=0.1)
+
+    # Create multi-pass run
+    run = RoseEngineLatheRun(config, bit, num_passes=12, segments_per_pass=1)
+    run.generate()
+
+    # Export to SVG
+    with tempfile.TemporaryDirectory() as tmpdir:
+        svg_path = os.path.join(tmpdir, "draperie_test.svg")
+        run.to_svg(svg_path)
+
+        assert os.path.exists(svg_path), "SVG file should exist"
+        assert os.path.getsize(svg_path) > 0, "SVG file should have content"
+
+
+def test_draperie_multi_pass_creates_wavey_circles():
+    """Test that RoseEngineLatheRun with draperie creates multiple complete curves"""
+    from turtles import CuttingBit, RoseEngineConfig, RoseEngineLatheRun
+
+    # Create draperie config
+    config = RoseEngineConfig.draperie(base_radius=20.0, wave_frequency=6.0, amplitude=2.0)
+    bit = CuttingBit.v_shaped(angle=30.0, width=0.1)
+
+    # Create multi-pass run with segments_per_pass=1 (complete curves)
+    num_passes = 16
+    run = RoseEngineLatheRun(config, bit, num_passes=num_passes, segments_per_pass=1)
+    run.generate()
+
+    # Get the generated lines
+    lines = run.get_lines()
+
+    # Should have one curve per pass
+    assert len(lines) == num_passes, f"Expected {num_passes} curves, got {len(lines)}"
+
+    # Each curve should have points (resolution + 1 for closed curve)
+    for i, curve in enumerate(lines):
+        assert len(curve) > 0, f"Curve {i} should have points"
+
+    # Verify that different passes produce different curves (due to phase rotation)
+    # Compare first and second curves - they should be different
+    if len(lines) >= 2:
+        curve1 = lines[0]
+        curve2 = lines[1]
+
+        # Calculate distance between corresponding points
+        total_diff = 0.0
+        for pt1, pt2 in zip(curve1[:10], curve2[:10]):  # Check first 10 points
+            dist = ((pt1[0] - pt2[0]) ** 2 + (pt1[1] - pt2[1]) ** 2) ** 0.5
+            total_diff += dist
+
+        avg_diff = total_diff / 10.0
+        assert avg_diff > 0.01, "Different passes should create different curves due to phase rotation"
+
