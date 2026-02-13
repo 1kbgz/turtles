@@ -488,4 +488,3 @@ def test_draperie_multi_pass_creates_wavey_circles():
 
         avg_diff = total_diff / 10.0
         assert avg_diff > 0.01, "Different passes should create different curves due to phase rotation"
-

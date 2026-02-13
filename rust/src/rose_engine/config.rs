@@ -329,11 +329,11 @@ mod tests {
         // Verify that RoseEngineConfig::draperie() creates correct config
         let wave_frequency = 6.0;
         let config = RoseEngineConfig::draperie(20.0, wave_frequency, 2.0);
-        
+
         assert_eq!(config.base_radius, 20.0);
         assert_eq!(config.amplitude, 2.0);
         assert_eq!(config.resolution, 1500);
-        
+
         // Verify it's a Draperie pattern with correct frequencies
         match config.rosette {
             RosettePattern::Draperie {

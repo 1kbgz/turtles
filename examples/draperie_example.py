@@ -8,6 +8,7 @@ undulating circular curves - a classic guilloché motif in fine watchmaking.
 Usage:
     python examples/draperie_example.py
 """
+
 import os
 
 from turtles import CuttingBit, RoseEngineConfig, RoseEngineLatheRun

@@ -267,7 +267,7 @@ mod tests {
             frequency: 6.0,
             depth_frequency: 12.0,
         };
-        
+
         // Test various angles
         for i in 0..100 {
             let angle = (i as f64) * 2.0 * PI / 100.0;
@@ -288,10 +288,10 @@ mod tests {
             frequency: 6.0,
             depth_frequency: 12.0,
         };
-        
+
         let d0 = pattern.displacement(0.0);
         let mut found_different = false;
-        
+
         for i in 1..100 {
             let angle = (i as f64) * 2.0 * PI / 100.0;
             let displacement = pattern.displacement(angle);
@@ -300,8 +300,11 @@ mod tests {
                 break;
             }
         }
-        
-        assert!(found_different, "Pattern should vary across different angles");
+
+        assert!(
+            found_different,
+            "Pattern should vary across different angles"
+        );
     }
 
     #[test]
@@ -311,7 +314,7 @@ mod tests {
             frequency: 6.0,
             depth_frequency: 12.0,
         };
-        
+
         // At angle=0, both sin terms are 0, so displacement should be 0
         let d0 = pattern.displacement(0.0);
         assert!(
@@ -319,7 +322,7 @@ mod tests {
             "At angle 0, displacement should be ~0, got {}",
             d0
         );
-        
+
         // Verify additive formula: 0.6 * sin(6*angle) + 0.4 * sin(12*angle)
         let angle = PI / 6.0;
         let expected = 0.6 * (6.0 * angle).sin() + 0.4 * (12.0 * angle).sin();
@@ -343,7 +346,7 @@ mod tests {
             frequency: 3.0,
             depth_frequency: 6.0,
         };
-        
+
         let mut found_different = false;
         for i in 1..50 {
             let angle = (i as f64) * 2.0 * PI / 50.0;
@@ -354,13 +357,12 @@ mod tests {
                 break;
             }
         }
-        
+
         assert!(
             found_different,
             "Different frequencies should produce different displacement patterns"
         );
     }
-
 
     #[test]
     fn test_default_pattern() {
