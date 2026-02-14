@@ -6,15 +6,10 @@ requires = [
 build-backend="hatchling.build"
 
 [project]
-<<<<<<< before updating
 name = "pyturtles"
-authors = [{name = "the turtles authors", email = "dev@1kbgz.com"}]
-=======
-name = "turtles"
 authors = [
     {name = "the turtles authors", email = "dev@1kbgz.com"},
 ]
->>>>>>> after updating
 description = "turtles turtles turtles turtles turtles turtles turtles turtles turtles turtles turtles turtles turtles turtles turtles turtles"
 readme = "README.md"
 license = { text = "Apache-2.0" }
