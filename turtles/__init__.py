@@ -4,6 +4,7 @@ __version__ = "0.1.0"
 from .turtles import (
     CuttingBit,
     DiamantLayer,
+    DraperieLayer,
     FlinqueLayer,
     LimaconLayer,
     RoseEngineConfig,
@@ -21,6 +22,7 @@ __all__ = (
     "CuttingBit",
     "RosettePattern",
     "DiamantLayer",
+    "DraperieLayer",
     "FlinqueLayer",
     "LimaconLayer",
 )
@@ -223,12 +225,116 @@ class WatchFace:
             resolution=resolution,
         )
 
+    def add_draperie(
+        self,
+        num_rings: int = 96,
+        base_radius: float = 22.0,
+        radius_step: float = 0.44,
+        wave_frequency: float = 12.0,
+        phase_shift: float = None,
+        phase_oscillations: float = 2.5,
+        hour: int = 12,
+        minute: int = 0,
+        distance: float = 0.0,
+        resolution: int = 1500,
+        phase_exponent: int = 3,
+        wave_exponent: int = 1,
+        circular_phase: float = 2.0,
+    ):
+        """Add a draperie (drapery) guilloché pattern.
+
+        The draperie pattern creates flowing, fabric-like folds through concentric
+        wavy rings whose phase oscillates sinusoidally from the innermost to the
+        outermost ring. Amplitude is automatically computed so that adjacent rings
+        never overlap.
+
+        Args:
+            num_rings: Number of concentric rings (more = denser).
+            base_radius: Centre of the ring band in mm.
+            radius_step: Radial spacing between ring centres.
+            wave_frequency: Number of wave undulations per revolution.
+            phase_shift: Peak angular oscillation in radians (default: π/12 ≈ 15°).
+            phase_oscillations: Number of full sinusoidal phase cycles.
+            hour: Hour position for center (1-12, default 12 = centered).
+            minute: Minute position for center (0-59).
+            distance: Distance from center (0 = centered on watch face).
+            resolution: Number of points per ring.
+            phase_exponent: Exponent for sin-power phase (only when circular_phase=0).
+            wave_exponent: Exponent for the wave shape (1 = sinusoidal, 3 = softer crests).
+            circular_phase: Dome-shaped phase exponent; 0 disables, 2.0 = rounded folds (default).
+        """
+        self._watch_face.add_draperie_at_clock(
+            hour=hour,
+            minute=minute,
+            distance=distance,
+            num_rings=num_rings,
+            base_radius=base_radius,
+            radius_step=radius_step,
+            wave_frequency=wave_frequency,
+            phase_shift=phase_shift,
+            phase_oscillations=phase_oscillations,
+            resolution=resolution,
+            phase_exponent=phase_exponent,
+            wave_exponent=wave_exponent,
+            circular_phase=circular_phase,
+        )
+
+    def add_draperie_sharp(
+        self,
+        num_rings: int = 96,
+        base_radius: float = 22.0,
+        radius_step: float = 0.44,
+        wave_frequency: float = 12.0,
+        phase_shift: float = None,
+        phase_oscillations: float = 2.5,
+        hour: int = 12,
+        minute: int = 0,
+        distance: float = 0.0,
+        resolution: int = 1500,
+        wave_exponent: int = 1,
+    ):
+        """Add a sharp-angled draperie guilloché pattern.
+
+        Identical to ``add_draperie`` but disables circular phase and uses
+        phase_exponent=1 for sharp V-shaped fold lines.
+
+        Args:
+            num_rings: Number of concentric rings (more = denser).
+            base_radius: Centre of the ring band in mm.
+            radius_step: Radial spacing between ring centres.
+            wave_frequency: Number of wave undulations per revolution.
+            phase_shift: Peak angular oscillation in radians (default: π/12 ≈ 15°).
+            phase_oscillations: Number of full sinusoidal phase cycles.
+            hour: Hour position for center (1-12, default 12 = centered).
+            minute: Minute position for center (0-59).
+            distance: Distance from center (0 = centered on watch face).
+            resolution: Number of points per ring.
+            wave_exponent: Exponent for the wave shape (1 = sinusoidal, 3 = softer crests).
+        """
+        self.add_draperie(
+            num_rings=num_rings,
+            base_radius=base_radius,
+            radius_step=radius_step,
+            wave_frequency=wave_frequency,
+            phase_shift=phase_shift,
+            phase_oscillations=phase_oscillations,
+            hour=hour,
+            minute=minute,
+            distance=distance,
+            resolution=resolution,
+            phase_exponent=1,
+            wave_exponent=wave_exponent,
+            circular_phase=0.0,
+        )
+
     def add(self, layer):
-        """Add a spirograph, flinque, diamant, or limacon layer."""
+        """Add a spirograph, flinque, diamant, draperie, or limacon layer."""
         if isinstance(layer, FlinqueLayer):
             self._watch_face.add_flinque_layer(layer)
         elif isinstance(layer, DiamantLayer):
             self._watch_face.add_diamant_layer(layer)
+        elif isinstance(layer, DraperieLayer):
+            self._watch_face.add_draperie_layer(layer)
         elif isinstance(layer, LimaconLayer):
             self._watch_face.add_limacon_layer(layer)
         else:
