@@ -416,78 +416,180 @@ def test_limacon_matches_rose_engine():
 
 def test_draperie_pattern_displacement():
     """Test that the draperie pattern can be created and generates output"""
-    from turtles import CuttingBit, RoseEngineConfig, RoseEngineLathe
+    from turtles import DraperieLayer
 
-    # Create draperie config
-    config = RoseEngineConfig.draperie(base_radius=20.0, wave_frequency=6.0, amplitude=2.0)
-    bit = CuttingBit.v_shaped(angle=30.0, width=0.1)
-
-    # Create lathe and generate
-    lathe = RoseEngineLathe(config, bit)
-    lathe.generate()
-
-    # If we get here, the pattern was successfully generated
-    assert lathe is not None
+    layer = DraperieLayer()
+    layer.generate()
+    assert layer.num_rings == 96
+    assert layer.base_radius == 22.0
 
 
 def test_draperie_svg_export():
     """Test creating a draperie pattern and exporting to SVG"""
-    from turtles import CuttingBit, RoseEngineConfig, RoseEngineLatheRun
+    from turtles import DraperieLayer
 
-    # Create draperie config
-    config = RoseEngineConfig.draperie(base_radius=20.0, wave_frequency=6.0, amplitude=2.0)
-    bit = CuttingBit.v_shaped(angle=30.0, width=0.1)
+    layer = DraperieLayer(num_rings=30, base_radius=15.0, resolution=200)
+    layer.generate()
 
-    # Create multi-pass run
-    run = RoseEngineLatheRun(config, bit, num_passes=12, segments_per_pass=1)
-    run.generate()
-
-    # Export to SVG
     with tempfile.TemporaryDirectory() as tmpdir:
         svg_path = os.path.join(tmpdir, "draperie_test.svg")
-        run.to_svg(svg_path)
+        layer.to_svg(svg_path)
 
         assert os.path.exists(svg_path), "SVG file should exist"
         assert os.path.getsize(svg_path) > 0, "SVG file should have content"
 
 
 def test_draperie_multi_pass_creates_wavey_circles():
-    """Test that RoseEngineLatheRun with draperie creates multiple complete curves"""
-    from turtles import CuttingBit, RoseEngineConfig, RoseEngineLatheRun
+    """Test that DraperieLayer creates concentric non-overlapping rings"""
+    import math
 
-    # Create draperie config
-    config = RoseEngineConfig.draperie(base_radius=20.0, wave_frequency=6.0, amplitude=2.0)
-    bit = CuttingBit.v_shaped(angle=30.0, width=0.1)
+    from turtles import DraperieLayer
 
-    # Create multi-pass run with segments_per_pass=1 (complete curves)
-    num_passes = 16
-    run = RoseEngineLatheRun(config, bit, num_passes=num_passes, segments_per_pass=1)
-    run.generate()
+    layer = DraperieLayer(num_rings=40, base_radius=15.0, resolution=300)
+    layer.generate()
 
-    # Get the generated lines
-    lines = run.get_lines()
+    lines = layer.get_lines()
+    assert len(lines) == 40, f"Expected 40 rings, got {len(lines)}"
 
-    # Should have one curve per pass
-    assert len(lines) == num_passes, f"Expected {num_passes} curves, got {len(lines)}"
+    # Verify adjacent rings never cross
+    for i in range(len(lines) - 1):
+        inner = lines[i]
+        outer = lines[i + 1]
+        n = min(len(inner), len(outer))
+        for j in range(n):
+            r_inner = math.sqrt(inner[j][0] ** 2 + inner[j][1] ** 2)
+            r_outer = math.sqrt(outer[j][0] ** 2 + outer[j][1] ** 2)
+            assert r_outer >= r_inner - 1e-6, f"Ring {i + 1} crosses ring {i} at point {j}"
 
-    # Each curve should have points (resolution + 1 for closed curve)
-    for i, curve in enumerate(lines):
-        assert len(curve) > 0, f"Curve {i} should have points"
 
-    # Verify that different passes produce different curves (due to phase rotation)
-    # Compare first and second curves - they should be different
-    if len(lines) >= 2:
-        curve1 = lines[0]
-        curve2 = lines[1]
+def test_draperie_layer_with_center():
+    """Test DraperieLayer with offset center"""
+    from turtles import DraperieLayer
 
-        # Calculate distance between corresponding points
-        # Minimum meaningful difference threshold: points should differ by at least 0.01mm
-        # on average to indicate phase rotation is creating distinct curves
-        MIN_CURVE_DIFFERENCE = 0.01
-        total_diff = 0.0
-        for pt1, pt2 in zip(curve1[:10], curve2[:10]):  # Check first 10 points
-            dist = ((pt1[0] - pt2[0]) ** 2 + (pt1[1] - pt2[1]) ** 2) ** 0.5
-            total_diff += dist
+    layer = DraperieLayer.with_center(5.0, 5.0, num_rings=20, base_radius=10.0)
+    assert layer.center_x == 5.0
+    assert layer.center_y == 5.0
+    layer.generate()
+    lines = layer.get_lines()
+    assert len(lines) == 20
 
-        avg_diff = total_diff / 10.0
-        assert avg_diff > MIN_CURVE_DIFFERENCE, "Different passes should create different curves due to phase rotation"
+
+def test_draperie_layer_at_clock():
+    """Test DraperieLayer at a clock position"""
+    from turtles import DraperieLayer
+
+    layer = DraperieLayer.at_clock(3, 0, 15.0, num_rings=20, base_radius=10.0)
+    assert layer.center_x > 0.0  # 3 o'clock → positive x
+    layer.generate()
+    lines = layer.get_lines()
+    assert len(lines) == 20
+
+
+def test_draperie_watchface_add():
+    """Test adding DraperieLayer via WatchFace.add()"""
+    from turtles import DraperieLayer
+
+    wf = WatchFace(radius=38.0)
+    wf.add_inner()
+    wf.add_outer()
+    wf.add_center_hole()
+
+    layer = DraperieLayer(num_rings=30, base_radius=15.0, resolution=200)
+    wf.add(layer)
+    wf.generate()
+
+    with tempfile.TemporaryDirectory() as tmpdir:
+        svg_path = os.path.join(tmpdir, "draperie_watchface.svg")
+        wf.to_svg(svg_path)
+        assert os.path.exists(svg_path)
+
+
+def test_draperie_watchface_add_draperie():
+    """Test WatchFace.add_draperie() convenience method"""
+    wf = WatchFace(radius=38.0)
+    wf.add_inner()
+    wf.add_outer()
+    wf.add_center_hole()
+    wf.add_draperie(num_rings=30, base_radius=15.0, resolution=200)
+    wf.generate()
+
+    with tempfile.TemporaryDirectory() as tmpdir:
+        svg_path = os.path.join(tmpdir, "draperie_add_method.svg")
+        wf.to_svg(svg_path)
+        assert os.path.exists(svg_path)
+
+
+def test_draperie_watchface_add_draperie_sharp():
+    """Test WatchFace.add_draperie_sharp() convenience method"""
+    wf = WatchFace(radius=38.0)
+    wf.add_inner()
+    wf.add_outer()
+    wf.add_center_hole()
+    wf.add_draperie_sharp(num_rings=30, base_radius=15.0, resolution=200)
+    wf.generate()
+
+    with tempfile.TemporaryDirectory() as tmpdir:
+        svg_path = os.path.join(tmpdir, "draperie_sharp.svg")
+        wf.to_svg(svg_path)
+        assert os.path.exists(svg_path)
+
+
+def test_draperie_phase_exponent():
+    """Test that phase_exponent and circular_phase are configurable via DraperieLayer"""
+    from turtles import DraperieLayer
+
+    # Default: circular_phase=2.0, phase_exponent=3
+    layer = DraperieLayer(num_rings=20, base_radius=10.0, resolution=100)
+    assert layer.phase_exponent == 3
+    assert layer.circular_phase == 2.0
+
+    # Sharp: circular_phase=0.0, phase_exponent=1
+    layer_sharp = DraperieLayer(num_rings=20, base_radius=10.0, resolution=100, phase_exponent=1, circular_phase=0.0)
+    assert layer_sharp.phase_exponent == 1
+    assert layer_sharp.circular_phase == 0.0
+
+    # Generate both and verify they produce different results
+    layer.generate()
+    layer_sharp.generate()
+    smooth_lines = layer.get_lines()
+    sharp_lines = layer_sharp.get_lines()
+    assert len(smooth_lines) == len(sharp_lines)
+    # The lines should differ (different phase envelopes)
+    differs = False
+    for s, sh in zip(smooth_lines, sharp_lines):
+        for sp, shp in zip(s, sh):
+            if abs(sp[0] - shp[0]) > 1e-10 or abs(sp[1] - shp[1]) > 1e-10:
+                differs = True
+                break
+        if differs:
+            break
+    assert differs, "Smooth and sharp draperie should produce different coordinates"
+
+
+def test_draperie_wave_exponent():
+    """Test that wave_exponent is configurable and produces different output"""
+    from turtles import DraperieLayer
+
+    # Default wave_exponent = 1
+    layer = DraperieLayer(num_rings=20, base_radius=10.0, resolution=100)
+    assert layer.wave_exponent == 1
+
+    # Soft wave crests = 3
+    layer_soft = DraperieLayer(num_rings=20, base_radius=10.0, resolution=100, wave_exponent=3)
+    assert layer_soft.wave_exponent == 3
+
+    # Generate both and verify they produce different results
+    layer.generate()
+    layer_soft.generate()
+    normal_lines = layer.get_lines()
+    soft_lines = layer_soft.get_lines()
+    assert len(normal_lines) == len(soft_lines)
+    differs = False
+    for n, s in zip(normal_lines, soft_lines):
+        for np_, sp in zip(n, s):
+            if abs(np_[0] - sp[0]) > 1e-10 or abs(np_[1] - sp[1]) > 1e-10:
+                differs = True
+                break
+        if differs:
+            break
+    assert differs, "Normal and soft-wave draperie should produce different coordinates"

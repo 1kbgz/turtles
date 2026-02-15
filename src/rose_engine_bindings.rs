@@ -438,12 +438,15 @@ impl RoseEngineLatheRun {
     /// run.to_svg("pattern.svg")
     /// ```
     #[new]
-    #[pyo3(signature = (config, bit, num_passes, segments_per_pass=24))]
+    #[pyo3(signature = (config, bit, num_passes, segments_per_pass=24, radius_step=0.0, phase_shift=0.0, phase_oscillations=1.0))]
     fn new(
         config: PyRef<RoseEngineConfig>,
         bit: PyRef<CuttingBit>,
         num_passes: usize,
         segments_per_pass: usize,
+        radius_step: f64,
+        phase_shift: f64,
+        phase_oscillations: f64,
     ) -> PyResult<Self> {
         BaseRoseEngineLatheRun::new_with_segments(
             config.inner.clone(),
@@ -453,7 +456,12 @@ impl RoseEngineLatheRun {
             0.0,
             0.0,
         )
-        .map(|inner| RoseEngineLatheRun { inner })
+        .map(|mut inner| {
+            inner.radius_step = radius_step;
+            inner.phase_shift = phase_shift;
+            inner.phase_oscillations = phase_oscillations;
+            RoseEngineLatheRun { inner }
+        })
         .map_err(|e| pyo3::exceptions::PyValueError::new_err(e.to_string()))
     }
 

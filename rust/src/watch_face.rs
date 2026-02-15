@@ -1,5 +1,6 @@
 use crate::common::{ExportConfig, Point2D, SpirographError};
 use crate::diamant::{DiamantConfig, DiamantLayer};
+use crate::draperie::{DraperieConfig, DraperieLayer};
 use crate::flinque::{FlinqueConfig, FlinqueLayer};
 use crate::guilloche::GuillochePattern;
 use crate::limacon::{LimaconConfig, LimaconLayer};
@@ -178,6 +179,23 @@ impl WatchFace {
             .add_diamant_at_clock(config, hour, minute, distance)
     }
 
+    /// Add a draperie (drapery pattern) layer
+    pub fn add_draperie_layer(&mut self, draperie: DraperieLayer) {
+        self.guilloche.add_draperie_layer(draperie);
+    }
+
+    /// Add a draperie layer at a clock position
+    pub fn add_draperie_at_clock(
+        &mut self,
+        config: DraperieConfig,
+        hour: u32,
+        minute: u32,
+        distance: f64,
+    ) -> Result<(), SpirographError> {
+        self.guilloche
+            .add_draperie_at_clock(config, hour, minute, distance)
+    }
+
     /// Add a limaçon pattern layer
     pub fn add_limacon_layer(&mut self, limacon: LimaconLayer) {
         self.guilloche.add_limacon_layer(limacon);
@@ -230,11 +248,26 @@ impl WatchFace {
             document = document.add(dial_circle);
         }
 
+        // Clip all pattern content to the dial circle
+        {
+            use ::svg::node::element::{ClipPath, Group};
+
+            let clip_circle = Circle::new().set("cx", 0).set("cy", 0).set("r", radius);
+            let clip = ClipPath::new().set("id", "dial-clip").add(clip_circle);
+            document = document.add(clip);
+        }
+
         // Guilloche line colors
         let colors = [
             "#1a1a1a", "#2d2d2d", "#3a3a3a", "#454545", "#505050", "#5a5a5a",
         ];
         let stroke_widths = [0.04, 0.035, 0.03, 0.03, 0.025, 0.025];
+
+        // All pattern content goes inside a clipped group
+        let mut pattern_group = {
+            use ::svg::node::element::Group;
+            Group::new().set("clip-path", "url(#dial-clip)")
+        };
 
         // Render spirograph layers from guilloche
         for (i, points) in self.get_spirograph_points().iter().enumerate() {
@@ -258,7 +291,7 @@ impl WatchFace {
                 .set("stroke-linejoin", "round")
                 .set("d", data);
 
-            document = document.add(path);
+            pattern_group = pattern_group.add(path);
         }
 
         // Render flinqué layers from guilloche
@@ -281,7 +314,7 @@ impl WatchFace {
                     .set("stroke-linejoin", "round")
                     .set("d", data);
 
-                document = document.add(path);
+                pattern_group = pattern_group.add(path);
             }
         }
 
@@ -305,7 +338,31 @@ impl WatchFace {
                     .set("stroke-linejoin", "round")
                     .set("d", data);
 
-                document = document.add(path);
+                pattern_group = pattern_group.add(path);
+            }
+        }
+
+        // Render draperie layers from guilloche
+        for ring_lines in self.get_draperie_lines() {
+            for ring_points in ring_lines {
+                if ring_points.is_empty() {
+                    continue;
+                }
+
+                let mut data = Data::new().move_to((ring_points[0].x, ring_points[0].y));
+                for point in ring_points.iter().skip(1) {
+                    data = data.line_to((point.x, point.y));
+                }
+
+                let path = Path::new()
+                    .set("fill", "none")
+                    .set("stroke", "#1a1a1a")
+                    .set("stroke-width", 0.03)
+                    .set("stroke-linecap", "round")
+                    .set("stroke-linejoin", "round")
+                    .set("d", data);
+
+                pattern_group = pattern_group.add(path);
             }
         }
 
@@ -329,9 +386,11 @@ impl WatchFace {
                     .set("stroke-linejoin", "round")
                     .set("d", data);
 
-                document = document.add(path);
+                pattern_group = pattern_group.add(path);
             }
         }
+
+        document = document.add(pattern_group);
 
         // Add outer bezel ring if configured
         if let Some(ref bezel) = self.bezel_config {
@@ -380,6 +439,10 @@ impl WatchFace {
 
     fn get_diamant_lines(&self) -> Vec<&Vec<Vec<Point2D>>> {
         self.guilloche.diamant_lines()
+    }
+
+    fn get_draperie_lines(&self) -> Vec<&Vec<Vec<Point2D>>> {
+        self.guilloche.draperie_lines()
     }
 
     fn get_limacon_lines(&self) -> Vec<&Vec<Vec<Point2D>>> {

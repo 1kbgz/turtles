@@ -2,6 +2,8 @@
 pub mod common;
 // Diamant (diamond) pattern generation
 pub mod diamant;
+// Draperie (drapery) pattern generation
+pub mod draperie;
 // Flinque (engine-turned) pattern generation
 pub mod flinque;
 // Spirograph and guilloche pattern generation modules
@@ -20,6 +22,7 @@ pub use common::{
     SpirographError,
 };
 pub use diamant::{DiamantConfig, DiamantLayer};
+pub use draperie::{DraperieConfig, DraperieLayer};
 pub use flinque::{FlinqueConfig, FlinqueLayer};
 pub use guilloche::GuillochePattern;
 pub use limacon::{LimaconConfig, LimaconLayer};

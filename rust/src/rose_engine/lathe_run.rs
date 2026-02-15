@@ -18,6 +18,21 @@ pub struct RoseEngineLatheRun {
     pub num_passes: usize,
     /// Number of segments per pass (creates gaps for classical guilloché appearance)
     pub segments_per_pass: usize,
+    /// Radius step for concentric ring mode.
+    /// When non-zero, each pass changes the base_radius by this amount
+    /// instead of rotating the phase. Used for draperie and similar patterns
+    /// where concentric non-overlapping rings are desired.
+    pub radius_step: f64,
+    /// Phase oscillation amplitude in concentric ring mode (radians).
+    /// The phase of each ring varies sinusoidally across the ring stack:
+    ///   phase = base_phase + phase_shift * sin(2π * phase_oscillations * i / num_passes)
+    /// This creates the classic draperie "back and forth" fold effect
+    /// where wave peaks sway left then right from center to edge.
+    pub phase_shift: f64,
+    /// Number of full sinusoidal cycles the phase completes across all rings.
+    /// Controls how many times the wave peaks sway back and forth from
+    /// center to edge. Default 1.0; the reference draperie image uses ~4-5.
+    pub phase_oscillations: f64,
     /// Center position of the pattern (x, y)
     pub center_x: f64,
     pub center_y: f64,
@@ -97,6 +112,9 @@ impl RoseEngineLatheRun {
             cutting_bit,
             num_passes,
             segments_per_pass,
+            radius_step: 0.0,
+            phase_shift: 0.0,
+            phase_oscillations: 1.0,
             center_x,
             center_y,
             passes: Vec::new(),
@@ -139,14 +157,23 @@ impl RoseEngineLatheRun {
         let rotation_step = 2.0 * PI / (self.num_passes as f64);
 
         for i in 0..self.num_passes {
-            let rotation = (i as f64) * rotation_step;
-
-            // Create a config for this pass with rotated phase
-            // Rotating the phase (not start/end angles) rotates the entire pattern
-            // around the center. For a sinusoidal pattern with frequency=1, this
-            // rotates the offset circle around the origin, creating the diamant pattern.
             let mut pass_config = self.base_config.clone();
-            pass_config.phase = self.base_config.phase + rotation;
+
+            if self.radius_step != 0.0 {
+                // Concentric ring mode: vary base_radius and optionally oscillate phase.
+                // Rings are centred around the original base_radius.
+                let offset = (i as f64) - ((self.num_passes - 1) as f64) / 2.0;
+                pass_config.base_radius = self.base_config.base_radius + offset * self.radius_step;
+                // Sinusoidal phase oscillation: peaks sway back and forth across
+                // the ring stack, creating the classic draperie fold effect.
+                let phase_t =
+                    2.0 * PI * self.phase_oscillations * (i as f64) / (self.num_passes as f64);
+                pass_config.phase = self.base_config.phase + self.phase_shift * phase_t.sin();
+            } else {
+                // Phase-rotation mode (default): rotate the pattern for each pass.
+                let rotation = (i as f64) * rotation_step;
+                pass_config.phase = self.base_config.phase + rotation;
+            }
 
             // Create and generate the lathe for this pass
             if let Ok(mut lathe) = RoseEngineLathe::new_with_center(

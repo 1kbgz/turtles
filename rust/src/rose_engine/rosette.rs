@@ -139,18 +139,13 @@ impl RosettePattern {
 
             RosettePattern::Draperie {
                 frequency,
-                depth_frequency,
+                depth_frequency: _,
             } => {
-                // Drapery pattern: flowing waves with depth modulation
-                // Primary wave creates the undulating circle shape
-                // Secondary depth modulation adds the "gathered fabric" depth variation
-                // Together with multi-pass rotation in RoseEngineLatheRun,
-                // this creates overlapping wavy circles resembling draped fabric
-                let primary_wave = (angle * frequency).sin();
-                let depth_wave = (angle * depth_frequency).sin();
-                // Combine both waves additively for richer undulation
-                // The two frequencies create interference patterns that look like fabric folds
-                0.6 * primary_wave + 0.4 * depth_wave
+                // Drapery pattern: clean sinusoidal wave for concentric ring generation.
+                // Each ring is drawn at a different base_radius (via radius_step in
+                // RoseEngineLatheRun) so the curves nest without crossing, producing
+                // the classic draped-fabric guilloché look.
+                (angle * frequency).sin()
             }
 
             RosettePattern::Diamant { divisions } => {
@@ -309,13 +304,13 @@ mod tests {
 
     #[test]
     fn test_draperie_pattern_symmetry() {
-        // Verify the additive wave formula properties
+        // Verify the clean sine wave formula properties
         let pattern = RosettePattern::Draperie {
             frequency: 6.0,
             depth_frequency: 12.0,
         };
 
-        // At angle=0, both sin terms are 0, so displacement should be 0
+        // At angle=0, sin(0) = 0
         let d0 = pattern.displacement(0.0);
         assert!(
             d0.abs() < 0.0001,
@@ -323,9 +318,9 @@ mod tests {
             d0
         );
 
-        // Verify additive formula: 0.6 * sin(6*angle) + 0.4 * sin(12*angle)
+        // Verify formula: sin(6*angle)
         let angle = PI / 6.0;
-        let expected = 0.6 * (6.0 * angle).sin() + 0.4 * (12.0 * angle).sin();
+        let expected = (6.0 * angle).sin();
         let actual = pattern.displacement(angle);
         assert!(
             (actual - expected).abs() < 0.0001,

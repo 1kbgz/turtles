@@ -2,6 +2,8 @@ use pyo3::prelude::*;
 use turtles::{
     DiamantConfig as BaseDiamantConfig,
     DiamantLayer as BaseDiamantLayer,
+    DraperieConfig as BaseDraperieConfig,
+    DraperieLayer as BaseDraperieLayer,
     ExportConfig as BaseExportConfig,
     FlinqueConfig as BaseFlinqueConfig,
     FlinqueLayer as BaseFlinqueLayer,
@@ -14,6 +16,7 @@ use turtles::{
 };
 
 use crate::diamant_bindings::DiamantLayer;
+use crate::draperie_bindings::DraperieLayer;
 use crate::guilloche_bindings::FlinqueLayer;
 use crate::limacon_bindings::LimaconLayer;
 use crate::spirograph_bindings::{HorizontalSpirograph, SphericalSpirograph, VerticalSpirograph};
@@ -243,6 +246,54 @@ impl WatchFace {
         };
         self.inner
             .add_diamant_at_clock(config, hour, minute, distance)
+            .map_err(|e| pyo3::exceptions::PyValueError::new_err(e.to_string()))
+    }
+
+    /// Add a draperie (drapery pattern) layer
+    fn add_draperie_layer(&mut self, draperie: &DraperieLayer) -> PyResult<()> {
+        let new_layer = BaseDraperieLayer::new_with_center(
+            draperie.inner.config.clone(),
+            draperie.inner.center_x,
+            draperie.inner.center_y,
+        )
+        .map_err(|e| pyo3::exceptions::PyValueError::new_err(e.to_string()))?;
+        self.inner.add_draperie_layer(new_layer);
+        Ok(())
+    }
+
+    /// Add a draperie layer positioned at a clock position
+    #[pyo3(signature = (hour, minute, distance, num_rings=96, base_radius=22.0, radius_step=0.44, wave_frequency=12.0, phase_shift=None, phase_oscillations=2.5, resolution=1500, phase_exponent=3, wave_exponent=1, circular_phase=2.0))]
+    fn add_draperie_at_clock(
+        &mut self,
+        hour: u32,
+        minute: u32,
+        distance: f64,
+        num_rings: usize,
+        base_radius: f64,
+        radius_step: f64,
+        wave_frequency: f64,
+        phase_shift: Option<f64>,
+        phase_oscillations: f64,
+        resolution: usize,
+        phase_exponent: u32,
+        wave_exponent: u32,
+        circular_phase: f64,
+    ) -> PyResult<()> {
+        let config = BaseDraperieConfig {
+            num_rings,
+            base_radius,
+            radius_step,
+            wave_frequency,
+            amplitude: None,
+            phase_shift: phase_shift.unwrap_or(std::f64::consts::PI / 12.0),
+            phase_oscillations,
+            resolution,
+            phase_exponent,
+            wave_exponent,
+            circular_phase,
+        };
+        self.inner
+            .add_draperie_at_clock(config, hour, minute, distance)
             .map_err(|e| pyo3::exceptions::PyValueError::new_err(e.to_string()))
     }
 

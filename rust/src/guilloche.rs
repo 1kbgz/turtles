@@ -1,5 +1,6 @@
 use crate::common::{validate_radius, ExportConfig, Point2D, SpirographError};
 use crate::diamant::{DiamantConfig, DiamantLayer};
+use crate::draperie::{DraperieConfig, DraperieLayer};
 use crate::flinque::{FlinqueConfig, FlinqueLayer};
 use crate::limacon::LimaconLayer;
 use crate::spirograph::{HorizontalSpirograph, SphericalSpirograph, VerticalSpirograph};
@@ -62,6 +63,7 @@ pub struct GuillochePattern {
     spirograph_layers: Vec<SpirographLayer>,
     flinque_layers: Vec<FlinqueLayer>,
     diamant_layers: Vec<DiamantLayer>,
+    draperie_layers: Vec<DraperieLayer>,
     limacon_layers: Vec<LimaconLayer>,
 }
 
@@ -75,6 +77,7 @@ impl GuillochePattern {
             spirograph_layers: Vec::new(),
             flinque_layers: Vec::new(),
             diamant_layers: Vec::new(),
+            draperie_layers: Vec::new(),
             limacon_layers: Vec::new(),
         })
     }
@@ -174,6 +177,36 @@ impl GuillochePattern {
         Ok(())
     }
 
+    /// Add a draperie (drapery pattern) layer
+    pub fn add_draperie_layer(&mut self, draperie: DraperieLayer) {
+        self.draperie_layers.push(draperie);
+    }
+
+    /// Add a draperie layer positioned at a given angle and distance from center
+    pub fn add_draperie_at_polar(
+        &mut self,
+        config: DraperieConfig,
+        angle: f64,
+        distance: f64,
+    ) -> Result<(), SpirographError> {
+        let draperie = DraperieLayer::new_at_polar(config, angle, distance)?;
+        self.draperie_layers.push(draperie);
+        Ok(())
+    }
+
+    /// Add a draperie layer positioned at a clock position
+    pub fn add_draperie_at_clock(
+        &mut self,
+        config: DraperieConfig,
+        hour: u32,
+        minute: u32,
+        distance: f64,
+    ) -> Result<(), SpirographError> {
+        let draperie = DraperieLayer::new_at_clock(config, hour, minute, distance)?;
+        self.draperie_layers.push(draperie);
+        Ok(())
+    }
+
     /// Add a limaçon pattern layer
     pub fn add_limacon_layer(&mut self, limacon: LimaconLayer) {
         self.limacon_layers.push(limacon);
@@ -222,6 +255,9 @@ impl GuillochePattern {
         for layer in &mut self.diamant_layers {
             layer.generate();
         }
+        for layer in &mut self.draperie_layers {
+            layer.generate();
+        }
         for layer in &mut self.limacon_layers {
             layer.generate();
         }
@@ -232,6 +268,7 @@ impl GuillochePattern {
         self.spirograph_layers.len()
             + self.flinque_layers.len()
             + self.diamant_layers.len()
+            + self.draperie_layers.len()
             + self.limacon_layers.len()
     }
 
@@ -253,6 +290,11 @@ impl GuillochePattern {
         self.diamant_layers.iter().map(|d| d.lines()).collect()
     }
 
+    /// Get all draperie layer lines (for rendering)
+    pub fn draperie_lines(&self) -> Vec<&Vec<Vec<Point2D>>> {
+        self.draperie_layers.iter().map(|d| d.lines()).collect()
+    }
+
     /// Get all limaçon layer lines (for rendering)
     pub fn limacon_lines(&self) -> Vec<&Vec<Vec<Point2D>>> {
         self.limacon_layers.iter().map(|l| l.lines()).collect()
@@ -267,6 +309,8 @@ impl GuillochePattern {
         if self.spirograph_layers.is_empty()
             && self.flinque_layers.is_empty()
             && self.diamant_layers.is_empty()
+            && self.draperie_layers.is_empty()
+            && self.limacon_layers.is_empty()
         {
             return Err(SpirographError::ExportError(
                 "No layers to export. Add layers first.".to_string(),
@@ -381,6 +425,30 @@ impl GuillochePattern {
 
                 let mut data = Data::new().move_to((circle_points[0].x, circle_points[0].y));
                 for point in circle_points.iter().skip(1) {
+                    data = data.line_to((point.x, point.y));
+                }
+
+                let path = Path::new()
+                    .set("fill", "none")
+                    .set("stroke", "#1a1a1a")
+                    .set("stroke-width", 0.03)
+                    .set("stroke-linecap", "round")
+                    .set("stroke-linejoin", "round")
+                    .set("d", data);
+
+                document = document.add(path);
+            }
+        }
+
+        // Render draperie layers
+        for draperie_layer in &self.draperie_layers {
+            for ring_points in draperie_layer.lines() {
+                if ring_points.is_empty() {
+                    continue;
+                }
+
+                let mut data = Data::new().move_to((ring_points[0].x, ring_points[0].y));
+                for point in ring_points.iter().skip(1) {
                     data = data.line_to((point.x, point.y));
                 }
 
