@@ -7,6 +7,7 @@ from .turtles import (
     DraperieLayer,
     FlinqueLayer,
     LimaconLayer,
+    PaonLayer,
     RoseEngineConfig,
     RoseEngineLathe,
     RoseEngineLatheRun,
@@ -25,6 +26,7 @@ __all__ = (
     "DraperieLayer",
     "FlinqueLayer",
     "LimaconLayer",
+    "PaonLayer",
 )
 
 
@@ -327,8 +329,59 @@ class WatchFace:
             circular_phase=0.0,
         )
 
+    def add_paon(
+        self,
+        num_lines: int = 500,
+        radius: float = 38.0,
+        amplitude: float = 0.1,
+        wave_frequency: float = 15.0,
+        phase_rate: float = 9.0,
+        hour: int = 12,
+        minute: int = 0,
+        distance: float = 0.0,
+        resolution: int = 800,
+        n_harmonics: int = 5,
+        fan_angle: float = 3.0,
+        vanishing_point: float = 0.2,
+    ):
+        """Add a paon (peacock) guilloché pattern.
+
+        Lines fan outward from 6 o'clock, each zigzagging perpendicular to its
+        travel direction.  Phase offsets between neighbouring lines create the
+        characteristic peacock-feather arch bands.
+
+        Args:
+            num_lines: Number of fan lines (more = denser pattern).
+            radius: Radius of the circular clipping region in mm.
+                    Defaults to 78% of the watch face radius (fills inner dial).
+            amplitude: Perpendicular oscillation amplitude in mm.
+            wave_frequency: Number of zigzag cycles per line.
+            phase_rate: Phase change rate across fan (controls arch band count).
+            hour: Hour position for center (1-12, default 12 = centered).
+            minute: Minute position for center (0-59).
+            distance: Distance from center (0 = centered on watch face).
+            resolution: Number of sample points per line.
+            n_harmonics: 0=pure sine (smooth arches), 1+=triangle-wave (sharper cusps).
+            fan_angle: Total angular spread of the fan in radians (~1.4 = 80°).
+            vanishing_point: VP distance below circle bottom (fraction of diameter).
+        """
+        self._watch_face.add_paon_at_clock(
+            hour=hour,
+            minute=minute,
+            distance=distance,
+            num_lines=num_lines,
+            radius=radius,
+            amplitude=amplitude,
+            wave_frequency=wave_frequency,
+            phase_rate=phase_rate,
+            resolution=resolution,
+            n_harmonics=n_harmonics,
+            fan_angle=fan_angle,
+            vanishing_point=vanishing_point,
+        )
+
     def add(self, layer):
-        """Add a spirograph, flinque, diamant, draperie, or limacon layer."""
+        """Add a spirograph, flinque, diamant, draperie, limacon, or paon layer."""
         if isinstance(layer, FlinqueLayer):
             self._watch_face.add_flinque_layer(layer)
         elif isinstance(layer, DiamantLayer):
@@ -337,6 +390,8 @@ class WatchFace:
             self._watch_face.add_draperie_layer(layer)
         elif isinstance(layer, LimaconLayer):
             self._watch_face.add_limacon_layer(layer)
+        elif isinstance(layer, PaonLayer):
+            self._watch_face.add_paon_layer(layer)
         else:
             self._watch_face.add_layer(layer)
 

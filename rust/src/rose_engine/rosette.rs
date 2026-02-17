@@ -47,16 +47,25 @@ pub enum RosettePattern {
     },
 
     /// Draperie (Drapery) - flowing fabric/wave pattern
-    /// Creates overlapping undulating circular curves resembling draped fabric.
-    /// Uses additive combination of two sinusoidal waves at different frequencies
-    /// to produce interference patterns. When used with RoseEngineLatheRun for
-    /// multi-pass generation, the phase-rotated passes create the characteristic
-    /// wavey circular guilloché pattern seen in fine watchmaking.
+    /// Creates concentric wavy rings resembling draped fabric.
+    /// Each ring is a sinusoidal modulation at the given frequency,
+    /// optionally raised to `wave_exponent` for softer crests.
+    /// Use with RoseEngineLatheRun in concentric-ring mode (radius_step > 0)
+    /// for multi-ring draperie generation.
     Draperie {
-        /// Wave frequency (number of waves)
+        /// Wave frequency (number of undulations per revolution)
         frequency: f64,
-        /// Secondary modulation for depth effect
-        depth_frequency: f64,
+        /// Exponent applied to the wave shape: 1 = sinusoidal (default),
+        /// 3 = softer rounded crests.
+        wave_exponent: u32,
+    },
+
+    /// Paon (Peacock) - peacock-feather arch pattern for linear (non-rotational) passes.
+    /// Each pass is a vertical line oscillating sinusoidally. The `frequency`
+    /// controls the number of arch rows across the dial height.
+    Paon {
+        /// Wave frequency (number of oscillation cycles across the dial height)
+        frequency: f64,
     },
 
     /// Diamant (Diamond) - geometric diamond/checkerboard pattern
@@ -139,12 +148,22 @@ impl RosettePattern {
 
             RosettePattern::Draperie {
                 frequency,
-                depth_frequency: _,
+                wave_exponent,
             } => {
-                // Drapery pattern: clean sinusoidal wave for concentric ring generation.
-                // Each ring is drawn at a different base_radius (via radius_step in
-                // RoseEngineLatheRun) so the curves nest without crossing, producing
-                // the classic draped-fabric guilloché look.
+                // Drapery pattern: sinusoidal wave with optional exponent.
+                let s = (angle * frequency).sin();
+                if *wave_exponent <= 1 {
+                    s
+                } else {
+                    s.abs().powi(*wave_exponent as i32) * s.signum()
+                }
+            }
+
+            RosettePattern::Paon { frequency } => {
+                // Paon: simple sinusoidal displacement.
+                // The actual arch pattern emerges from the linear-pass mode
+                // in RoseEngineLatheRun::new_paon which varies the phase
+                // across passes. Here we just provide the base sine wave.
                 (angle * frequency).sin()
             }
 
@@ -260,7 +279,7 @@ mod tests {
         // Verify displacement values stay within [-1.0, 1.0] for various angles
         let pattern = RosettePattern::Draperie {
             frequency: 6.0,
-            depth_frequency: 12.0,
+            wave_exponent: 1,
         };
 
         // Test various angles
@@ -281,7 +300,7 @@ mod tests {
         // Verify the pattern is not flat (produces varying displacement across angles)
         let pattern = RosettePattern::Draperie {
             frequency: 6.0,
-            depth_frequency: 12.0,
+            wave_exponent: 1,
         };
 
         let d0 = pattern.displacement(0.0);
@@ -307,7 +326,7 @@ mod tests {
         // Verify the clean sine wave formula properties
         let pattern = RosettePattern::Draperie {
             frequency: 6.0,
-            depth_frequency: 12.0,
+            wave_exponent: 1,
         };
 
         // At angle=0, sin(0) = 0
@@ -335,11 +354,11 @@ mod tests {
         // Verify that different frequency values produce different displacement curves
         let pattern1 = RosettePattern::Draperie {
             frequency: 6.0,
-            depth_frequency: 12.0,
+            wave_exponent: 1,
         };
         let pattern2 = RosettePattern::Draperie {
             frequency: 3.0,
-            depth_frequency: 6.0,
+            wave_exponent: 1,
         };
 
         let mut found_different = false;

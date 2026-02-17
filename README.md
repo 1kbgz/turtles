@@ -30,6 +30,10 @@ A library for generating spirograph and guilloché patterns.
 <img src="https://raw.githubusercontent.com/1kbgz/turtles/refs/heads/main/docs/img/draperie_sharp.png" width=500>
 <img src="https://raw.githubusercontent.com/1kbgz/turtles/refs/heads/main/docs/img/draperie_petal.png" width=500>
 
+### Paon
+
+<img src="https://raw.githubusercontent.com/1kbgz/turtles/refs/heads/main/docs/img/paon.png" width=500>
+
 ### Export Formats
 
 - **SVG** - 2D vector output for laser engraving and visualization

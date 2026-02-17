@@ -3,6 +3,7 @@ use crate::diamant::{DiamantConfig, DiamantLayer};
 use crate::draperie::{DraperieConfig, DraperieLayer};
 use crate::flinque::{FlinqueConfig, FlinqueLayer};
 use crate::limacon::LimaconLayer;
+use crate::paon::{PaonConfig, PaonLayer};
 use crate::spirograph::{HorizontalSpirograph, SphericalSpirograph, VerticalSpirograph};
 
 /// Enum to hold different types of spirograph patterns
@@ -65,6 +66,7 @@ pub struct GuillochePattern {
     diamant_layers: Vec<DiamantLayer>,
     draperie_layers: Vec<DraperieLayer>,
     limacon_layers: Vec<LimaconLayer>,
+    paon_layers: Vec<PaonLayer>,
 }
 
 impl GuillochePattern {
@@ -79,6 +81,7 @@ impl GuillochePattern {
             diamant_layers: Vec::new(),
             draperie_layers: Vec::new(),
             limacon_layers: Vec::new(),
+            paon_layers: Vec::new(),
         })
     }
 
@@ -244,6 +247,42 @@ impl GuillochePattern {
         Ok(())
     }
 
+    /// Add a paon (peacock) pattern layer
+    pub fn add_paon_layer(&mut self, paon: PaonLayer) {
+        self.paon_layers.push(paon);
+    }
+
+    /// Add a paon layer positioned at a given angle and distance from center
+    pub fn add_paon_at_polar(
+        &mut self,
+        config: PaonConfig,
+        angle: f64,
+        distance: f64,
+    ) -> Result<(), SpirographError> {
+        let paon = PaonLayer::new_at_polar(config, angle, distance)?;
+        self.paon_layers.push(paon);
+        Ok(())
+    }
+
+    /// Add a paon layer positioned at a clock position
+    ///
+    /// # Arguments
+    /// * `config` - Paon configuration
+    /// * `hour` - Hour position (1-12, where 12 is at top)
+    /// * `minute` - Minute position (0-59)
+    /// * `distance` - Distance from center of watch face
+    pub fn add_paon_at_clock(
+        &mut self,
+        config: PaonConfig,
+        hour: u32,
+        minute: u32,
+        distance: f64,
+    ) -> Result<(), SpirographError> {
+        let paon = PaonLayer::new_at_clock(config, hour, minute, distance)?;
+        self.paon_layers.push(paon);
+        Ok(())
+    }
+
     /// Generate all layers
     pub fn generate(&mut self) {
         for layer in &mut self.spirograph_layers {
@@ -261,6 +300,9 @@ impl GuillochePattern {
         for layer in &mut self.limacon_layers {
             layer.generate();
         }
+        for layer in &mut self.paon_layers {
+            layer.generate();
+        }
     }
 
     /// Get total layer count (spirographs + flinqué + diamant + limaçon)
@@ -270,6 +312,7 @@ impl GuillochePattern {
             + self.diamant_layers.len()
             + self.draperie_layers.len()
             + self.limacon_layers.len()
+            + self.paon_layers.len()
     }
 
     /// Get all spirograph layer points (for rendering)
@@ -300,6 +343,11 @@ impl GuillochePattern {
         self.limacon_layers.iter().map(|l| l.lines()).collect()
     }
 
+    /// Get all paon layer lines (for rendering)
+    pub fn paon_lines(&self) -> Vec<&Vec<Vec<Point2D>>> {
+        self.paon_layers.iter().map(|p| p.lines()).collect()
+    }
+
     /// Export all layers to separate files with the given base name
     pub fn export_all(
         &self,
@@ -311,6 +359,7 @@ impl GuillochePattern {
             && self.diamant_layers.is_empty()
             && self.draperie_layers.is_empty()
             && self.limacon_layers.is_empty()
+            && self.paon_layers.is_empty()
         {
             return Err(SpirographError::ExportError(
                 "No layers to export. Add layers first.".to_string(),
@@ -449,6 +498,30 @@ impl GuillochePattern {
 
                 let mut data = Data::new().move_to((ring_points[0].x, ring_points[0].y));
                 for point in ring_points.iter().skip(1) {
+                    data = data.line_to((point.x, point.y));
+                }
+
+                let path = Path::new()
+                    .set("fill", "none")
+                    .set("stroke", "#1a1a1a")
+                    .set("stroke-width", 0.03)
+                    .set("stroke-linecap", "round")
+                    .set("stroke-linejoin", "round")
+                    .set("d", data);
+
+                document = document.add(path);
+            }
+        }
+
+        // Render paon layers
+        for paon_layer in &self.paon_layers {
+            for line_points in paon_layer.lines() {
+                if line_points.is_empty() {
+                    continue;
+                }
+
+                let mut data = Data::new().move_to((line_points[0].x, line_points[0].y));
+                for point in line_points.iter().skip(1) {
                     data = data.line_to((point.x, point.y));
                 }
 
