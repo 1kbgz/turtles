@@ -76,9 +76,18 @@ impl RosettePattern {
 
     /// Create a Draperie (Drapery) pattern
     #[staticmethod]
-    fn draperie(frequency: f64, depth_frequency: f64) -> Self {
+    #[pyo3(signature = (frequency, wave_exponent=1))]
+    fn draperie(frequency: f64, wave_exponent: u32) -> Self {
         RosettePattern {
-            inner: BaseRosettePattern::Draperie { frequency, depth_frequency },
+            inner: BaseRosettePattern::Draperie { frequency, wave_exponent },
+        }
+    }
+
+    /// Create a Paon (Peacock) pattern
+    #[staticmethod]
+    fn paon(frequency: f64) -> Self {
+        RosettePattern {
+            inner: BaseRosettePattern::Paon { frequency },
         }
     }
 
@@ -111,8 +120,11 @@ impl RosettePattern {
             BaseRosettePattern::GrainDeRiz { grain_size, rows } => {
                 format!("RosettePattern.grain_de_riz(grain_size={}, rows={})", grain_size, rows)
             }
-            BaseRosettePattern::Draperie { frequency, depth_frequency } => {
-                format!("RosettePattern.draperie(frequency={}, depth_frequency={})", frequency, depth_frequency)
+            BaseRosettePattern::Draperie { frequency, wave_exponent } => {
+                format!("RosettePattern.draperie(frequency={}, wave_exponent={})", frequency, wave_exponent)
+            }
+            BaseRosettePattern::Paon { frequency } => {
+                format!("RosettePattern.paon(frequency={})", frequency)
             }
             BaseRosettePattern::Diamant { divisions } => {
                 format!("RosettePattern.diamant(divisions={})", divisions)
@@ -429,7 +441,7 @@ impl RoseEngineLatheRun {
     /// ```python
     /// from turtles import RoseEngineLatheRun, RoseEngineConfig, CuttingBit, RosettePattern
     ///
-    /// config = RoseEngineConfig(base_radius=20.0, amplitude=2.0)
+    /// config = RoseEngineConfig(base_radius=20.0, amplitude=0.5)
     /// config.set_rosette(RosettePattern.multi_lobe(12))
     /// bit = CuttingBit.v_shaped(angle=30.0, width=0.5)
     ///
@@ -438,7 +450,7 @@ impl RoseEngineLatheRun {
     /// run.to_svg("pattern.svg")
     /// ```
     #[new]
-    #[pyo3(signature = (config, bit, num_passes, segments_per_pass=24, radius_step=0.0, phase_shift=0.0, phase_oscillations=1.0))]
+    #[pyo3(signature = (config, bit, num_passes, segments_per_pass=24, radius_step=0.0, phase_shift=0.0, phase_oscillations=1.0, circular_phase=0.0, phase_exponent=1))]
     fn new(
         config: PyRef<RoseEngineConfig>,
         bit: PyRef<CuttingBit>,
@@ -447,6 +459,8 @@ impl RoseEngineLatheRun {
         radius_step: f64,
         phase_shift: f64,
         phase_oscillations: f64,
+        circular_phase: f64,
+        phase_exponent: u32,
     ) -> PyResult<Self> {
         BaseRoseEngineLatheRun::new_with_segments(
             config.inner.clone(),
@@ -460,6 +474,8 @@ impl RoseEngineLatheRun {
             inner.radius_step = radius_step;
             inner.phase_shift = phase_shift;
             inner.phase_oscillations = phase_oscillations;
+            inner.circular_phase = circular_phase;
+            inner.phase_exponent = phase_exponent;
             RoseEngineLatheRun { inner }
         })
         .map_err(|e| pyo3::exceptions::PyValueError::new_err(e.to_string()))
@@ -481,6 +497,83 @@ impl RoseEngineLatheRun {
             bit.inner.clone(),
             num_passes,
             segments_per_pass,
+            center_x,
+            center_y,
+        )
+        .map(|inner| RoseEngineLatheRun { inner })
+        .map_err(|e| pyo3::exceptions::PyValueError::new_err(e.to_string()))
+    }
+
+    /// Create a rose engine draperie pattern that produces identical output
+    /// to the mathematical DraperieLayer.
+    ///
+    /// This configures the rose engine lathe run with the correct rosette
+    /// pattern, amplitude, phase alignment, and phase shape function.
+    #[staticmethod]
+    #[pyo3(signature = (num_rings=96, base_radius=22.0, radius_step=0.44, wave_frequency=12.0, phase_shift=None, phase_oscillations=2.5, resolution=1500, phase_exponent=3, wave_exponent=1, circular_phase=2.0, center_x=0.0, center_y=0.0))]
+    fn draperie(
+        num_rings: usize,
+        base_radius: f64,
+        radius_step: f64,
+        wave_frequency: f64,
+        phase_shift: Option<f64>,
+        phase_oscillations: f64,
+        resolution: usize,
+        phase_exponent: u32,
+        wave_exponent: u32,
+        circular_phase: f64,
+        center_x: f64,
+        center_y: f64,
+    ) -> PyResult<Self> {
+        let ps = phase_shift.unwrap_or(std::f64::consts::PI / 12.0);
+        BaseRoseEngineLatheRun::new_draperie(
+            num_rings,
+            base_radius,
+            radius_step,
+            wave_frequency,
+            ps,
+            phase_oscillations,
+            resolution,
+            phase_exponent,
+            wave_exponent,
+            circular_phase,
+            center_x,
+            center_y,
+        )
+        .map(|inner| RoseEngineLatheRun { inner })
+        .map_err(|e| pyo3::exceptions::PyValueError::new_err(e.to_string()))
+    }
+
+    /// Create a rose engine paon (peacock) pattern that produces identical
+    /// output to the mathematical PaonLayer.
+    ///
+    /// This configures the rose engine lathe run in linear-pass mode with
+    /// fan lines emanating from 6 o'clock and zigzag oscillation.
+    #[staticmethod]
+    #[pyo3(signature = (num_lines=500, radius=22.0, amplitude=0.035, wave_frequency=10.0, phase_rate=9.0, resolution=800, n_harmonics=3, fan_angle=4.0, vanishing_point=0.3, center_x=0.0, center_y=0.0))]
+    fn paon(
+        num_lines: usize,
+        radius: f64,
+        amplitude: f64,
+        wave_frequency: f64,
+        phase_rate: f64,
+        resolution: usize,
+        n_harmonics: usize,
+        fan_angle: f64,
+        vanishing_point: f64,
+        center_x: f64,
+        center_y: f64,
+    ) -> PyResult<Self> {
+        BaseRoseEngineLatheRun::new_paon(
+            num_lines,
+            radius,
+            amplitude,
+            wave_frequency,
+            phase_rate,
+            resolution,
+            n_harmonics,
+            fan_angle,
+            vanishing_point,
             center_x,
             center_y,
         )

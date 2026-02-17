@@ -212,7 +212,7 @@ def test_rosette_pattern():
     grain_de_riz = RosettePattern.grain_de_riz(grain_size=1.0, rows=12)
     assert grain_de_riz is not None
 
-    draperie = RosettePattern.draperie(frequency=6.0, depth_frequency=12.0)
+    draperie = RosettePattern.draperie(frequency=6.0, wave_exponent=1)
     assert draperie is not None
 
     diamant = RosettePattern.diamant(divisions=12)
@@ -333,7 +333,7 @@ def test_rose_engine_lathe_run_patterns():
     patterns = [
         RosettePattern.huit_eight(lobes=8),
         RosettePattern.grain_de_riz(grain_size=1.0, rows=12),
-        RosettePattern.draperie(frequency=6.0, depth_frequency=3.0),
+        RosettePattern.draperie(frequency=6.0, wave_exponent=1),
         RosettePattern.diamant(divisions=12),
     ]
 
@@ -593,3 +593,197 @@ def test_draperie_wave_exponent():
         if differs:
             break
     assert differs, "Normal and soft-wave draperie should produce different coordinates"
+
+
+def test_draperie_matches_rose_engine():
+    """Test that the mathematical DraperieLayer and rose engine RoseEngineLatheRun.draperie() produce identical output"""
+    from turtles import DraperieLayer, RoseEngineLatheRun
+
+    # Create mathematical DraperieLayer with default params
+    math_layer = DraperieLayer(
+        num_rings=20,
+        base_radius=10.0,
+        radius_step=0.44,
+        wave_frequency=12.0,
+        phase_oscillations=2.5,
+        resolution=100,
+        phase_exponent=3,
+        wave_exponent=1,
+        circular_phase=2.0,
+    )
+    math_layer.generate()
+
+    # Create equivalent rose engine draperie
+    import math
+
+    rose_run = RoseEngineLatheRun.draperie(
+        num_rings=20,
+        base_radius=10.0,
+        radius_step=0.44,
+        wave_frequency=12.0,
+        phase_shift=math.pi / 12.0,
+        phase_oscillations=2.5,
+        resolution=100,
+        phase_exponent=3,
+        wave_exponent=1,
+        circular_phase=2.0,
+    )
+    rose_run.generate()
+
+    math_lines = math_layer.get_lines()
+    rose_lines = rose_run.get_lines()
+
+    assert len(math_lines) == len(rose_lines), f"Expected {len(math_lines)} rings, got {len(rose_lines)}"
+
+    for i, (ml, rl) in enumerate(zip(math_lines, rose_lines)):
+        assert len(ml) == len(rl), f"Ring {i}: point count differs {len(ml)} vs {len(rl)}"
+        for j, (mp, rp) in enumerate(zip(ml, rl)):
+            dist = ((mp[0] - rp[0]) ** 2 + (mp[1] - rp[1]) ** 2) ** 0.5
+            assert dist < 1e-10, f"Ring {i}, point {j}: math=({mp[0]:.6f},{mp[1]:.6f}), rose=({rp[0]:.6f},{rp[1]:.6f}), dist={dist}"
+
+
+# ── Paon (Peacock) tests ────────────────────────────────────────────────
+
+
+def test_paon_layer():
+    """Test that PaonLayer can be created and generates output"""
+    from turtles import PaonLayer
+
+    layer = PaonLayer()
+    assert layer.num_lines == 500
+    assert layer.radius == 22.0
+    assert layer.amplitude == 0.035
+    assert layer.wave_frequency == 10.0
+    assert layer.phase_rate == 9.0
+    assert layer.n_harmonics == 3
+    assert abs(layer.fan_angle - 4.0) < 1e-10
+    assert abs(layer.vanishing_point - 0.3) < 1e-10
+    layer.generate()
+    lines = layer.get_lines()
+    assert len(lines) > 0, "PaonLayer should produce lines"
+
+
+def test_paon_svg_export():
+    """Test creating a paon pattern and exporting to SVG"""
+    from turtles import PaonLayer
+
+    layer = PaonLayer(num_lines=50, radius=15.0, resolution=200)
+    layer.generate()
+
+    with tempfile.TemporaryDirectory() as tmpdir:
+        svg_path = os.path.join(tmpdir, "paon_test.svg")
+        layer.to_svg(svg_path)
+
+        assert os.path.exists(svg_path), "SVG file should exist"
+        assert os.path.getsize(svg_path) > 0, "SVG file should have content"
+
+
+def test_paon_layer_with_center():
+    """Test PaonLayer with offset center"""
+    from turtles import PaonLayer
+
+    layer = PaonLayer.with_center(5.0, 5.0, num_lines=50, radius=10.0)
+    assert layer.center_x == 5.0
+    assert layer.center_y == 5.0
+    layer.generate()
+    lines = layer.get_lines()
+    assert len(lines) > 0
+
+
+def test_paon_layer_at_clock():
+    """Test PaonLayer at a clock position"""
+    from turtles import PaonLayer
+
+    layer = PaonLayer.at_clock(3, 0, 15.0, num_lines=50, radius=10.0)
+    assert layer.center_x > 0.0  # 3 o'clock → positive x
+    layer.generate()
+    lines = layer.get_lines()
+    assert len(lines) > 0
+
+
+def test_paon_lines_within_circle():
+    """Test that all paon points are within the radius circle"""
+    import math
+
+    from turtles import PaonLayer
+
+    layer = PaonLayer(num_lines=100, radius=15.0, amplitude=2.0, resolution=400)
+    layer.generate()
+    lines = layer.get_lines()
+
+    for i, line in enumerate(lines):
+        for j, (x, y) in enumerate(line):
+            dist = math.sqrt(x * x + y * y)
+            assert dist <= 15.0 + 1e-6, f"Point ({x}, {y}) in line {i} at index {j} is outside radius: dist={dist}"
+
+
+def test_paon_watchface_add():
+    """Test adding PaonLayer via WatchFace.add()"""
+    from turtles import PaonLayer
+
+    wf = WatchFace(radius=38.0)
+    wf.add_inner()
+    wf.add_outer()
+    wf.add_center_hole()
+
+    layer = PaonLayer(num_lines=50, radius=15.0, resolution=200)
+    wf.add(layer)
+    wf.generate()
+
+    with tempfile.TemporaryDirectory() as tmpdir:
+        svg_path = os.path.join(tmpdir, "paon_watchface.svg")
+        wf.to_svg(svg_path)
+        assert os.path.exists(svg_path)
+
+
+def test_paon_watchface_add_paon():
+    """Test WatchFace.add_paon() convenience method"""
+    wf = WatchFace(radius=38.0)
+    wf.add_inner()
+    wf.add_outer()
+    wf.add_center_hole()
+    wf.add_paon(num_lines=50, radius=15.0, resolution=200)
+    wf.generate()
+
+    with tempfile.TemporaryDirectory() as tmpdir:
+        svg_path = os.path.join(tmpdir, "paon_add_method.svg")
+        wf.to_svg(svg_path)
+        assert os.path.exists(svg_path)
+
+
+def test_paon_matches_rose_engine():
+    """Test that mathematical PaonLayer and RoseEngineLatheRun.paon() produce identical output"""
+    from turtles import PaonLayer, RoseEngineLatheRun
+
+    # Create mathematical PaonLayer
+    math_layer = PaonLayer(
+        num_lines=50,
+        radius=15.0,
+        amplitude=2.0,
+        wave_frequency=6.0,
+        phase_rate=4.0,
+        resolution=200,
+    )
+    math_layer.generate()
+
+    # Create equivalent rose engine paon
+    rose_run = RoseEngineLatheRun.paon(
+        num_lines=50,
+        radius=15.0,
+        amplitude=2.0,
+        wave_frequency=6.0,
+        phase_rate=4.0,
+        resolution=200,
+    )
+    rose_run.generate()
+
+    math_lines = math_layer.get_lines()
+    rose_lines = rose_run.get_lines()
+
+    assert len(math_lines) == len(rose_lines), f"Expected {len(math_lines)} lines, got {len(rose_lines)}"
+
+    for i, (ml, rl) in enumerate(zip(math_lines, rose_lines)):
+        assert len(ml) == len(rl), f"Line {i}: point count differs {len(ml)} vs {len(rl)}"
+        for j, (mp, rp) in enumerate(zip(ml, rl)):
+            dist = ((mp[0] - rp[0]) ** 2 + (mp[1] - rp[1]) ** 2) ** 0.5
+            assert dist < 1e-10, f"Line {i}, point {j}: math=({mp[0]:.6f},{mp[1]:.6f}), rose=({rp[0]:.6f},{rp[1]:.6f}), dist={dist}"

@@ -233,7 +233,7 @@ impl RoseEngineConfig {
         let mut config = RoseEngineConfig::new(base_radius, amplitude);
         config.rosette = RosettePattern::Draperie {
             frequency: wave_frequency,
-            depth_frequency: wave_frequency * 2.0,
+            wave_exponent: 1,
         };
         config.resolution = 1500;
         config
@@ -335,14 +335,14 @@ mod tests {
         assert_eq!(config.amplitude, 2.0);
         assert_eq!(config.resolution, 1500);
 
-        // Verify it's a Draperie pattern with correct frequencies
+        // Verify it's a Draperie pattern with correct frequency
         match config.rosette {
             RosettePattern::Draperie {
                 frequency,
-                depth_frequency,
+                wave_exponent,
             } => {
                 assert_eq!(frequency, wave_frequency);
-                assert_eq!(depth_frequency, wave_frequency * 2.0);
+                assert_eq!(wave_exponent, 1);
             }
             _ => panic!("Should be Draperie pattern"),
         }

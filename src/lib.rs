@@ -4,6 +4,7 @@ mod diamant_bindings;
 mod draperie_bindings;
 mod guilloche_bindings;
 mod limacon_bindings;
+mod paon_bindings;
 mod rose_engine_bindings;
 mod spirograph_bindings;
 mod watch_face_bindings;
@@ -12,6 +13,7 @@ pub use diamant_bindings::DiamantLayer;
 pub use draperie_bindings::DraperieLayer;
 pub use guilloche_bindings::{FlinqueLayer, GuillochePattern};
 pub use limacon_bindings::LimaconLayer;
+pub use paon_bindings::PaonLayer;
 pub use rose_engine_bindings::{CuttingBit, RoseEngineConfig, RoseEngineLathe, RoseEngineLatheRun, RosettePattern};
 pub use spirograph_bindings::{HorizontalSpirograph, SphericalSpirograph, VerticalSpirograph};
 pub use watch_face_bindings::WatchFace;
@@ -34,6 +36,9 @@ fn turtles(_py: Python, m: &Bound<PyModule>) -> PyResult<()> {
 
     // Draperie (drapery) pattern layer
     m.add_class::<DraperieLayer>().unwrap();
+
+    // Paon (peacock) pattern layer
+    m.add_class::<PaonLayer>().unwrap();
 
     // Limaçon pattern layer
     m.add_class::<LimaconLayer>().unwrap();

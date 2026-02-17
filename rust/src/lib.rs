@@ -10,6 +10,8 @@ pub mod flinque;
 pub mod guilloche;
 // Limaçon pattern generation
 pub mod limacon;
+// Paon (Peacock) pattern generation
+pub mod paon;
 pub mod spirograph;
 // Rose engine lathe module
 pub mod rose_engine;
@@ -26,6 +28,7 @@ pub use draperie::{DraperieConfig, DraperieLayer};
 pub use flinque::{FlinqueConfig, FlinqueLayer};
 pub use guilloche::GuillochePattern;
 pub use limacon::{LimaconConfig, LimaconLayer};
+pub use paon::{paon_wave_fn, PaonConfig, PaonLayer};
 pub use rose_engine::{
     Arc, BitShape, CuttingBit, RenderedOutput, RoseEngineConfig, RoseEngineLathe,
     RoseEngineLatheRun, RosettePattern, ToolPathOutput,

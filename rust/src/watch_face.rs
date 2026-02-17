@@ -4,6 +4,7 @@ use crate::draperie::{DraperieConfig, DraperieLayer};
 use crate::flinque::{FlinqueConfig, FlinqueLayer};
 use crate::guilloche::GuillochePattern;
 use crate::limacon::{LimaconConfig, LimaconLayer};
+use crate::paon::{PaonConfig, PaonLayer};
 use crate::spirograph::{HorizontalSpirograph, SphericalSpirograph, VerticalSpirograph};
 
 /// Watch dial circle configuration
@@ -213,6 +214,23 @@ impl WatchFace {
             .add_limacon_at_clock(config, hour, minute, distance)
     }
 
+    /// Add a paon (peacock pattern) layer
+    pub fn add_paon_layer(&mut self, paon: PaonLayer) {
+        self.guilloche.add_paon_layer(paon);
+    }
+
+    /// Add a paon layer at a clock position
+    pub fn add_paon_at_clock(
+        &mut self,
+        config: PaonConfig,
+        hour: u32,
+        minute: u32,
+        distance: f64,
+    ) -> Result<(), SpirographError> {
+        self.guilloche
+            .add_paon_at_clock(config, hour, minute, distance)
+    }
+
     /// Generate all layers
     pub fn generate(&mut self) {
         self.guilloche.generate();
@@ -390,6 +408,30 @@ impl WatchFace {
             }
         }
 
+        // Render paon layers from guilloche
+        for line_set in self.get_paon_lines() {
+            for line_points in line_set {
+                if line_points.is_empty() {
+                    continue;
+                }
+
+                let mut data = Data::new().move_to((line_points[0].x, line_points[0].y));
+                for point in line_points.iter().skip(1) {
+                    data = data.line_to((point.x, point.y));
+                }
+
+                let path = Path::new()
+                    .set("fill", "none")
+                    .set("stroke", "#1a1a1a")
+                    .set("stroke-width", 0.03)
+                    .set("stroke-linecap", "round")
+                    .set("stroke-linejoin", "round")
+                    .set("d", data);
+
+                pattern_group = pattern_group.add(path);
+            }
+        }
+
         document = document.add(pattern_group);
 
         // Add outer bezel ring if configured
@@ -447,6 +489,10 @@ impl WatchFace {
 
     fn get_limacon_lines(&self) -> Vec<&Vec<Vec<Point2D>>> {
         self.guilloche.limacon_lines()
+    }
+
+    fn get_paon_lines(&self) -> Vec<&Vec<Vec<Point2D>>> {
+        self.guilloche.paon_lines()
     }
 }
 

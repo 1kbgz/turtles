@@ -449,4 +449,93 @@ mod tests {
         let amp = config.safe_amplitude();
         assert!(amp > 0.0, "Safe amplitude should be positive, got {}", amp);
     }
+
+    #[test]
+    fn test_draperie_matches_rose_engine() {
+        use crate::rose_engine::RoseEngineLatheRun;
+
+        // Use defaults matching the mathematical module
+        let num_rings = 96;
+        let base_radius = 22.0;
+        let radius_step = 0.44;
+        let wave_frequency = 12.0;
+        let phase_shift = PI / 12.0;
+        let phase_oscillations = 2.5;
+        let resolution = 1500;
+        let phase_exponent = 3_u32;
+        let wave_exponent = 1_u32;
+        let circular_phase = 2.0_f64;
+
+        // Create mathematical DraperieLayer
+        let config = DraperieConfig {
+            num_rings,
+            base_radius,
+            radius_step,
+            wave_frequency,
+            amplitude: None,
+            phase_shift,
+            phase_oscillations,
+            resolution,
+            phase_exponent,
+            wave_exponent,
+            circular_phase,
+        };
+        let mut math_layer = DraperieLayer::new(config).unwrap();
+        math_layer.generate();
+
+        // Create equivalent rose engine draperie
+        let mut rose_run = RoseEngineLatheRun::new_draperie(
+            num_rings,
+            base_radius,
+            radius_step,
+            wave_frequency,
+            phase_shift,
+            phase_oscillations,
+            resolution,
+            phase_exponent,
+            wave_exponent,
+            circular_phase,
+            0.0,
+            0.0,
+        )
+        .unwrap();
+        rose_run.generate();
+
+        // Both should have the same number of rings/lines
+        let math_lines = math_layer.lines();
+        let rose_lines = rose_run.lines();
+
+        assert_eq!(
+            math_lines.len(),
+            rose_lines.len(),
+            "DraperieLayer and RoseEngineLatheRun should have same number of rings"
+        );
+
+        // Each ring should have the same number of points
+        for (i, (math_ring, rose_ring)) in math_lines.iter().zip(rose_lines.iter()).enumerate() {
+            assert_eq!(
+                math_ring.len(),
+                rose_ring.len(),
+                "Ring {} should have same number of points",
+                i
+            );
+
+            // Compare all points — they should be identical (within floating point tolerance)
+            for (j, (math_pt, rose_pt)) in math_ring.iter().zip(rose_ring.iter()).enumerate() {
+                let dist =
+                    ((math_pt.x - rose_pt.x).powi(2) + (math_pt.y - rose_pt.y).powi(2)).sqrt();
+                assert!(
+                    dist < 1e-10,
+                    "Point {},{} differs: math=({}, {}), rose=({}, {}), dist={}",
+                    i,
+                    j,
+                    math_pt.x,
+                    math_pt.y,
+                    rose_pt.x,
+                    rose_pt.y,
+                    dist
+                );
+            }
+        }
+    }
 }

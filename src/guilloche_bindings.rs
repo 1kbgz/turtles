@@ -7,6 +7,8 @@ use turtles::{
     FlinqueLayer as BaseFlinqueLayer,
     LimaconConfig as BaseLimaconConfig,
     LimaconLayer as BaseLimaconLayer,
+    PaonConfig as BasePaonConfig,
+    PaonLayer as BasePaonLayer,
     HorizontalSpirograph as BaseHorizontalSpirograph,
     VerticalSpirograph as BaseVerticalSpirograph,
     SphericalSpirograph as BaseSphericalSpirograph,
@@ -15,6 +17,7 @@ use turtles::{
 
 use crate::diamant_bindings::DiamantLayer;
 use crate::limacon_bindings::LimaconLayer;
+use crate::paon_bindings::PaonLayer;
 use crate::spirograph_bindings::{HorizontalSpirograph, VerticalSpirograph, SphericalSpirograph};
 
 /// Python wrapper for FlinqueLayer - a radial sunburst engine-turned pattern
@@ -517,6 +520,80 @@ impl GuillochePattern {
             resolution,
         };
         self.inner.add_limacon_at_clock(config, hour, minute, distance)
+            .map_err(|e| pyo3::exceptions::PyValueError::new_err(e.to_string()))
+    }
+
+    /// Add a paon (peacock pattern) layer to the pattern
+    fn add_paon_layer(&mut self, paon: &PaonLayer) -> PyResult<()> {
+        let new_layer = BasePaonLayer::new_with_center(
+            paon.inner.config.clone(),
+            paon.inner.center_x,
+            paon.inner.center_y,
+        ).map_err(|e| pyo3::exceptions::PyValueError::new_err(e.to_string()))?;
+        self.inner.add_paon_layer(new_layer);
+        Ok(())
+    }
+
+    /// Add a paon layer positioned at a given angle and distance from origin
+    #[pyo3(signature = (angle, distance, num_lines=500, radius=22.0, amplitude=0.035, wave_frequency=10.0, phase_rate=9.0, resolution=800, n_harmonics=3, fan_angle=4.0, vanishing_point=0.3))]
+    fn add_paon_at_polar(
+        &mut self,
+        angle: f64,
+        distance: f64,
+        num_lines: usize,
+        radius: f64,
+        amplitude: f64,
+        wave_frequency: f64,
+        phase_rate: f64,
+        resolution: usize,
+        n_harmonics: usize,
+        fan_angle: f64,
+        vanishing_point: f64,
+    ) -> PyResult<()> {
+        let config = BasePaonConfig {
+            num_lines,
+            radius,
+            amplitude,
+            wave_frequency,
+            phase_rate,
+            resolution,
+            n_harmonics,
+            fan_angle,
+            vanishing_point,
+        };
+        self.inner.add_paon_at_polar(config, angle, distance)
+            .map_err(|e| pyo3::exceptions::PyValueError::new_err(e.to_string()))
+    }
+
+    /// Add a paon layer positioned at a clock position
+    #[pyo3(signature = (hour, minute, distance, num_lines=500, radius=22.0, amplitude=0.035, wave_frequency=10.0, phase_rate=9.0, resolution=800, n_harmonics=3, fan_angle=4.0, vanishing_point=0.3))]
+    fn add_paon_at_clock(
+        &mut self,
+        hour: u32,
+        minute: u32,
+        distance: f64,
+        num_lines: usize,
+        radius: f64,
+        amplitude: f64,
+        wave_frequency: f64,
+        phase_rate: f64,
+        resolution: usize,
+        n_harmonics: usize,
+        fan_angle: f64,
+        vanishing_point: f64,
+    ) -> PyResult<()> {
+        let config = BasePaonConfig {
+            num_lines,
+            radius,
+            amplitude,
+            wave_frequency,
+            phase_rate,
+            resolution,
+            n_harmonics,
+            fan_angle,
+            vanishing_point,
+        };
+        self.inner.add_paon_at_clock(config, hour, minute, distance)
             .map_err(|e| pyo3::exceptions::PyValueError::new_err(e.to_string()))
     }
 
