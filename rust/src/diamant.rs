@@ -298,4 +298,57 @@ mod tests {
             );
         }
     }
+
+    #[test]
+    fn test_diamant_matches_rose_engine() {
+        use crate::rose_engine::RoseEngineLatheRun;
+
+        let num_circles = 12;
+        let circle_radius = 10.0;
+        let resolution = 360;
+
+        // Create mathematical DiamantLayer
+        let config = DiamantConfig::new(num_circles, circle_radius).with_resolution(resolution);
+        let mut diamant = DiamantLayer::new(config).unwrap();
+        diamant.generate();
+
+        // Create equivalent rose engine diamant
+        let mut rose_run =
+            RoseEngineLatheRun::new_diamant(num_circles, circle_radius, resolution, 0.0, 0.0)
+                .unwrap();
+        rose_run.generate();
+
+        let diamant_lines = diamant.lines();
+        let rose_lines = rose_run.lines();
+
+        assert_eq!(
+            diamant_lines.len(),
+            rose_lines.len(),
+            "DiamantLayer and RoseEngineLatheRun should have same number of circles"
+        );
+
+        for (i, (d_circle, r_circle)) in diamant_lines.iter().zip(rose_lines.iter()).enumerate() {
+            assert_eq!(
+                d_circle.len(),
+                r_circle.len(),
+                "Circle {} should have same number of points",
+                i
+            );
+
+            for (j, (d_pt, r_pt)) in d_circle.iter().zip(r_circle.iter()).enumerate() {
+                let dist = ((d_pt.x - r_pt.x).powi(2) + (d_pt.y - r_pt.y).powi(2)).sqrt();
+                assert!(
+                    dist < 1e-10,
+                    "Point {},{} differs: diamant=({}, {}), rose=({}, {}), dist={}",
+                    i,
+                    j,
+                    d_pt.x,
+                    d_pt.y,
+                    r_pt.x,
+                    r_pt.y,
+                    dist
+                );
+            }
+        }
+    }
 }

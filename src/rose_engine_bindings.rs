@@ -581,6 +581,95 @@ impl RoseEngineLatheRun {
         .map_err(|e| pyo3::exceptions::PyValueError::new_err(e.to_string()))
     }
 
+    /// Create a rose engine diamant (diamond) pattern that produces identical
+    /// output to the mathematical DiamantLayer.
+    ///
+    /// Models a physical rose engine with a round eccentric cam (sinusoidal
+    /// rosette, frequency 1) whose eccentricity equals the circle radius.
+    /// Each pass traces a circle of radius `circle_radius` tangent to the
+    /// centre.  Multiple passes at different angular positions create the
+    /// characteristic diamond mesh.
+    #[staticmethod]
+    #[pyo3(signature = (num_circles=72, circle_radius=20.0, resolution=360, center_x=0.0, center_y=0.0))]
+    fn diamant(
+        num_circles: usize,
+        circle_radius: f64,
+        resolution: usize,
+        center_x: f64,
+        center_y: f64,
+    ) -> PyResult<Self> {
+        BaseRoseEngineLatheRun::new_diamant(
+            num_circles,
+            circle_radius,
+            resolution,
+            center_x,
+            center_y,
+        )
+        .map(|inner| RoseEngineLatheRun { inner })
+        .map_err(|e| pyo3::exceptions::PyValueError::new_err(e.to_string()))
+    }
+
+    /// Create a rose engine limaçon pattern that produces identical output
+    /// to the mathematical LimaconLayer.
+    ///
+    /// Models a physical rose engine with a round eccentric rosette
+    /// (sinusoidal cam, frequency 1).  Each pass traces the polar curve
+    /// r = base_radius + amplitude · sin(θ + phase).  Multiple passes at
+    /// different phase offsets create the overlapping limaçon mesh.
+    #[staticmethod]
+    #[pyo3(signature = (num_curves=72, base_radius=20.0, amplitude=20.0, resolution=360, center_x=0.0, center_y=0.0))]
+    fn limacon(
+        num_curves: usize,
+        base_radius: f64,
+        amplitude: f64,
+        resolution: usize,
+        center_x: f64,
+        center_y: f64,
+    ) -> PyResult<Self> {
+        BaseRoseEngineLatheRun::new_limacon(
+            num_curves,
+            base_radius,
+            amplitude,
+            resolution,
+            center_x,
+            center_y,
+        )
+        .map(|inner| RoseEngineLatheRun { inner })
+        .map_err(|e| pyo3::exceptions::PyValueError::new_err(e.to_string()))
+    }
+
+    /// Create a rose engine flinqué (engine-turned) pattern that produces
+    /// identical output to the mathematical FlinqueLayer.
+    ///
+    /// Models a physical rose engine with a multi-lobe rosette (num_petals
+    /// lobes) plus a secondary sinusoidal rosette for fine ripple.  The lathe
+    /// makes concentric-ring passes from the inner to the outer radius.
+    #[staticmethod]
+    #[pyo3(signature = (radius=10.0, num_petals=12, num_waves=60, wave_amplitude=0.8, wave_frequency=20.0, inner_radius_ratio=0.05, center_x=0.0, center_y=0.0))]
+    fn flinque(
+        radius: f64,
+        num_petals: usize,
+        num_waves: usize,
+        wave_amplitude: f64,
+        wave_frequency: f64,
+        inner_radius_ratio: f64,
+        center_x: f64,
+        center_y: f64,
+    ) -> PyResult<Self> {
+        BaseRoseEngineLatheRun::new_flinque(
+            radius,
+            num_petals,
+            num_waves,
+            wave_amplitude,
+            wave_frequency,
+            inner_radius_ratio,
+            center_x,
+            center_y,
+        )
+        .map(|inner| RoseEngineLatheRun { inner })
+        .map_err(|e| pyo3::exceptions::PyValueError::new_err(e.to_string()))
+    }
+
     /// Generate all passes of the rose engine pattern
     fn generate(&mut self) {
         self.inner.generate();

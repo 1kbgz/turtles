@@ -106,6 +106,16 @@ impl DiamantLayer {
         self.inner.generate();
     }
 
+    /// Get the generated pattern lines as a list of point lists
+    /// Each line is a list of (x, y) tuples
+    fn get_lines(&self) -> Vec<Vec<(f64, f64)>> {
+        self.inner
+            .lines()
+            .iter()
+            .map(|line| line.iter().map(|p| (p.x, p.y)).collect())
+            .collect()
+    }
+
     /// Export the pattern to SVG format
     fn to_svg(&self, filename: &str) -> PyResult<()> {
         self.inner
