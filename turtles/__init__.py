@@ -126,7 +126,7 @@ class WatchFace:
 
     def add_flinque(
         self,
-        radius: float,
+        radius: float = None,
         hour: int = 12,
         minute: int = 0,
         distance: float = 0.0,
@@ -139,7 +139,7 @@ class WatchFace:
         """Add a flinqué (engine-turned) pattern.
 
         Args:
-            radius: Radius of the flinqué pattern.
+            radius: Radius of the flinqué pattern. Defaults to watch face radius.
             hour: Hour position for center (1-12, default 12 = centered).
             minute: Minute position for center (0-59).
             distance: Distance from center (0 = centered on watch face).
@@ -149,6 +149,8 @@ class WatchFace:
             wave_frequency: Frequency of fine ripple texture.
             inner_radius_ratio: Inner radius as fraction of outer radius.
         """
+        if radius is None:
+            radius = self.radius
         self._watch_face.add_flinque_at_clock(
             radius=radius,
             hour=hour,
@@ -161,10 +163,18 @@ class WatchFace:
             inner_radius_ratio=inner_radius_ratio,
         )
 
+    def add_flinque_layer(self, layer):
+        """Add a pre-configured FlinqueLayer to the watch face.
+
+        Args:
+            layer: A FlinqueLayer instance.
+        """
+        self._watch_face.add_flinque_layer(layer)
+
     def add_diamant(
         self,
         num_circles: int = 72,
-        circle_radius: float = 20.0,
+        circle_radius: float = None,
         hour: int = 12,
         minute: int = 0,
         distance: float = 0.0,
@@ -178,12 +188,14 @@ class WatchFace:
 
         Args:
             num_circles: Number of circles to draw (more = denser mesh).
-            circle_radius: Radius of each individual circle.
+            circle_radius: Radius of each individual circle. Defaults to watch face radius.
             hour: Hour position for center (1-12, default 12 = centered).
             minute: Minute position for center (0-59).
             distance: Distance from center (0 = centered on watch face).
             resolution: Number of points per circle.
         """
+        if circle_radius is None:
+            circle_radius = self.radius
         self._watch_face.add_diamant_at_clock(
             num_circles=num_circles,
             circle_radius=circle_radius,
@@ -193,11 +205,19 @@ class WatchFace:
             resolution=resolution,
         )
 
+    def add_diamant_layer(self, layer):
+        """Add a pre-configured DiamantLayer to the watch face.
+
+        Args:
+            layer: A DiamantLayer instance.
+        """
+        self._watch_face.add_diamant_layer(layer)
+
     def add_limacon(
         self,
         num_curves: int = 72,
-        base_radius: float = 20.0,
-        amplitude: float = 20.0,
+        base_radius: float = None,
+        amplitude: float = None,
         hour: int = 12,
         minute: int = 0,
         distance: float = 0.0,
@@ -210,13 +230,17 @@ class WatchFace:
 
         Args:
             num_curves: Number of limaçon curves to draw (more = denser pattern).
-            base_radius: Base radius of the limaçon curves.
-            amplitude: Amplitude of the limaçon curves.
+            base_radius: Base radius of the limaçon curves. Defaults to watch face radius.
+            amplitude: Amplitude of the limaçon curves. Defaults to watch face radius.
             hour: Hour position for center (1-12, default 12 = centered).
             minute: Minute position for center (0-59).
             distance: Distance from center (0 = centered on watch face).
             resolution: Number of points per curve.
         """
+        if base_radius is None:
+            base_radius = self.radius
+        if amplitude is None:
+            amplitude = self.radius
         self._watch_face.add_limacon_at_clock(
             num_curves=num_curves,
             base_radius=base_radius,
@@ -227,10 +251,18 @@ class WatchFace:
             resolution=resolution,
         )
 
+    def add_limacon_layer(self, layer):
+        """Add a pre-configured LimaconLayer to the watch face.
+
+        Args:
+            layer: A LimaconLayer instance.
+        """
+        self._watch_face.add_limacon_layer(layer)
+
     def add_draperie(
         self,
         num_rings: int = 96,
-        base_radius: float = 22.0,
+        base_radius: float = None,
         radius_step: float = 0.44,
         wave_frequency: float = 12.0,
         phase_shift: float = None,
@@ -252,7 +284,7 @@ class WatchFace:
 
         Args:
             num_rings: Number of concentric rings (more = denser).
-            base_radius: Centre of the ring band in mm.
+            base_radius: Centre of the ring band in mm. Defaults to watch face radius.
             radius_step: Radial spacing between ring centres.
             wave_frequency: Number of wave undulations per revolution.
             phase_shift: Peak angular oscillation in radians (default: π/12 ≈ 15°).
@@ -265,6 +297,8 @@ class WatchFace:
             wave_exponent: Exponent for the wave shape (1 = sinusoidal, 3 = softer crests).
             circular_phase: Dome-shaped phase exponent; 0 disables, 2.0 = rounded folds (default).
         """
+        if base_radius is None:
+            base_radius = self.radius
         self._watch_face.add_draperie_at_clock(
             hour=hour,
             minute=minute,
@@ -281,10 +315,18 @@ class WatchFace:
             circular_phase=circular_phase,
         )
 
+    def add_draperie_layer(self, layer):
+        """Add a pre-configured DraperieLayer to the watch face.
+
+        Args:
+            layer: A DraperieLayer instance.
+        """
+        self._watch_face.add_draperie_layer(layer)
+
     def add_draperie_sharp(
         self,
         num_rings: int = 96,
-        base_radius: float = 22.0,
+        base_radius: float = None,
         radius_step: float = 0.44,
         wave_frequency: float = 12.0,
         phase_shift: float = None,
@@ -332,7 +374,7 @@ class WatchFace:
     def add_paon(
         self,
         num_lines: int = 500,
-        radius: float = 38.0,
+        radius: float = None,
         amplitude: float = 0.1,
         wave_frequency: float = 15.0,
         phase_rate: float = 9.0,
@@ -352,8 +394,7 @@ class WatchFace:
 
         Args:
             num_lines: Number of fan lines (more = denser pattern).
-            radius: Radius of the circular clipping region in mm.
-                    Defaults to 78% of the watch face radius (fills inner dial).
+            radius: Radius of the circular clipping region in mm. Defaults to watch face radius.
             amplitude: Perpendicular oscillation amplitude in mm.
             wave_frequency: Number of zigzag cycles per line.
             phase_rate: Phase change rate across fan (controls arch band count).
@@ -365,6 +406,8 @@ class WatchFace:
             fan_angle: Total angular spread of the fan in radians (~1.4 = 80°).
             vanishing_point: VP distance below circle bottom (fraction of diameter).
         """
+        if radius is None:
+            radius = self.radius
         self._watch_face.add_paon_at_clock(
             hour=hour,
             minute=minute,
@@ -379,6 +422,14 @@ class WatchFace:
             fan_angle=fan_angle,
             vanishing_point=vanishing_point,
         )
+
+    def add_paon_layer(self, layer):
+        """Add a pre-configured PaonLayer to the watch face.
+
+        Args:
+            layer: A PaonLayer instance.
+        """
+        self._watch_face.add_paon_layer(layer)
 
     def add(self, layer):
         """Add a spirograph, flinque, diamant, draperie, limacon, or paon layer."""

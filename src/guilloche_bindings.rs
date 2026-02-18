@@ -147,6 +147,21 @@ impl FlinqueLayer {
         self.inner.center_y
     }
 
+    /// Generate the flinqué pattern
+    fn generate(&mut self) {
+        self.inner.generate();
+    }
+
+    /// Get the generated pattern lines as a list of point lists
+    /// Each line is a list of (x, y) tuples
+    fn get_lines(&self) -> Vec<Vec<(f64, f64)>> {
+        self.inner
+            .lines()
+            .iter()
+            .map(|line| line.iter().map(|p| (p.x, p.y)).collect())
+            .collect()
+    }
+
     fn __repr__(&self) -> String {
         format!(
             "FlinqueLayer(radius={}, center=({}, {}), petals={})",

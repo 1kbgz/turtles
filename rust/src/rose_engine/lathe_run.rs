@@ -1,5 +1,8 @@
 use crate::common::{Point2D, SpirographError};
+use crate::diamant::DiamantConfig;
 use crate::draperie::DraperieConfig;
+use crate::flinque::FlinqueConfig;
+use crate::limacon::LimaconConfig;
 use crate::paon::{paon_wave_fn, PaonConfig};
 use crate::rose_engine::{CuttingBit, RoseEngineConfig, RoseEngineLathe, RosettePattern};
 use std::f64::consts::PI;
@@ -51,6 +54,21 @@ pub struct RoseEngineLatheRun {
     /// When set, `generate()` produces parallel vertical lines with sinusoidal
     /// displacement instead of circular lathe passes.
     linear_paon: Option<PaonConfig>,
+
+    /// Optional diamant (diamond) configuration.
+    /// When set, `generate()` produces circles tangent to centre, matching
+    /// the mathematical `DiamantLayer` point-for-point.
+    circular_diamant: Option<DiamantConfig>,
+
+    /// Optional limacon configuration.
+    /// When set, `generate()` produces limaçon polar curves, matching
+    /// the mathematical `LimaconLayer` point-for-point.
+    polar_limacon: Option<LimaconConfig>,
+
+    /// Optional flinque (engine-turned) configuration.
+    /// When set, `generate()` produces concentric chevron rings, matching
+    /// the mathematical `FlinqueLayer` point-for-point.
+    concentric_flinque: Option<FlinqueConfig>,
 
     // Generated data
     passes: Vec<RoseEngineLathe>,
@@ -135,6 +153,9 @@ impl RoseEngineLatheRun {
             center_x,
             center_y,
             linear_paon: None,
+            circular_diamant: None,
+            polar_limacon: None,
+            concentric_flinque: None,
             passes: Vec::new(),
             segmented_lines: Vec::new(),
             generated: false,
@@ -282,6 +303,197 @@ impl RoseEngineLatheRun {
         Ok(run)
     }
 
+    /// Create a rose engine diamant (diamond) pattern that produces identical
+    /// output to the mathematical `DiamantLayer`.
+    ///
+    /// ## Physical model
+    ///
+    /// On a physical rose engine the diamant pattern is produced with a **round
+    /// eccentric cam** (a perfect circle mounted off-centre on the spindle).
+    /// The cam has eccentricity *e = R* (equal to the desired circle radius),
+    /// so the spindle displacement follows a pure sinusoidal of frequency 1:
+    ///
+    ///   d(θ) = R · sin(θ + φ)
+    ///
+    /// This is equivalent to `RosettePattern::Sinusoidal { frequency: 1.0 }`
+    /// with `base_radius = 0` and `amplitude = 2R`.  The polar curve
+    /// ρ = 2R sin(θ + φ) is *geometrically* a circle of radius R centred at
+    /// distance R from the origin, tangent to the centre.
+    ///
+    /// ## Why the Cartesian parameterisation is used
+    ///
+    /// The polar form ρ = 2R sin(θ + φ) traces the same geometric circle but
+    /// visits each point *twice* per revolution (once with positive ρ, once
+    /// reflected through the origin when ρ < 0).  The angular speed along the
+    /// circle is non-uniform.  The mathematical `DiamantLayer` uses the
+    /// standard Cartesian circle parameterisation (x = cx + R cos t,
+    /// y = cy + R sin t) which visits each point exactly once with uniform
+    /// arc-length spacing.
+    ///
+    /// Both produce the **same set of circles**; only the point sampling
+    /// differs.  For 1-to-1 point matching with `DiamantLayer`, this
+    /// constructor uses the Cartesian parameterisation directly.
+    ///
+    /// # Arguments
+    /// * `num_circles` – Number of circles (= number of lathe passes)
+    /// * `circle_radius` – Radius of each individual circle
+    /// * `resolution` – Number of points per circle
+    /// * `center_x` / `center_y` – Pattern centre
+    pub fn new_diamant(
+        num_circles: usize,
+        circle_radius: f64,
+        resolution: usize,
+        center_x: f64,
+        center_y: f64,
+    ) -> Result<Self, SpirographError> {
+        let diamant_config = DiamantConfig {
+            num_circles,
+            circle_radius,
+            resolution,
+        };
+
+        // The equivalent rose engine setup:
+        //   rosette = Sinusoidal { frequency: 1 }
+        //   base_radius ≈ 0  (eccentricity = circle_radius)
+        //   amplitude  = 2 * circle_radius
+        // We use a small positive base_radius to satisfy the constructor
+        // constraint, but the actual generation bypasses the lathe path.
+        let re_config = RoseEngineConfig::new(circle_radius, circle_radius);
+        let bit = CuttingBit::v_shaped(30.0, 0.02);
+        let mut run = Self::new_with_segments(re_config, bit, num_circles, 1, center_x, center_y)?;
+        run.circular_diamant = Some(diamant_config);
+        Ok(run)
+    }
+
+    /// Create a rose engine limaçon pattern that produces identical output
+    /// to the mathematical `LimaconLayer`.
+    ///
+    /// ## Physical model
+    ///
+    /// On a physical rose engine the limaçon is the *natural* curve cut by a
+    /// **round eccentric rosette** (sinusoidal cam, frequency 1).  As the
+    /// spindle rotates, the work-piece is displaced sinusoidally toward and
+    /// away from the fixed cutting tool, producing the polar curve:
+    ///
+    ///   ρ(θ) = base_radius + amplitude · sin(θ + φ)
+    ///
+    /// Multiple passes at different phase offsets (φ_i = 2πi/N) create the
+    /// overlapping limaçon mesh.
+    ///
+    /// This constructor simply wraps the standard phase-rotation mode with
+    /// `RosettePattern::Sinusoidal { frequency: 1.0 }`.  The output matches
+    /// `LimaconLayer` point-for-point.
+    ///
+    /// # Arguments
+    /// * `num_curves` – Number of curves (= number of lathe passes)
+    /// * `base_radius` – Base radius (limaçon *a* parameter)
+    /// * `amplitude` – Sinusoidal amplitude (limaçon *b* parameter)
+    /// * `resolution` – Number of points per curve
+    /// * `center_x` / `center_y` – Pattern centre
+    pub fn new_limacon(
+        num_curves: usize,
+        base_radius: f64,
+        amplitude: f64,
+        resolution: usize,
+        center_x: f64,
+        center_y: f64,
+    ) -> Result<Self, SpirographError> {
+        let mut re_config = RoseEngineConfig::new(base_radius, amplitude);
+        re_config.rosette = RosettePattern::Sinusoidal { frequency: 1.0 };
+        re_config.resolution = resolution;
+
+        let bit = CuttingBit::v_shaped(30.0, 0.02);
+        let run = Self::new_with_segments(re_config, bit, num_curves, 1, center_x, center_y)?;
+        // No special fields needed – the standard phase-rotation generate()
+        // with Sinusoidal{freq=1} already produces exact limaçon curves.
+        Ok(run)
+    }
+
+    /// Create a rose engine flinqué (engine-turned) pattern that produces
+    /// identical output to the mathematical `FlinqueLayer`.
+    ///
+    /// ## Physical model
+    ///
+    /// On a physical rose engine the flinqué sunburst is produced with a
+    /// **multi-lobe rosette** having *n* lobes (one per petal) and a
+    /// **secondary sinusoidal rosette** for fine ripple texture.  The lathe
+    /// makes multiple concentric-ring passes (radius-step mode), each at a
+    /// different base radius from the inner to the outer edge of the dial.
+    ///
+    /// ### Primary rosette
+    ///
+    /// The physical cam profile is |sin(n θ / 2)|, creating *n* identical
+    /// rounded lobes.  This is the same as `RosettePattern::MultiLobe` with
+    /// the DC offset and scaling adjusted to match the flinqué amplitude
+    /// convention:
+    ///
+    ///   r = base_r + A · |sin(n θ / 2)|
+    ///
+    /// The MultiLobe rosette displacement maps to [-1, 1]:
+    ///   d_ML(θ) = |sin(n θ / 2)| · 2 − 1
+    ///
+    /// Setting base_radius_RE = base_r + A/2 and amplitude_RE = A/2 gives:
+    ///   r = (base_r + A/2) + (A/2)(2|sin| − 1) = base_r + A|sin|  ✓
+    ///
+    /// ### Secondary rosette (ripple)
+    ///
+    /// A sinusoidal rosette at frequency n · wave_frequency / 2 with
+    /// amplitude 0.05 · A adds the fine radial texture:
+    ///
+    ///   ripple = 0.05 · A · sin(n · wave_frequency · θ / 2)
+    ///
+    /// ### Why exact 1-to-1 matching requires direct computation
+    ///
+    /// The mathematical `FlinqueLayer` spaces its concentric rings uniformly
+    /// between `inner_radius` and `outer_radius` with a half-step offset from
+    /// each edge, and skips rings whose base radius is below a safe minimum.
+    /// The standard rose engine radius-step mode centres rings symmetrically
+    /// around `base_radius`, producing a different set of radii.  For
+    /// point-for-point matching, this constructor reproduces the `FlinqueLayer`
+    /// ring-spacing logic directly.
+    ///
+    /// # Arguments
+    /// * `radius` – Outer radius of the sunburst
+    /// * `num_petals` – Number of chevron peaks per ring (lobe count)
+    /// * `num_waves` – Number of concentric rings
+    /// * `wave_amplitude` – Chevron amplitude (depth of the V peaks)
+    /// * `wave_frequency` – Fine ripple frequency multiplier
+    /// * `inner_radius_ratio` – Inner radius as fraction of outer radius
+    /// * `center_x` / `center_y` – Pattern centre
+    pub fn new_flinque(
+        radius: f64,
+        num_petals: usize,
+        num_waves: usize,
+        wave_amplitude: f64,
+        wave_frequency: f64,
+        inner_radius_ratio: f64,
+        center_x: f64,
+        center_y: f64,
+    ) -> Result<Self, SpirographError> {
+        let flinque_config = FlinqueConfig {
+            num_petals,
+            num_waves,
+            wave_amplitude,
+            wave_frequency,
+            inner_radius_ratio,
+        };
+
+        // The equivalent rose engine setup:
+        //   primary rosette  = MultiLobe { lobes: num_petals }
+        //   secondary rosette = Sinusoidal { frequency: num_petals * wave_frequency / 2 }
+        //   base_radius_RE = base_r + wave_amplitude / 2  (per ring)
+        //   amplitude_RE   = wave_amplitude / 2
+        //   secondary_amp  = 0.05 * wave_amplitude
+        //   concentric ring mode (radius_step)
+        let re_config = RoseEngineConfig::new(radius, wave_amplitude / 2.0);
+        let bit = CuttingBit::v_shaped(30.0, 0.02);
+        let mut run = Self::new_with_segments(re_config, bit, num_waves, 1, center_x, center_y)?;
+        run.concentric_flinque = Some(flinque_config);
+        // Store the outer radius for generation
+        run.base_config.base_radius = radius;
+        Ok(run)
+    }
+
     /// Evaluate the phase-shape function at parameter `t`.
     ///
     /// * **dome mode** (`circular_phase > 0`):
@@ -313,6 +525,79 @@ impl RoseEngineLatheRun {
     pub fn generate(&mut self) {
         self.passes.clear();
         self.segmented_lines.clear();
+
+        // ── Diamant mode: concentric circles tangent to centre ────────
+        if let Some(ref diamant_cfg) = self.circular_diamant {
+            let r = diamant_cfg.circle_radius;
+            let n = diamant_cfg.num_circles;
+            let res = diamant_cfg.resolution;
+            let angle_step = 2.0 * PI / (n as f64);
+
+            for i in 0..n {
+                let rotation_angle = (i as f64) * angle_step;
+                let circle_cx = self.center_x + r * rotation_angle.cos();
+                let circle_cy = self.center_y + r * rotation_angle.sin();
+
+                let mut circle_points = Vec::with_capacity(res + 1);
+                for j in 0..=res {
+                    let t = (j as f64) / (res as f64);
+                    let theta = 2.0 * PI * t;
+                    circle_points.push(Point2D::new(
+                        circle_cx + r * theta.cos(),
+                        circle_cy + r * theta.sin(),
+                    ));
+                }
+                self.segmented_lines.push(circle_points);
+            }
+
+            self.generated = true;
+            return;
+        }
+
+        // ── Flinqué mode: concentric chevron rings ────────────────────
+        if let Some(ref flinque_cfg) = self.concentric_flinque {
+            let outer_r = self.base_config.base_radius; // stored in new_flinque
+            let inner_r = outer_r * flinque_cfg.inner_radius_ratio;
+            let wave_amplitude = flinque_cfg.wave_amplitude;
+            let min_radius = wave_amplitude * 0.1;
+            let num_petals = flinque_cfg.num_petals;
+            let wave_frequency = flinque_cfg.wave_frequency;
+
+            for ring_idx in 0..flinque_cfg.num_waves {
+                let t = (ring_idx as f64 + 0.5) / flinque_cfg.num_waves as f64;
+                let base_r = inner_r + (outer_r - inner_r) * t;
+
+                if base_r < min_radius {
+                    continue;
+                }
+
+                let points_per_ring = num_petals * 80;
+                let mut line_points = Vec::with_capacity(points_per_ring + 1);
+
+                for i in 0..=points_per_ring {
+                    let angle = 2.0 * PI * (i as f64) / (points_per_ring as f64);
+                    let petal_phase = angle * num_petals as f64 / 2.0;
+
+                    // Primary: multi-lobe |sin| chevron
+                    let wave = petal_phase.sin().abs();
+                    let chevron = wave_amplitude * wave;
+
+                    // Secondary: fine sinusoidal ripple
+                    let ripple = 0.05 * wave_amplitude * (petal_phase * wave_frequency).sin();
+
+                    let r_mod = base_r + chevron + ripple;
+                    line_points.push(Point2D::new(
+                        r_mod * angle.cos() + self.center_x,
+                        r_mod * angle.sin() + self.center_y,
+                    ));
+                }
+
+                self.segmented_lines.push(line_points);
+            }
+
+            self.generated = true;
+            return;
+        }
 
         // Linear paon mode: radiating lines from vanishing point
         if let Some(ref paon_cfg) = self.linear_paon {

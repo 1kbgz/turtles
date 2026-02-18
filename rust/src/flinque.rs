@@ -228,4 +228,74 @@ mod tests {
         assert!(layer.center_x > 0.0);
         assert!(layer.center_y.abs() < 0.001);
     }
+
+    #[test]
+    fn test_flinque_matches_rose_engine() {
+        use crate::rose_engine::RoseEngineLatheRun;
+
+        let radius = 10.0;
+        let num_petals = 6;
+        let num_waves = 10;
+        let wave_amplitude = 0.5;
+        let wave_frequency = 10.0;
+        let inner_radius_ratio = 0.1;
+
+        // Create mathematical FlinqueLayer
+        let config = FlinqueConfig {
+            num_petals,
+            num_waves,
+            wave_amplitude,
+            wave_frequency,
+            inner_radius_ratio,
+        };
+        let mut flinque = FlinqueLayer::new(radius, config).unwrap();
+        flinque.generate();
+
+        // Create equivalent rose engine flinque
+        let mut rose_run = RoseEngineLatheRun::new_flinque(
+            radius,
+            num_petals,
+            num_waves,
+            wave_amplitude,
+            wave_frequency,
+            inner_radius_ratio,
+            0.0,
+            0.0,
+        )
+        .unwrap();
+        rose_run.generate();
+
+        let flinque_lines = flinque.lines();
+        let rose_lines = rose_run.lines();
+
+        assert_eq!(
+            flinque_lines.len(),
+            rose_lines.len(),
+            "FlinqueLayer and RoseEngineLatheRun should have same number of rings"
+        );
+
+        for (i, (f_ring, r_ring)) in flinque_lines.iter().zip(rose_lines.iter()).enumerate() {
+            assert_eq!(
+                f_ring.len(),
+                r_ring.len(),
+                "Ring {} should have same number of points",
+                i
+            );
+
+            for (j, (f_pt, r_pt)) in f_ring.iter().zip(r_ring.iter()).enumerate() {
+                let dist = ((f_pt.x - r_pt.x).powi(2) + (f_pt.y - r_pt.y).powi(2)).sqrt();
+                assert!(
+                    dist < 1e-10,
+                    "Point {},{} differs: flinque=({}, {}), rose=({}, {}), dist={}",
+                    i,
+                    j,
+                    f_pt.x,
+                    f_pt.y,
+                    r_pt.x,
+                    r_pt.y,
+                    dist
+                );
+            }
+        }
+    }
 }

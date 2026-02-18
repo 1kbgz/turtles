@@ -787,3 +787,121 @@ def test_paon_matches_rose_engine():
         for j, (mp, rp) in enumerate(zip(ml, rl)):
             dist = ((mp[0] - rp[0]) ** 2 + (mp[1] - rp[1]) ** 2) ** 0.5
             assert dist < 1e-10, f"Line {i}, point {j}: math=({mp[0]:.6f},{mp[1]:.6f}), rose=({rp[0]:.6f},{rp[1]:.6f}), dist={dist}"
+
+
+def test_diamant_matches_rose_engine():
+    """Test that mathematical DiamantLayer and RoseEngineLatheRun.diamant() produce identical output"""
+    from turtles import RoseEngineLatheRun
+    from turtles.turtles import DiamantLayer
+
+    num_circles = 12
+    circle_radius = 10.0
+    resolution = 360
+
+    # Create mathematical DiamantLayer
+    math_layer = DiamantLayer(num_circles=num_circles, circle_radius=circle_radius, resolution=resolution)
+    math_layer.generate()
+
+    # Create equivalent rose engine diamant
+    rose_run = RoseEngineLatheRun.diamant(
+        num_circles=num_circles,
+        circle_radius=circle_radius,
+        resolution=resolution,
+    )
+    rose_run.generate()
+
+    math_lines = math_layer.get_lines()
+    rose_lines = rose_run.get_lines()
+
+    assert len(math_lines) == len(rose_lines), f"Expected {len(math_lines)} circles, got {len(rose_lines)}"
+
+    for i, (ml, rl) in enumerate(zip(math_lines, rose_lines)):
+        assert len(ml) == len(rl), f"Circle {i}: point count differs {len(ml)} vs {len(rl)}"
+        for j, (mp, rp) in enumerate(zip(ml, rl)):
+            dist = ((mp[0] - rp[0]) ** 2 + (mp[1] - rp[1]) ** 2) ** 0.5
+            assert dist < 1e-10, f"Circle {i}, point {j}: math=({mp[0]:.6f},{mp[1]:.6f}), rose=({rp[0]:.6f},{rp[1]:.6f}), dist={dist}"
+
+
+def test_flinque_matches_rose_engine():
+    """Test that mathematical FlinqueLayer and RoseEngineLatheRun.flinque() produce identical output"""
+    from turtles import RoseEngineLatheRun
+    from turtles.turtles import FlinqueLayer
+
+    radius = 10.0
+    num_petals = 6
+    num_waves = 10
+    wave_amplitude = 0.5
+    wave_frequency = 10.0
+    inner_radius_ratio = 0.1
+
+    # Create mathematical FlinqueLayer
+    math_layer = FlinqueLayer(
+        radius=radius,
+        num_petals=num_petals,
+        num_waves=num_waves,
+        wave_amplitude=wave_amplitude,
+        wave_frequency=wave_frequency,
+        inner_radius_ratio=inner_radius_ratio,
+    )
+    math_layer.generate()
+
+    # Create equivalent rose engine flinque
+    rose_run = RoseEngineLatheRun.flinque(
+        radius=radius,
+        num_petals=num_petals,
+        num_waves=num_waves,
+        wave_amplitude=wave_amplitude,
+        wave_frequency=wave_frequency,
+        inner_radius_ratio=inner_radius_ratio,
+    )
+    rose_run.generate()
+
+    math_lines = math_layer.get_lines()
+    rose_lines = rose_run.get_lines()
+
+    assert len(math_lines) == len(rose_lines), f"Expected {len(math_lines)} rings, got {len(rose_lines)}"
+
+    for i, (ml, rl) in enumerate(zip(math_lines, rose_lines)):
+        assert len(ml) == len(rl), f"Ring {i}: point count differs {len(ml)} vs {len(rl)}"
+        for j, (mp, rp) in enumerate(zip(ml, rl)):
+            dist = ((mp[0] - rp[0]) ** 2 + (mp[1] - rp[1]) ** 2) ** 0.5
+            assert dist < 1e-10, f"Ring {i}, point {j}: math=({mp[0]:.6f},{mp[1]:.6f}), rose=({rp[0]:.6f},{rp[1]:.6f}), dist={dist}"
+
+
+def test_limacon_matches_rose_engine_via_limacon():
+    """Test that LimaconLayer matches the dedicated RoseEngineLatheRun.limacon() constructor"""
+    from turtles import LimaconLayer, RoseEngineLatheRun
+
+    num_curves = 12
+    base_radius = 20.0
+    amplitude = 20.0
+    resolution = 360
+
+    # Create LimaconLayer
+    limacon = LimaconLayer(
+        num_curves=num_curves,
+        base_radius=base_radius,
+        amplitude=amplitude,
+        resolution=resolution,
+    )
+    limacon.generate()
+
+    # Create equivalent rose engine limacon
+    rose_run = RoseEngineLatheRun.limacon(
+        num_curves=num_curves,
+        base_radius=base_radius,
+        amplitude=amplitude,
+        resolution=resolution,
+    )
+    rose_run.generate()
+
+    limacon_lines = limacon.get_lines()
+    rose_lines = rose_run.get_lines()
+
+    assert len(limacon_lines) == len(rose_lines), f"Expected {len(limacon_lines)} curves, got {len(rose_lines)}"
+
+    for i, (lim_curve, rose_curve) in enumerate(zip(limacon_lines, rose_lines)):
+        assert len(lim_curve) == len(rose_curve), f"Curve {i}: point count differs"
+        for j, (lim_pt, rose_pt) in enumerate(zip(lim_curve, rose_curve)):
+            dist = ((lim_pt[0] - rose_pt[0]) ** 2 + (lim_pt[1] - rose_pt[1]) ** 2) ** 0.5
+            assert dist < 1e-10, f"Point {i},{j} differs: dist={dist}"
