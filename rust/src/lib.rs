@@ -8,6 +8,8 @@ pub mod draperie;
 pub mod flinque;
 // Spirograph and guilloche pattern generation modules
 pub mod guilloche;
+// Huit-Eight (Figure-Eight) pattern generation
+pub mod huiteight;
 // Limaçon pattern generation
 pub mod limacon;
 // Paon (Peacock) pattern generation
@@ -27,6 +29,7 @@ pub use diamant::{DiamantConfig, DiamantLayer};
 pub use draperie::{DraperieConfig, DraperieLayer};
 pub use flinque::{FlinqueConfig, FlinqueLayer};
 pub use guilloche::GuillochePattern;
+pub use huiteight::{HuitEightConfig, HuitEightLayer};
 pub use limacon::{LimaconConfig, LimaconLayer};
 pub use paon::{paon_wave_fn, PaonConfig, PaonLayer};
 pub use rose_engine::{

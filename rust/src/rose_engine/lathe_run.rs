@@ -2,6 +2,7 @@ use crate::common::{Point2D, SpirographError};
 use crate::diamant::DiamantConfig;
 use crate::draperie::DraperieConfig;
 use crate::flinque::FlinqueConfig;
+use crate::huiteight::HuitEightConfig;
 use crate::limacon::LimaconConfig;
 use crate::paon::{paon_wave_fn, PaonConfig};
 use crate::rose_engine::{CuttingBit, RoseEngineConfig, RoseEngineLathe, RosettePattern};
@@ -69,6 +70,11 @@ pub struct RoseEngineLatheRun {
     /// When set, `generate()` produces concentric chevron rings, matching
     /// the mathematical `FlinqueLayer` point-for-point.
     concentric_flinque: Option<FlinqueConfig>,
+
+    /// Optional huit-eight (figure-eight) configuration.
+    /// When set, `generate()` produces lemniscate curves passing through
+    /// the centre, matching the mathematical `HuitEightLayer` point-for-point.
+    circular_huiteight: Option<HuitEightConfig>,
 
     // Generated data
     passes: Vec<RoseEngineLathe>,
@@ -156,6 +162,7 @@ impl RoseEngineLatheRun {
             circular_diamant: None,
             polar_limacon: None,
             concentric_flinque: None,
+            circular_huiteight: None,
             passes: Vec::new(),
             segmented_lines: Vec::new(),
             generated: false,
@@ -494,6 +501,64 @@ impl RoseEngineLatheRun {
         Ok(run)
     }
 
+    /// Create a rose engine huit-eight (figure-eight) pattern that produces
+    /// identical output to the mathematical `HuitEightLayer`.
+    ///
+    /// ## Physical model
+    ///
+    /// On a physical rose engine the huit-eight pattern is produced with a
+    /// **figure-eight cam** (lemniscate-shaped) mounted on the spindle.
+    /// As the spindle rotates, the cam displacement traces the lemniscate
+    /// of Bernoulli:
+    ///
+    ///   x(t) = a · cos(t) / (1 + sin²(t))
+    ///   y(t) = a · sin(t) · cos(t) / (1 + sin²(t))
+    ///
+    /// where `a` = `scale` is the half-width of the figure-eight.  The curve
+    /// passes through the origin twice per revolution, creating a smooth
+    /// figure-eight that is tangent to itself at the centre.
+    ///
+    /// Multiple passes at different angular rotations create the overlapping
+    /// lemniscate mesh.
+    ///
+    /// ## Why the Cartesian parameterisation is used
+    ///
+    /// The existing `RosettePattern::HuitEight` displacement function
+    /// `sin(n·θ) · cos(θ/2)` produces a modulated radial curve, not a true
+    /// lemniscate.  For point-for-point matching with `HuitEightLayer`, this
+    /// constructor uses the Cartesian lemniscate parameterisation directly.
+    ///
+    /// # Arguments
+    /// * `num_curves` – Number of figure-eight curves (= number of passes)
+    /// * `scale` – Half-width of each lemniscate
+    /// * `resolution` – Number of points per curve
+    /// * `center_x` / `center_y` – Pattern centre
+    /// * `num_clusters` – Group curves into N clusters (0 = uniform)
+    /// * `cluster_spread` – Angular spread per cluster in radians (0 = auto)
+    pub fn new_huiteight(
+        num_curves: usize,
+        scale: f64,
+        resolution: usize,
+        center_x: f64,
+        center_y: f64,
+        num_clusters: usize,
+        cluster_spread: f64,
+    ) -> Result<Self, SpirographError> {
+        let he_config = HuitEightConfig {
+            num_curves,
+            scale,
+            resolution,
+            num_clusters,
+            cluster_spread,
+        };
+
+        let re_config = RoseEngineConfig::new(scale, scale);
+        let bit = CuttingBit::v_shaped(30.0, 0.02);
+        let mut run = Self::new_with_segments(re_config, bit, num_curves, 1, center_x, center_y)?;
+        run.circular_huiteight = Some(he_config);
+        Ok(run)
+    }
+
     /// Evaluate the phase-shape function at parameter `t`.
     ///
     /// * **dome mode** (`circular_phase > 0`):
@@ -548,6 +613,69 @@ impl RoseEngineLatheRun {
                     ));
                 }
                 self.segmented_lines.push(circle_points);
+            }
+
+            self.generated = true;
+            return;
+        }
+
+        // ── Huit-eight mode: lemniscate (figure-eight) curves ─────────
+        if let Some(ref he_cfg) = self.circular_huiteight {
+            let n = he_cfg.num_curves;
+            let a = he_cfg.scale;
+            let res = he_cfg.resolution;
+
+            // Build rotation angles (matches HuitEightLayer::generate exactly)
+            let rotations: Vec<f64> = if he_cfg.num_clusters > 0 && he_cfg.num_clusters < n {
+                let nc = he_cfg.num_clusters;
+                let curves_per_cluster = n / nc;
+                let remainder = n % nc;
+                let sector = 2.0 * PI / (nc as f64);
+                let spread = if he_cfg.cluster_spread > 0.0 {
+                    he_cfg.cluster_spread
+                } else {
+                    sector * 0.5
+                };
+
+                let mut rots = Vec::with_capacity(n);
+                for k in 0..nc {
+                    let cluster_center = (k as f64) * sector;
+                    let count = curves_per_cluster + if k < remainder { 1 } else { 0 };
+                    for c in 0..count {
+                        let t = if count > 1 {
+                            (c as f64) / ((count - 1) as f64) - 0.5
+                        } else {
+                            0.0
+                        };
+                        rots.push(cluster_center + t * spread);
+                    }
+                }
+                rots
+            } else {
+                let angle_step = 2.0 * PI / (n as f64);
+                (0..n).map(|i| (i as f64) * angle_step).collect()
+            };
+
+            for rot in &rotations {
+                let cos_rot = rot.cos();
+                let sin_rot = rot.sin();
+
+                let mut pts = Vec::with_capacity(res + 1);
+                for j in 0..=res {
+                    let t = 2.0 * PI * (j as f64) / (res as f64);
+                    let sin_t = t.sin();
+                    let cos_t = t.cos();
+                    let denom = 1.0 + sin_t * sin_t;
+                    let lx = a * cos_t / denom;
+                    let ly = a * sin_t * cos_t / denom;
+
+                    // Rotate and translate
+                    pts.push(Point2D::new(
+                        self.center_x + lx * cos_rot - ly * sin_rot,
+                        self.center_y + lx * sin_rot + ly * cos_rot,
+                    ));
+                }
+                self.segmented_lines.push(pts);
             }
 
             self.generated = true;

@@ -3,6 +3,7 @@ use crate::diamant::{DiamantConfig, DiamantLayer};
 use crate::draperie::{DraperieConfig, DraperieLayer};
 use crate::flinque::{FlinqueConfig, FlinqueLayer};
 use crate::guilloche::GuillochePattern;
+use crate::huiteight::{HuitEightConfig, HuitEightLayer};
 use crate::limacon::{LimaconConfig, LimaconLayer};
 use crate::paon::{PaonConfig, PaonLayer};
 use crate::spirograph::{HorizontalSpirograph, SphericalSpirograph, VerticalSpirograph};
@@ -197,6 +198,23 @@ impl WatchFace {
             .add_draperie_at_clock(config, hour, minute, distance)
     }
 
+    /// Add a huit-eight (figure-eight) pattern layer
+    pub fn add_huiteight_layer(&mut self, huiteight: HuitEightLayer) {
+        self.guilloche.add_huiteight_layer(huiteight);
+    }
+
+    /// Add a huit-eight layer at a clock position
+    pub fn add_huiteight_at_clock(
+        &mut self,
+        config: HuitEightConfig,
+        hour: u32,
+        minute: u32,
+        distance: f64,
+    ) -> Result<(), SpirographError> {
+        self.guilloche
+            .add_huiteight_at_clock(config, hour, minute, distance)
+    }
+
     /// Add a limaçon pattern layer
     pub fn add_limacon_layer(&mut self, limacon: LimaconLayer) {
         self.guilloche.add_limacon_layer(limacon);
@@ -384,6 +402,30 @@ impl WatchFace {
             }
         }
 
+        // Render huiteight layers from guilloche
+        for curve_lines in self.get_huiteight_lines() {
+            for curve_points in curve_lines {
+                if curve_points.is_empty() {
+                    continue;
+                }
+
+                let mut data = Data::new().move_to((curve_points[0].x, curve_points[0].y));
+                for point in curve_points.iter().skip(1) {
+                    data = data.line_to((point.x, point.y));
+                }
+
+                let path = Path::new()
+                    .set("fill", "none")
+                    .set("stroke", "#1a1a1a")
+                    .set("stroke-width", 0.03)
+                    .set("stroke-linecap", "round")
+                    .set("stroke-linejoin", "round")
+                    .set("d", data);
+
+                pattern_group = pattern_group.add(path);
+            }
+        }
+
         // Render limaçon layers from guilloche
         for curve_lines in self.get_limacon_lines() {
             for curve_points in curve_lines {
@@ -485,6 +527,10 @@ impl WatchFace {
 
     fn get_draperie_lines(&self) -> Vec<&Vec<Vec<Point2D>>> {
         self.guilloche.draperie_lines()
+    }
+
+    fn get_huiteight_lines(&self) -> Vec<&Vec<Vec<Point2D>>> {
+        self.guilloche.huiteight_lines()
     }
 
     fn get_limacon_lines(&self) -> Vec<&Vec<Vec<Point2D>>> {

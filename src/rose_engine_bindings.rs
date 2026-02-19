@@ -670,6 +670,37 @@ impl RoseEngineLatheRun {
         .map_err(|e| pyo3::exceptions::PyValueError::new_err(e.to_string()))
     }
 
+    /// Create a rose engine huit-eight (figure-eight) pattern that produces
+    /// identical output to the mathematical HuitEightLayer.
+    ///
+    /// Models a physical rose engine with a figure-eight cam (lemniscate-
+    /// shaped) mounted on the spindle.  Each pass traces a lemniscate of
+    /// Bernoulli, and multiple passes at different angular rotations create
+    /// the overlapping figure-eight mesh.
+    #[staticmethod]
+    #[pyo3(signature = (num_curves=72, scale=20.0, resolution=360, center_x=0.0, center_y=0.0, num_clusters=0, cluster_spread=0.0))]
+    fn huiteight(
+        num_curves: usize,
+        scale: f64,
+        resolution: usize,
+        center_x: f64,
+        center_y: f64,
+        num_clusters: usize,
+        cluster_spread: f64,
+    ) -> PyResult<Self> {
+        BaseRoseEngineLatheRun::new_huiteight(
+            num_curves,
+            scale,
+            resolution,
+            center_x,
+            center_y,
+            num_clusters,
+            cluster_spread,
+        )
+        .map(|inner| RoseEngineLatheRun { inner })
+        .map_err(|e| pyo3::exceptions::PyValueError::new_err(e.to_string()))
+    }
+
     /// Generate all passes of the rose engine pattern
     fn generate(&mut self) {
         self.inner.generate();

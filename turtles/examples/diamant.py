@@ -6,19 +6,19 @@ This example creates a diamant guilloché pattern. The diamant pattern is formed
 by creating equally-sized circles that are tangent to the center, rotated around
 the center. The overlapping circles create diamond/mesh intersections.
 
-Three implementations are provided:
+Four implementations are provided:
 1. DiamantLayer - Direct geometric calculation using circles (recommended)
 2. LimaconLayer - Direct geometric calculation using limaçon curves
-3. RoseEngineLatheRun - Using the rose engine simulation
+3. RoseEngineLatheRun.diamant() - Rose engine simulation (circles, matches DiamantLayer 1-1)
+4. RoseEngineLatheRun.limacon() - Rose engine simulation (limaçon, matches LimaconLayer 1-1)
 """
 
+import os
+
 from turtles import (
-    CuttingBit,
     DiamantLayer,
     LimaconLayer,
-    RoseEngineConfig,
     RoseEngineLatheRun,
-    RosettePattern,
 )
 
 
@@ -29,16 +29,11 @@ def diamant_direct():
     This is the recommended approach - it directly calculates circles that are
     tangent to the center and rotates them around to create the pattern.
     """
-    # Create a diamant layer with 72 circles, each with radius 20mm
-    # More circles = denser mesh pattern
     layer = DiamantLayer(num_circles=72, circle_radius=20.0, resolution=360)
     layer.generate()
 
-    # Export to SVG
     layer.to_svg("examples/svg/diamant_direct.svg")
-    print("Generated examples/svg/diamant_direct.svg")
-    print("  Method: DiamantLayer (direct geometric calculation)")
-    print("  Circles: 72, each with radius 20.0mm")
+    print("Diamant direct (DiamantLayer) → examples/svg/diamant_direct.svg")
 
 
 def limacon_direct():
@@ -51,79 +46,73 @@ def limacon_direct():
     When amplitude = base_radius, the curves pass through the origin,
     creating shapes that are tangent to the center.
     """
-    # Create a limaçon layer with 72 curves, matching rose engine parameters
     layer = LimaconLayer(num_curves=72, base_radius=20.0, amplitude=20.0, resolution=360)
     layer.generate()
 
-    # Export to SVG
     layer.to_svg("examples/svg/limacon_direct.svg")
-    print("Generated examples/svg/limacon_direct.svg")
-    print("  Method: LimaconLayer (direct geometric calculation)")
-    print("  Curves: 72, base_radius=20.0mm, amplitude=20.0mm")
+    print("Limaçon direct (LimaconLayer) → examples/svg/limacon_direct.svg")
 
 
 def diamant_rose_engine():
     """
-    Create a diamant-style pattern using RoseEngineLatheRun (rose engine simulation).
+    Create diamant pattern using RoseEngineLatheRun.diamant() (rose engine simulation).
 
-    NOTE: The rose engine produces limaçon (snail) shapes in polar coordinates,
-    which are different from the true circles produced by DiamantLayer.
-    Both create beautiful overlapping patterns, but with different geometry.
-
-    The sinusoidal rosette with frequency=1 creates:
-        radius = base_radius + amplitude * sin(angle)
-
-    This traces a limaçon that passes through the origin when amplitude = base_radius,
-    creating shapes that are tangent to the center like the direct method.
+    This produces identical output to the mathematical DiamantLayer.
+    The rose engine models a round eccentric cam whose eccentricity equals the
+    circle radius.  Each pass traces a circle tangent to the centre.
     """
-    # Use sinusoidal rosette with frequency=1
-    # When amplitude = base_radius, the shapes pass through the origin
-    # matching the tangent-to-center behavior of DiamantLayer
-    config = RoseEngineConfig(base_radius=20.0, amplitude=20.0)
-    config.set_rosette(RosettePattern.sinusoidal(frequency=1.0))
-    config.set_resolution(360)
-
-    # Create a cutting bit
-    bit = CuttingBit.v_shaped(angle=30.0, width=0.02)
-
-    # Create multi-pass run - each pass will be rotated around the center
-    # by rotating the phase of the sinusoidal pattern
-    # Use segments_per_pass=1 to draw complete shapes without gaps
-    run = RoseEngineLatheRun(config, bit, num_passes=72, segments_per_pass=1)
+    run = RoseEngineLatheRun.diamant(num_circles=72, circle_radius=20.0, resolution=360)
     run.generate()
 
-    # Export to SVG
     run.to_svg("examples/svg/diamant_rose_engine.svg")
-    print("Generated examples/svg/diamant_rose_engine.svg")
-    print("  Method: RoseEngineLatheRun (rose engine simulation)")
-    print("  Passes: 72")
-    print("  Note: Creates limaçon shapes (different from true circles)")
+    print("Diamant rose engine (RoseEngineLatheRun) → examples/svg/diamant_rose_engine.svg")
+
+
+def limacon_rose_engine():
+    """
+    Create limaçon pattern using RoseEngineLatheRun.limacon() (rose engine simulation).
+
+    This produces identical output to the mathematical LimaconLayer.
+    The rose engine uses a sinusoidal cam (frequency 1) whose polar equation
+    r = base_radius + amplitude · sin(θ + phase) naturally traces limaçon curves.
+    """
+    run = RoseEngineLatheRun.limacon(num_curves=72, base_radius=20.0, amplitude=20.0, resolution=360)
+    run.generate()
+
+    run.to_svg("examples/svg/limacon_rose_engine.svg")
+    print("Limaçon rose engine (RoseEngineLatheRun) → examples/svg/limacon_rose_engine.svg")
 
 
 def main():
     print("Generating Diamant (Diamond) Guilloché Patterns\n")
-    print("=" * 50)
+    print("=" * 55)
 
     # Method 1: Direct geometric calculation with circles (recommended)
     print("\nMethod 1: DiamantLayer (circles)")
-    print("-" * 30)
+    print("-" * 35)
     diamant_direct()
 
     # Method 2: Direct geometric calculation with limaçon curves
     print("\nMethod 2: LimaconLayer (limaçon curves)")
-    print("-" * 30)
+    print("-" * 35)
     limacon_direct()
 
-    # Method 3: Rose engine simulation
-    print("\nMethod 3: RoseEngineLatheRun")
-    print("-" * 30)
+    # Method 3: Rose engine simulation (circles)
+    print("\nMethod 3: RoseEngineLatheRun.diamant()")
+    print("-" * 35)
     diamant_rose_engine()
 
-    print("\n" + "=" * 50)
+    # Method 4: Rose engine simulation (limaçon)
+    print("\nMethod 4: RoseEngineLatheRun.limacon()")
+    print("-" * 35)
+    limacon_rose_engine()
+
+    print("\n" + "=" * 55)
     print("Done! Check examples/svg/ for output files.")
-    print("\nNote: LimaconLayer and RoseEngineLatheRun produce identical output.")
-    print("DiamantLayer uses true circles, which is subtly different.")
+    print("\nNote: DiamantLayer and RoseEngineLatheRun.diamant() produce identical output (circles).")
+    print("Note: LimaconLayer and RoseEngineLatheRun.limacon() produce identical output (limaçon).")
 
 
 if __name__ == "__main__":
+    os.makedirs(os.path.join("examples", "svg"), exist_ok=True)
     main()

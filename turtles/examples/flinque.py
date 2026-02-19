@@ -5,14 +5,15 @@ Demonstrates the flinqué guilloché pattern — a classic engine-turned motif
 with petal-like lobes and fine wavy engraving, commonly found on watch dials,
 cigarette cases, and decorative metalwork.
 
-Two approaches are provided:
+Three approaches are provided:
 1. FlinqueLayer via GuillochePattern - Standalone pattern (add layer, generate, export)
 2. WatchFace.add_flinque() - High-level watch face API
+3. RoseEngineLatheRun.flinque() - Rose engine lathe simulation
 """
 
 import os
 
-from turtles import FlinqueLayer, WatchFace
+from turtles import FlinqueLayer, RoseEngineLatheRun, WatchFace
 from turtles.turtles import GuillochePattern
 
 
@@ -129,6 +130,28 @@ def watchface_flinque_multi():
     print("Watch face flinqué (4 positions) → examples/svg/flinque_watchface_multi.svg")
 
 
+def flinque_rose_engine():
+    """
+    Create a flinqué pattern using RoseEngineLatheRun.flinque() (rose engine simulation).
+
+    This produces identical output to the mathematical FlinqueLayer.
+    The rose engine models a multi-lobe rosette plus a secondary sinusoidal
+    rosette for fine ripple, making concentric-ring passes.
+    """
+    run = RoseEngineLatheRun.flinque(
+        radius=38.0,
+        num_petals=12,
+        num_waves=60,
+        wave_amplitude=0.8,
+        wave_frequency=20.0,
+        inner_radius_ratio=0.05,
+    )
+    run.generate()
+
+    run.to_svg("examples/svg/flinque_rose_engine.svg")
+    print("Flinqué rose engine (RoseEngineLatheRun) → examples/svg/flinque_rose_engine.svg")
+
+
 def main():
     print("Generating Flinqué (Engine-Turned) Guilloché Patterns\n")
     print("=" * 55)
@@ -158,8 +181,14 @@ def main():
     print("-" * 35)
     watchface_flinque_multi()
 
+    # Method 6: Rose engine simulation
+    print("\nMethod 6: RoseEngineLatheRun.flinque()")
+    print("-" * 35)
+    flinque_rose_engine()
+
     print("\n" + "=" * 55)
     print("Done! Check examples/svg/ for output files.")
+    print("\nNote: FlinqueLayer and RoseEngineLatheRun.flinque() produce identical output.")
 
 
 if __name__ == "__main__":
