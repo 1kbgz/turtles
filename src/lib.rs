@@ -3,6 +3,7 @@ use pyo3::prelude::*;
 mod diamant_bindings;
 mod draperie_bindings;
 mod guilloche_bindings;
+mod huiteight_bindings;
 mod limacon_bindings;
 mod paon_bindings;
 mod rose_engine_bindings;
@@ -12,6 +13,7 @@ mod watch_face_bindings;
 pub use diamant_bindings::DiamantLayer;
 pub use draperie_bindings::DraperieLayer;
 pub use guilloche_bindings::{FlinqueLayer, GuillochePattern};
+pub use huiteight_bindings::HuitEightLayer;
 pub use limacon_bindings::LimaconLayer;
 pub use paon_bindings::PaonLayer;
 pub use rose_engine_bindings::{CuttingBit, RoseEngineConfig, RoseEngineLathe, RoseEngineLatheRun, RosettePattern};
@@ -33,6 +35,9 @@ fn turtles(_py: Python, m: &Bound<PyModule>) -> PyResult<()> {
 
     // Diamant (diamond) pattern layer
     m.add_class::<DiamantLayer>().unwrap();
+
+    // Huit-Eight (figure-eight) pattern layer
+    m.add_class::<HuitEightLayer>().unwrap();
 
     // Draperie (drapery) pattern layer
     m.add_class::<DraperieLayer>().unwrap();

@@ -6,6 +6,7 @@ from .turtles import (
     DiamantLayer,
     DraperieLayer,
     FlinqueLayer,
+    HuitEightLayer,
     LimaconLayer,
     PaonLayer,
     RoseEngineConfig,
@@ -25,6 +26,7 @@ __all__ = (
     "DiamantLayer",
     "DraperieLayer",
     "FlinqueLayer",
+    "HuitEightLayer",
     "LimaconLayer",
     "PaonLayer",
 )
@@ -431,14 +433,64 @@ class WatchFace:
         """
         self._watch_face.add_paon_layer(layer)
 
+    def add_huiteight(
+        self,
+        num_curves: int = 72,
+        scale: float = None,
+        hour: int = 12,
+        minute: int = 0,
+        distance: float = 0.0,
+        resolution: int = 360,
+        num_clusters: int = 0,
+        cluster_spread: float = 0.0,
+    ):
+        """Add a huit-eight (figure-eight) guilloché pattern.
+
+        The huit-eight pattern is formed by drawing lemniscate curves (figure-eights)
+        that pass through the centre, rotated around the centre.  The overlapping
+        lemniscates create an intricate woven mesh pattern.
+
+        Args:
+            num_curves: Number of figure-eight curves (more = denser mesh).
+            scale: Half-width of each lemniscate. Defaults to watch face radius.
+            hour: Hour position for center (1-12, default 12 = centered).
+            minute: Minute position for center (0-59).
+            distance: Distance from center (0 = centered on watch face).
+            resolution: Number of points per curve.
+            num_clusters: Number of clusters to group curves into (0 = uniform).
+            cluster_spread: Angular spread within each cluster in radians (0.0 = auto).
+        """
+        if scale is None:
+            scale = self.radius
+        self._watch_face.add_huiteight_at_clock(
+            num_curves=num_curves,
+            scale=scale,
+            hour=hour,
+            minute=minute,
+            distance=distance,
+            resolution=resolution,
+            num_clusters=num_clusters,
+            cluster_spread=cluster_spread,
+        )
+
+    def add_huiteight_layer(self, layer):
+        """Add a pre-configured HuitEightLayer to the watch face.
+
+        Args:
+            layer: A HuitEightLayer instance.
+        """
+        self._watch_face.add_huiteight_layer(layer)
+
     def add(self, layer):
-        """Add a spirograph, flinque, diamant, draperie, limacon, or paon layer."""
+        """Add a spirograph, flinque, diamant, draperie, huiteight, limacon, or paon layer."""
         if isinstance(layer, FlinqueLayer):
             self._watch_face.add_flinque_layer(layer)
         elif isinstance(layer, DiamantLayer):
             self._watch_face.add_diamant_layer(layer)
         elif isinstance(layer, DraperieLayer):
             self._watch_face.add_draperie_layer(layer)
+        elif isinstance(layer, HuitEightLayer):
+            self._watch_face.add_huiteight_layer(layer)
         elif isinstance(layer, LimaconLayer):
             self._watch_face.add_limacon_layer(layer)
         elif isinstance(layer, PaonLayer):

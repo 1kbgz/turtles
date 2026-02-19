@@ -34,6 +34,10 @@ A library for generating spirograph and guilloché patterns.
 
 <img src="https://raw.githubusercontent.com/1kbgz/turtles/refs/heads/main/docs/img/paon.png" width=500>
 
+### Huit-Eight (Figure-Eight)
+
+<img src="https://raw.githubusercontent.com/1kbgz/turtles/refs/heads/main/docs/img/huiteight.png" width=500>
+
 ### Export Formats
 
 - **SVG** - 2D vector output for laser engraving and visualization

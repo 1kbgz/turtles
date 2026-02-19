@@ -2,6 +2,7 @@ use crate::common::{validate_radius, ExportConfig, Point2D, SpirographError};
 use crate::diamant::{DiamantConfig, DiamantLayer};
 use crate::draperie::{DraperieConfig, DraperieLayer};
 use crate::flinque::{FlinqueConfig, FlinqueLayer};
+use crate::huiteight::{HuitEightConfig, HuitEightLayer};
 use crate::limacon::LimaconLayer;
 use crate::paon::{PaonConfig, PaonLayer};
 use crate::spirograph::{HorizontalSpirograph, SphericalSpirograph, VerticalSpirograph};
@@ -65,6 +66,7 @@ pub struct GuillochePattern {
     flinque_layers: Vec<FlinqueLayer>,
     diamant_layers: Vec<DiamantLayer>,
     draperie_layers: Vec<DraperieLayer>,
+    huiteight_layers: Vec<HuitEightLayer>,
     limacon_layers: Vec<LimaconLayer>,
     paon_layers: Vec<PaonLayer>,
 }
@@ -80,6 +82,7 @@ impl GuillochePattern {
             flinque_layers: Vec::new(),
             diamant_layers: Vec::new(),
             draperie_layers: Vec::new(),
+            huiteight_layers: Vec::new(),
             limacon_layers: Vec::new(),
             paon_layers: Vec::new(),
         })
@@ -183,6 +186,42 @@ impl GuillochePattern {
     /// Add a draperie (drapery pattern) layer
     pub fn add_draperie_layer(&mut self, draperie: DraperieLayer) {
         self.draperie_layers.push(draperie);
+    }
+
+    /// Add a huit-eight (figure-eight) pattern layer
+    pub fn add_huiteight_layer(&mut self, huiteight: HuitEightLayer) {
+        self.huiteight_layers.push(huiteight);
+    }
+
+    /// Add a huit-eight layer positioned at a given angle and distance from center
+    pub fn add_huiteight_at_polar(
+        &mut self,
+        config: HuitEightConfig,
+        angle: f64,
+        distance: f64,
+    ) -> Result<(), SpirographError> {
+        let huiteight = HuitEightLayer::new_at_polar(config, angle, distance)?;
+        self.huiteight_layers.push(huiteight);
+        Ok(())
+    }
+
+    /// Add a huit-eight layer positioned at a clock position
+    ///
+    /// # Arguments
+    /// * `config` - Huit-eight configuration
+    /// * `hour` - Hour position (1-12, where 12 is at top)
+    /// * `minute` - Minute position (0-59)
+    /// * `distance` - Distance from center of watch face
+    pub fn add_huiteight_at_clock(
+        &mut self,
+        config: HuitEightConfig,
+        hour: u32,
+        minute: u32,
+        distance: f64,
+    ) -> Result<(), SpirographError> {
+        let huiteight = HuitEightLayer::new_at_clock(config, hour, minute, distance)?;
+        self.huiteight_layers.push(huiteight);
+        Ok(())
     }
 
     /// Add a draperie layer positioned at a given angle and distance from center
@@ -297,6 +336,9 @@ impl GuillochePattern {
         for layer in &mut self.draperie_layers {
             layer.generate();
         }
+        for layer in &mut self.huiteight_layers {
+            layer.generate();
+        }
         for layer in &mut self.limacon_layers {
             layer.generate();
         }
@@ -311,6 +353,7 @@ impl GuillochePattern {
             + self.flinque_layers.len()
             + self.diamant_layers.len()
             + self.draperie_layers.len()
+            + self.huiteight_layers.len()
             + self.limacon_layers.len()
             + self.paon_layers.len()
     }
@@ -338,6 +381,11 @@ impl GuillochePattern {
         self.draperie_layers.iter().map(|d| d.lines()).collect()
     }
 
+    /// Get all huit-eight layer lines (for rendering)
+    pub fn huiteight_lines(&self) -> Vec<&Vec<Vec<Point2D>>> {
+        self.huiteight_layers.iter().map(|h| h.lines()).collect()
+    }
+
     /// Get all limaçon layer lines (for rendering)
     pub fn limacon_lines(&self) -> Vec<&Vec<Vec<Point2D>>> {
         self.limacon_layers.iter().map(|l| l.lines()).collect()
@@ -358,6 +406,7 @@ impl GuillochePattern {
             && self.flinque_layers.is_empty()
             && self.diamant_layers.is_empty()
             && self.draperie_layers.is_empty()
+            && self.huiteight_layers.is_empty()
             && self.limacon_layers.is_empty()
             && self.paon_layers.is_empty()
         {
@@ -474,6 +523,30 @@ impl GuillochePattern {
 
                 let mut data = Data::new().move_to((circle_points[0].x, circle_points[0].y));
                 for point in circle_points.iter().skip(1) {
+                    data = data.line_to((point.x, point.y));
+                }
+
+                let path = Path::new()
+                    .set("fill", "none")
+                    .set("stroke", "#1a1a1a")
+                    .set("stroke-width", 0.03)
+                    .set("stroke-linecap", "round")
+                    .set("stroke-linejoin", "round")
+                    .set("d", data);
+
+                document = document.add(path);
+            }
+        }
+
+        // Render huit-eight layers
+        for huiteight_layer in &self.huiteight_layers {
+            for curve_points in huiteight_layer.lines() {
+                if curve_points.is_empty() {
+                    continue;
+                }
+
+                let mut data = Data::new().move_to((curve_points[0].x, curve_points[0].y));
+                for point in curve_points.iter().skip(1) {
                     data = data.line_to((point.x, point.y));
                 }
 

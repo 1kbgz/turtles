@@ -868,6 +868,225 @@ def test_flinque_matches_rose_engine():
             assert dist < 1e-10, f"Ring {i}, point {j}: math=({mp[0]:.6f},{mp[1]:.6f}), rose=({rp[0]:.6f},{rp[1]:.6f}), dist={dist}"
 
 
+# ── Huit-Eight (Figure-Eight) tests ─────────────────────────────────────
+
+
+def test_huiteight_layer():
+    """Test HuitEightLayer creation and generation"""
+    from turtles import HuitEightLayer
+
+    layer = HuitEightLayer(num_curves=24, scale=15.0, resolution=360)
+    assert layer is not None
+    assert layer.num_curves == 24
+    assert layer.scale == 15.0
+
+    # Generate the pattern
+    layer.generate()
+
+    # Get the lines
+    lines = layer.get_lines()
+    assert len(lines) == 24
+    assert len(lines[0]) == 361  # resolution + 1
+
+
+def test_huiteight_svg_export():
+    """Test creating a huit-eight pattern and exporting to SVG"""
+    from turtles import HuitEightLayer
+
+    layer = HuitEightLayer(num_curves=12, scale=10.0, resolution=200)
+    layer.generate()
+
+    with tempfile.TemporaryDirectory() as tmpdir:
+        svg_path = os.path.join(tmpdir, "huiteight_test.svg")
+        layer.to_svg(svg_path)
+
+        assert os.path.exists(svg_path), "SVG file should exist"
+        assert os.path.getsize(svg_path) > 0, "SVG file should have content"
+
+
+def test_huiteight_layer_with_center():
+    """Test HuitEightLayer with offset center"""
+    from turtles import HuitEightLayer
+
+    layer = HuitEightLayer.with_center(12, 10.0, 5.0, 5.0)
+    assert layer.center_x == 5.0
+    assert layer.center_y == 5.0
+    layer.generate()
+    lines = layer.get_lines()
+    assert len(lines) == 12
+
+
+def test_huiteight_layer_at_clock():
+    """Test HuitEightLayer at a clock position"""
+    from turtles import HuitEightLayer
+
+    layer = HuitEightLayer.at_clock(12, 10.0, 3, 0, 15.0)
+    assert layer.center_x > 0.0  # 3 o'clock → positive x
+    layer.generate()
+    lines = layer.get_lines()
+    assert len(lines) == 12
+
+
+def test_huiteight_passes_through_origin():
+    """Test that each figure-eight curve passes through or near the origin"""
+    import math
+
+    from turtles import HuitEightLayer
+
+    layer = HuitEightLayer(num_curves=4, scale=10.0, resolution=360)
+    layer.generate()
+    lines = layer.get_lines()
+
+    for i, line in enumerate(lines):
+        min_dist = min(math.sqrt(x * x + y * y) for x, y in line)
+        assert min_dist < 0.5, f"Curve {i} should pass near origin, min_dist={min_dist}"
+
+
+def test_huiteight_watchface_add():
+    """Test adding HuitEightLayer via WatchFace.add()"""
+    from turtles import HuitEightLayer
+
+    wf = WatchFace(radius=38.0)
+    wf.add_inner()
+    wf.add_outer()
+    wf.add_center_hole()
+
+    layer = HuitEightLayer(num_curves=24, scale=15.0, resolution=200)
+    wf.add(layer)
+    wf.generate()
+
+    with tempfile.TemporaryDirectory() as tmpdir:
+        svg_path = os.path.join(tmpdir, "huiteight_watchface.svg")
+        wf.to_svg(svg_path)
+        assert os.path.exists(svg_path)
+
+
+def test_huiteight_watchface_add_huiteight():
+    """Test WatchFace.add_huiteight() convenience method"""
+    wf = WatchFace(radius=38.0)
+    wf.add_inner()
+    wf.add_outer()
+    wf.add_center_hole()
+    wf.add_huiteight(num_curves=24, scale=15.0, resolution=200)
+    wf.generate()
+
+    with tempfile.TemporaryDirectory() as tmpdir:
+        svg_path = os.path.join(tmpdir, "huiteight_add_method.svg")
+        wf.to_svg(svg_path)
+        assert os.path.exists(svg_path)
+
+
+def test_huiteight_matches_rose_engine():
+    """Test that mathematical HuitEightLayer and RoseEngineLatheRun.huiteight() produce identical output"""
+    from turtles import HuitEightLayer, RoseEngineLatheRun
+
+    num_curves = 12
+    scale = 10.0
+    resolution = 360
+
+    # Create mathematical HuitEightLayer
+    math_layer = HuitEightLayer(num_curves=num_curves, scale=scale, resolution=resolution)
+    math_layer.generate()
+
+    # Create equivalent rose engine huiteight
+    rose_run = RoseEngineLatheRun.huiteight(
+        num_curves=num_curves,
+        scale=scale,
+        resolution=resolution,
+    )
+    rose_run.generate()
+
+    math_lines = math_layer.get_lines()
+    rose_lines = rose_run.get_lines()
+
+    assert len(math_lines) == len(rose_lines), f"Expected {len(math_lines)} curves, got {len(rose_lines)}"
+
+    for i, (ml, rl) in enumerate(zip(math_lines, rose_lines)):
+        assert len(ml) == len(rl), f"Curve {i}: point count differs {len(ml)} vs {len(rl)}"
+        for j, (mp, rp) in enumerate(zip(ml, rl)):
+            dist = ((mp[0] - rp[0]) ** 2 + (mp[1] - rp[1]) ** 2) ** 0.5
+            assert dist < 1e-10, f"Curve {i}, point {j}: math=({mp[0]:.6f},{mp[1]:.6f}), rose=({rp[0]:.6f},{rp[1]:.6f}), dist={dist}"
+
+
+def test_huiteight_clustered_matches_rose_engine():
+    """Test that clustered HuitEightLayer and RoseEngineLatheRun.huiteight() with clusters match"""
+    from turtles import HuitEightLayer, RoseEngineLatheRun
+
+    num_curves = 48
+    scale = 10.0
+    resolution = 360
+    num_clusters = 8
+    cluster_spread = 0.3
+
+    math_layer = HuitEightLayer(
+        num_curves=num_curves,
+        scale=scale,
+        resolution=resolution,
+        num_clusters=num_clusters,
+        cluster_spread=cluster_spread,
+    )
+    math_layer.generate()
+
+    rose_run = RoseEngineLatheRun.huiteight(
+        num_curves=num_curves,
+        scale=scale,
+        resolution=resolution,
+        num_clusters=num_clusters,
+        cluster_spread=cluster_spread,
+    )
+    rose_run.generate()
+
+    math_lines = math_layer.get_lines()
+    rose_lines = rose_run.get_lines()
+
+    assert len(math_lines) == len(rose_lines), f"Expected {len(math_lines)} curves, got {len(rose_lines)}"
+
+    for i, (ml, rl) in enumerate(zip(math_lines, rose_lines)):
+        assert len(ml) == len(rl), f"Curve {i}: point count differs {len(ml)} vs {len(rl)}"
+        for j, (mp, rp) in enumerate(zip(ml, rl)):
+            dist = ((mp[0] - rp[0]) ** 2 + (mp[1] - rp[1]) ** 2) ** 0.5
+            assert dist < 1e-10, f"Clustered curve {i}, point {j}: dist={dist}"
+
+
+def test_huiteight_clustering_properties():
+    """Test HuitEightLayer clustering getters"""
+    from turtles import HuitEightLayer
+
+    # Uniform (default)
+    layer = HuitEightLayer(num_curves=24, scale=10.0)
+    assert layer.num_clusters == 0
+    assert layer.cluster_spread == 0.0
+
+    # Clustered
+    layer = HuitEightLayer(num_curves=48, scale=10.0, num_clusters=8, cluster_spread=0.3)
+    assert layer.num_clusters == 8
+    assert layer.cluster_spread == 0.3
+    layer.generate()
+    lines = layer.get_lines()
+    assert len(lines) == 48
+
+
+def test_huiteight_clustered_watchface():
+    """Test WatchFace.add_huiteight() with clustering params"""
+    wf = WatchFace(radius=38.0)
+    wf.add_inner()
+    wf.add_outer()
+    wf.add_center_hole()
+    wf.add_huiteight(
+        num_curves=72,
+        scale=38.0,
+        resolution=360,
+        num_clusters=8,
+        cluster_spread=0.3,
+    )
+    wf.generate()
+
+    with tempfile.TemporaryDirectory() as tmpdir:
+        svg_path = os.path.join(tmpdir, "huiteight_clustered_watchface.svg")
+        wf.to_svg(svg_path)
+        assert os.path.exists(svg_path)
+
+
 def test_limacon_matches_rose_engine_via_limacon():
     """Test that LimaconLayer matches the dedicated RoseEngineLatheRun.limacon() constructor"""
     from turtles import LimaconLayer, RoseEngineLatheRun

@@ -8,6 +8,8 @@ use turtles::{
     FlinqueConfig as BaseFlinqueConfig,
     FlinqueLayer as BaseFlinqueLayer,
     HorizontalSpirograph as BaseHorizontalSpirograph,
+    HuitEightConfig as BaseHuitEightConfig,
+    HuitEightLayer as BaseHuitEightLayer,
     LimaconConfig as BaseLimaconConfig,
     LimaconLayer as BaseLimaconLayer,
     PaonConfig as BasePaonConfig,
@@ -20,6 +22,7 @@ use turtles::{
 use crate::diamant_bindings::DiamantLayer;
 use crate::draperie_bindings::DraperieLayer;
 use crate::guilloche_bindings::FlinqueLayer;
+use crate::huiteight_bindings::HuitEightLayer;
 use crate::limacon_bindings::LimaconLayer;
 use crate::paon_bindings::PaonLayer;
 use crate::spirograph_bindings::{HorizontalSpirograph, SphericalSpirograph, VerticalSpirograph};
@@ -297,6 +300,43 @@ impl WatchFace {
         };
         self.inner
             .add_draperie_at_clock(config, hour, minute, distance)
+            .map_err(|e| pyo3::exceptions::PyValueError::new_err(e.to_string()))
+    }
+
+    /// Add a huit-eight (figure-eight) pattern layer
+    fn add_huiteight_layer(&mut self, huiteight: &HuitEightLayer) -> PyResult<()> {
+        let new_layer = BaseHuitEightLayer::new_with_center(
+            huiteight.inner.config.clone(),
+            huiteight.inner.center_x,
+            huiteight.inner.center_y,
+        )
+        .map_err(|e| pyo3::exceptions::PyValueError::new_err(e.to_string()))?;
+        self.inner.add_huiteight_layer(new_layer);
+        Ok(())
+    }
+
+    /// Add a huit-eight layer positioned at a clock position
+    #[pyo3(signature = (num_curves, scale, hour, minute, distance, resolution=360, num_clusters=0, cluster_spread=0.0))]
+    fn add_huiteight_at_clock(
+        &mut self,
+        num_curves: usize,
+        scale: f64,
+        hour: u32,
+        minute: u32,
+        distance: f64,
+        resolution: usize,
+        num_clusters: usize,
+        cluster_spread: f64,
+    ) -> PyResult<()> {
+        let config = BaseHuitEightConfig {
+            num_curves,
+            scale,
+            resolution,
+            num_clusters,
+            cluster_spread,
+        };
+        self.inner
+            .add_huiteight_at_clock(config, hour, minute, distance)
             .map_err(|e| pyo3::exceptions::PyValueError::new_err(e.to_string()))
     }
 
