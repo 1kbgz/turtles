@@ -477,7 +477,12 @@ mod tests {
         let bit = CuttingBit::v_shaped(60.0, 1.0);
         let lathe = RoseEngineLathe::new(config, bit).unwrap();
 
-        let result = lathe.to_svg(std::env::temp_dir().join("test.svg").to_str().expect("temp dir path is valid UTF-8"));
+        let result = lathe.to_svg(
+            std::env::temp_dir()
+                .join("test.svg")
+                .to_str()
+                .expect("temp dir path is valid UTF-8"),
+        );
         assert!(result.is_err());
     }
 
