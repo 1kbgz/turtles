@@ -155,7 +155,11 @@ turtles/labextension
 
 # Rust
 target
-<<<<<<< before updating
+
+# Hydra
+outputs/
+multirun/
+
 *.stl
 *.svg
 !examples/svg/*.svg
@@ -163,9 +167,3 @@ target
 
 # Testing
 /tmp*.py
-=======
-
-# Hydra
-outputs/
-multirun/
->>>>>>> after updating

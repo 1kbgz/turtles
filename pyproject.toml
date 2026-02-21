@@ -85,22 +85,6 @@ filename = "rust/Cargo.toml"
 search = 'version = "{current_version}"'
 replace = 'version = "{new_version}"'
 
-<<<<<<< before updating
-[tool.check-manifest]
-ignore = [
-    ".copier-answers.yaml",
-    "Cargo.toml",
-    "Cargo.lock",
-    "Makefile",
-    "docs/**/*",
-    "examples/**/*",
-    "rust/.config/*",
-    "rust/Cargo.lock",
-    "rust/README.md",
-]
-
-=======
->>>>>>> after updating
 [tool.cibuildwheel]
 build = "cp310-*"
 test-command = "pytest -vvv {project}/turtles/tests"
