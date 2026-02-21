@@ -141,14 +141,12 @@ js/node_modules
 js/test-results
 js/playwright-report
 js/*.tgz
-turtles/extension
 
 # Jupyter
 .ipynb_checkpoints
 .autoversion
 Untitled*.ipynb
-!turtles/extension/turtles.json
-!turtles/extension/install.json
+turtles/extension
 turtles/nbextension
 turtles/labextension
 
@@ -157,6 +155,7 @@ turtles/labextension
 
 # Rust
 target
+<<<<<<< before updating
 *.stl
 *.svg
 !examples/svg/*.svg
@@ -164,3 +163,9 @@ target
 
 # Testing
 /tmp*.py
+=======
+
+# Hydra
+outputs/
+multirun/
+>>>>>>> after updating
