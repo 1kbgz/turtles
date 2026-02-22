@@ -530,11 +530,11 @@ mod tests {
         let mut layer = PaonLayer::new(config).unwrap();
         layer.generate();
 
-        let tmpfile = "/tmp/test_paon.svg";
-        let result = layer.to_svg(tmpfile);
+        let tmpfile = std::env::temp_dir().join("test_paon.svg");
+        let result = layer.to_svg(tmpfile.to_str().expect("temp dir path is valid UTF-8"));
         assert!(result.is_ok());
         // Cleanup
-        let _ = std::fs::remove_file(tmpfile);
+        let _ = std::fs::remove_file(&tmpfile);
     }
 
     #[test]
