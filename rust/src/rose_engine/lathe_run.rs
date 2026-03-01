@@ -1,3 +1,4 @@
+use crate::clous_de_paris::ClousDeParisConfig;
 use crate::common::{Point2D, SpirographError};
 use crate::diamant::DiamantConfig;
 use crate::draperie::DraperieConfig;
@@ -75,6 +76,12 @@ pub struct RoseEngineLatheRun {
     /// When set, `generate()` produces lemniscate curves passing through
     /// the centre, matching the mathematical `HuitEightLayer` point-for-point.
     circular_huiteight: Option<HuitEightConfig>,
+
+    /// Optional clous de Paris (hobnail grid) configuration.
+    /// When set, `generate()` produces two perpendicular sets of parallel
+    /// straight lines clipped to a circle, matching the mathematical
+    /// `ClousDeParisLayer` point-for-point.
+    grid_clous_de_paris: Option<ClousDeParisConfig>,
 
     // Generated data
     passes: Vec<RoseEngineLathe>,
@@ -163,6 +170,7 @@ impl RoseEngineLatheRun {
             polar_limacon: None,
             concentric_flinque: None,
             circular_huiteight: None,
+            grid_clous_de_paris: None,
             passes: Vec::new(),
             segmented_lines: Vec::new(),
             generated: false,
@@ -559,6 +567,48 @@ impl RoseEngineLatheRun {
         Ok(run)
     }
 
+    /// Create a rose engine clous de Paris (hobnail) pattern that produces
+    /// identical output to the mathematical `ClousDeParisLayer`.
+    ///
+    /// ## Physical model
+    ///
+    /// On a physical straight-line engine, the clous de Paris is produced by
+    /// making parallel V-groove cuts across the dial, then rotating the work
+    /// 90° and cutting a second set of parallel grooves.  The intersection of
+    /// the two orthogonal groove sets creates a regular grid of small four-sided
+    /// pyramids — the characteristic "hobnail" texture.
+    ///
+    /// This constructor stores the `ClousDeParisConfig` and delegates to the
+    /// same analytical line-generation logic as `ClousDeParisLayer::generate()`.
+    ///
+    /// # Arguments
+    /// * `spacing` – Distance between parallel grooves in mm
+    /// * `radius` – Clipping circle radius
+    /// * `angle` – Grid rotation angle in radians (π/4 = 45° classic)
+    /// * `resolution` – Points per line
+    /// * `center_x` / `center_y` – Pattern centre
+    pub fn new_clous_de_paris(
+        spacing: f64,
+        radius: f64,
+        angle: f64,
+        resolution: usize,
+        center_x: f64,
+        center_y: f64,
+    ) -> Result<Self, SpirographError> {
+        let cdp_config = ClousDeParisConfig {
+            spacing,
+            radius,
+            angle,
+            resolution,
+        };
+
+        let re_config = RoseEngineConfig::new(radius, 0.0);
+        let bit = CuttingBit::v_shaped(30.0, 0.02);
+        let mut run = Self::new_with_segments(re_config, bit, 1, 1, center_x, center_y)?;
+        run.grid_clous_de_paris = Some(cdp_config);
+        Ok(run)
+    }
+
     /// Evaluate the phase-shape function at parameter `t`.
     ///
     /// * **dome mode** (`circular_phase > 0`):
@@ -776,6 +826,53 @@ impl RoseEngineLatheRun {
 
                 if line_points.len() >= 2 {
                     self.segmented_lines.push(line_points);
+                }
+            }
+
+            self.generated = true;
+            return;
+        }
+
+        // ── Clous de Paris mode: two orthogonal sets of parallel lines ─
+        if let Some(ref cdp_cfg) = self.grid_clous_de_paris {
+            let r = cdp_cfg.radius;
+            let s = cdp_cfg.spacing;
+            let grid_angle = cdp_cfg.angle;
+            let res = cdp_cfg.resolution;
+
+            for dir in 0..2 {
+                let theta = grid_angle + (dir as f64) * PI / 2.0;
+                let cos_t = theta.cos();
+                let sin_t = theta.sin();
+
+                let n_lines = (r / s).ceil() as i32;
+
+                for i in -n_lines..=n_lines {
+                    let offset = (i as f64) * s;
+
+                    let disc = r * r - offset * offset;
+                    if disc < 0.0 {
+                        continue;
+                    }
+
+                    let t_half = disc.sqrt();
+                    let ox = self.center_x + offset * (-sin_t);
+                    let oy = self.center_y + offset * cos_t;
+
+                    let mut line_points = Vec::with_capacity(res + 1);
+
+                    for j in 0..=res {
+                        let frac = j as f64 / res as f64;
+                        let t = -t_half + 2.0 * t_half * frac;
+
+                        let x = ox + t * cos_t;
+                        let y = oy + t * sin_t;
+                        line_points.push(Point2D::new(x, y));
+                    }
+
+                    if line_points.len() >= 2 {
+                        self.segmented_lines.push(line_points);
+                    }
                 }
             }
 
