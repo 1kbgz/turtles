@@ -2,6 +2,7 @@ __version__ = "0.1.0"
 
 # Import all classes from the Rust extension
 from .turtles import (
+    ClousDeParisLayer,
     CuttingBit,
     DiamantLayer,
     DraperieLayer,
@@ -23,6 +24,7 @@ __all__ = (
     "RoseEngineConfig",
     "CuttingBit",
     "RosettePattern",
+    "ClousDeParisLayer",
     "DiamantLayer",
     "DraperieLayer",
     "FlinqueLayer",
@@ -121,10 +123,57 @@ class WatchFace:
         self._watch_face.add_hole_at_clock(hour, minute, radius, hole_radius)
 
     # Textures
-    # TODO add_clous_de_paris
     # TODO add_tapisserie
     # TODO add_sunburst
-    # TODO add_flinque
+
+    def add_clous_de_paris(
+        self,
+        spacing: float = 1.0,
+        radius: float = None,
+        angle: float = None,
+        hour: int = 12,
+        minute: int = 0,
+        distance: float = 0.0,
+        resolution: int = 200,
+    ):
+        """Add a clous de Paris (hobnail) guilloché pattern.
+
+        The clous de Paris pattern is created by two sets of parallel straight-line
+        grooves cut at right angles, creating a grid of small pyramidal hobnails.
+        The pattern is typically rotated 45° for the classic diagonal appearance.
+
+        Args:
+            spacing: Distance between parallel grooves in mm (controls hobnail size).
+            radius: Radius of the circular clipping region in mm. Defaults to watch face radius.
+            angle: Grid rotation angle in radians. Defaults to π/4 (45°).
+            hour: Hour position for center (1-12, default 12 = centered).
+            minute: Minute position for center (0-59).
+            distance: Distance from center (0 = centered on watch face).
+            resolution: Number of sample points per line.
+        """
+        import math
+
+        if radius is None:
+            radius = self.radius
+        if angle is None:
+            angle = math.pi / 4.0
+        self._watch_face.add_clous_de_paris_at_clock(
+            hour=hour,
+            minute=minute,
+            distance=distance,
+            spacing=spacing,
+            radius=radius,
+            angle=angle,
+            resolution=resolution,
+        )
+
+    def add_clous_de_paris_layer(self, layer):
+        """Add a pre-configured ClousDeParisLayer to the watch face.
+
+        Args:
+            layer: A ClousDeParisLayer instance.
+        """
+        self._watch_face.add_clous_de_paris_layer(layer)
 
     def add_flinque(
         self,
@@ -482,7 +531,7 @@ class WatchFace:
         self._watch_face.add_huiteight_layer(layer)
 
     def add(self, layer):
-        """Add a spirograph, flinque, diamant, draperie, huiteight, limacon, or paon layer."""
+        """Add a spirograph, flinque, diamant, draperie, huiteight, limacon, paon, or clous_de_paris layer."""
         if isinstance(layer, FlinqueLayer):
             self._watch_face.add_flinque_layer(layer)
         elif isinstance(layer, DiamantLayer):
@@ -495,6 +544,8 @@ class WatchFace:
             self._watch_face.add_limacon_layer(layer)
         elif isinstance(layer, PaonLayer):
             self._watch_face.add_paon_layer(layer)
+        elif isinstance(layer, ClousDeParisLayer):
+            self._watch_face.add_clous_de_paris_layer(layer)
         else:
             self._watch_face.add_layer(layer)
 

@@ -1124,3 +1124,235 @@ def test_limacon_matches_rose_engine_via_limacon():
         for j, (lim_pt, rose_pt) in enumerate(zip(lim_curve, rose_curve)):
             dist = ((lim_pt[0] - rose_pt[0]) ** 2 + (lim_pt[1] - rose_pt[1]) ** 2) ** 0.5
             assert dist < 1e-10, f"Point {i},{j} differs: dist={dist}"
+
+
+# ── Clous de Paris (Hobnail) tests ──────────────────────────────────────
+
+
+def test_clous_de_paris_layer():
+    """Test that ClousDeParisLayer can be created and generates output"""
+    from turtles import ClousDeParisLayer
+
+    layer = ClousDeParisLayer()
+    assert layer.spacing == 1.0
+    assert layer.radius == 22.0
+    assert layer.resolution == 200
+    layer.generate()
+    lines = layer.get_lines()
+    assert len(lines) > 0, "ClousDeParisLayer should produce lines"
+
+
+def test_clous_de_paris_svg_export():
+    """Test creating a clous de Paris pattern and exporting to SVG"""
+    from turtles import ClousDeParisLayer
+
+    layer = ClousDeParisLayer(spacing=2.0, radius=15.0, resolution=50)
+    layer.generate()
+
+    with tempfile.TemporaryDirectory() as tmpdir:
+        svg_path = os.path.join(tmpdir, "clous_de_paris_test.svg")
+        layer.to_svg(svg_path)
+
+        assert os.path.exists(svg_path), "SVG file should exist"
+        assert os.path.getsize(svg_path) > 0, "SVG file should have content"
+
+
+def test_clous_de_paris_layer_with_center():
+    """Test ClousDeParisLayer with offset center"""
+    from turtles import ClousDeParisLayer
+
+    layer = ClousDeParisLayer.with_center(5.0, 5.0, spacing=2.0, radius=10.0)
+    assert layer.center_x == 5.0
+    assert layer.center_y == 5.0
+    layer.generate()
+    lines = layer.get_lines()
+    assert len(lines) > 0
+
+
+def test_clous_de_paris_layer_at_clock():
+    """Test ClousDeParisLayer at a clock position"""
+    from turtles import ClousDeParisLayer
+
+    layer = ClousDeParisLayer.at_clock(3, 0, 15.0, spacing=2.0, radius=10.0)
+    assert layer.center_x > 0.0  # 3 o'clock → positive x
+    layer.generate()
+    lines = layer.get_lines()
+    assert len(lines) > 0
+
+
+def test_clous_de_paris_lines_within_circle():
+    """Test that all clous de Paris points are within the radius circle"""
+    import math
+
+    from turtles import ClousDeParisLayer
+
+    layer = ClousDeParisLayer(spacing=2.0, radius=15.0, resolution=100)
+    layer.generate()
+    lines = layer.get_lines()
+
+    for i, line in enumerate(lines):
+        for j, (x, y) in enumerate(line):
+            dist = math.sqrt(x * x + y * y)
+            assert dist <= 15.0 + 1e-6, f"Point ({x}, {y}) in line {i} at index {j} is outside radius: dist={dist}"
+
+
+def test_clous_de_paris_two_directions():
+    """Test that the pattern contains lines in two orthogonal directions"""
+
+    from turtles import ClousDeParisLayer
+
+    # Use angle=0 so we get horizontal + vertical lines
+    layer = ClousDeParisLayer(spacing=3.0, radius=10.0, angle=0.0, resolution=50)
+    layer.generate()
+    lines = layer.get_lines()
+    assert len(lines) >= 4  # at least 2 per direction
+
+    # Check that some lines are roughly horizontal (small y variation)
+    # and some are roughly vertical (small x variation)
+    has_horizontal = False
+    has_vertical = False
+    for line in lines:
+        if len(line) < 2:
+            continue
+        x_range = max(p[0] for p in line) - min(p[0] for p in line)
+        y_range = max(p[1] for p in line) - min(p[1] for p in line)
+        if x_range > 5.0 and y_range < 0.1:
+            has_horizontal = True
+        if y_range > 5.0 and x_range < 0.1:
+            has_vertical = True
+    assert has_horizontal, "Should have horizontal lines when angle=0"
+    assert has_vertical, "Should have vertical lines when angle=0"
+
+
+def test_clous_de_paris_watchface_add():
+    """Test adding ClousDeParisLayer via WatchFace.add()"""
+    from turtles import ClousDeParisLayer
+
+    wf = WatchFace(radius=38.0)
+    wf.add_inner()
+    wf.add_outer()
+    wf.add_center_hole()
+
+    layer = ClousDeParisLayer(spacing=2.0, radius=15.0, resolution=50)
+    wf.add(layer)
+    wf.generate()
+
+    with tempfile.TemporaryDirectory() as tmpdir:
+        svg_path = os.path.join(tmpdir, "clous_de_paris_watchface.svg")
+        wf.to_svg(svg_path)
+        assert os.path.exists(svg_path)
+
+
+def test_clous_de_paris_watchface_add_method():
+    """Test WatchFace.add_clous_de_paris() convenience method"""
+    wf = WatchFace(radius=38.0)
+    wf.add_inner()
+    wf.add_outer()
+    wf.add_center_hole()
+    wf.add_clous_de_paris(spacing=2.0, radius=15.0, resolution=50)
+    wf.generate()
+
+    with tempfile.TemporaryDirectory() as tmpdir:
+        svg_path = os.path.join(tmpdir, "clous_de_paris_add_method.svg")
+        wf.to_svg(svg_path)
+        assert os.path.exists(svg_path)
+
+
+def test_clous_de_paris_matches_rose_engine():
+    """Test that mathematical ClousDeParisLayer and RoseEngineLatheRun.clous_de_paris() produce identical output"""
+    import math
+
+    from turtles import ClousDeParisLayer, RoseEngineLatheRun
+
+    spacing = 3.0
+    radius = 15.0
+    angle = math.pi / 4.0
+    resolution = 50
+
+    # Create mathematical ClousDeParisLayer
+    math_layer = ClousDeParisLayer(
+        spacing=spacing,
+        radius=radius,
+        angle=angle,
+        resolution=resolution,
+    )
+    math_layer.generate()
+
+    # Create equivalent rose engine clous de Paris
+    rose_run = RoseEngineLatheRun.clous_de_paris(
+        spacing=spacing,
+        radius=radius,
+        angle=angle,
+        resolution=resolution,
+    )
+    rose_run.generate()
+
+    math_lines = math_layer.get_lines()
+    rose_lines = rose_run.get_lines()
+
+    assert len(math_lines) == len(rose_lines), f"Expected {len(math_lines)} lines, got {len(rose_lines)}"
+
+    for i, (ml, rl) in enumerate(zip(math_lines, rose_lines)):
+        assert len(ml) == len(rl), f"Line {i}: point count differs {len(ml)} vs {len(rl)}"
+        for j, (mp, rp) in enumerate(zip(ml, rl)):
+            dist = ((mp[0] - rp[0]) ** 2 + (mp[1] - rp[1]) ** 2) ** 0.5
+            assert dist < 1e-10, f"Line {i}, point {j}: math=({mp[0]:.6f},{mp[1]:.6f}), rose=({rp[0]:.6f},{rp[1]:.6f}), dist={dist}"
+
+
+def test_clous_de_paris_different_angles():
+    """Test that different grid angles produce different patterns"""
+    import math
+
+    from turtles import ClousDeParisLayer
+
+    layer_45 = ClousDeParisLayer(spacing=3.0, radius=10.0, angle=math.pi / 4.0, resolution=20)
+    layer_0 = ClousDeParisLayer(spacing=3.0, radius=10.0, angle=0.0, resolution=20)
+
+    layer_45.generate()
+    layer_0.generate()
+
+    lines_45 = layer_45.get_lines()
+    lines_0 = layer_0.get_lines()
+
+    # Same number of lines (symmetry of the circle)
+    assert len(lines_45) == len(lines_0)
+
+    # But the actual coordinates should differ
+    differs = False
+    for l45, l0 in zip(lines_45, lines_0):
+        for p45, p0 in zip(l45, l0):
+            if abs(p45[0] - p0[0]) > 1e-6 or abs(p45[1] - p0[1]) > 1e-6:
+                differs = True
+                break
+        if differs:
+            break
+    assert differs, "Different angles should produce different coordinates"
+
+
+def test_clous_de_paris_invalid_params():
+    """Test that invalid parameters raise errors"""
+    from turtles import ClousDeParisLayer
+
+    try:
+        ClousDeParisLayer(spacing=0.0)
+        assert False, "Should have raised ValueError for zero spacing"
+    except ValueError:
+        pass
+
+    try:
+        ClousDeParisLayer(spacing=-1.0)
+        assert False, "Should have raised ValueError for negative spacing"
+    except ValueError:
+        pass
+
+    try:
+        ClousDeParisLayer(radius=0.0)
+        assert False, "Should have raised ValueError for zero radius"
+    except ValueError:
+        pass
+
+    try:
+        ClousDeParisLayer(radius=-5.0)
+        assert False, "Should have raised ValueError for negative radius"
+    except ValueError:
+        pass

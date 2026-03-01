@@ -701,6 +701,33 @@ impl RoseEngineLatheRun {
         .map_err(|e| pyo3::exceptions::PyValueError::new_err(e.to_string()))
     }
 
+    /// Create a rose engine clous de Paris (hobnail) pattern that produces
+    /// identical output to the mathematical ClousDeParisLayer.
+    ///
+    /// Models a physical straight-line engine making two orthogonal sets of
+    /// parallel V-groove cuts, creating a grid of pyramidal hobnails.
+    #[staticmethod]
+    #[pyo3(signature = (spacing=1.0, radius=22.0, angle=std::f64::consts::FRAC_PI_4, resolution=200, center_x=0.0, center_y=0.0))]
+    fn clous_de_paris(
+        spacing: f64,
+        radius: f64,
+        angle: f64,
+        resolution: usize,
+        center_x: f64,
+        center_y: f64,
+    ) -> PyResult<Self> {
+        BaseRoseEngineLatheRun::new_clous_de_paris(
+            spacing,
+            radius,
+            angle,
+            resolution,
+            center_x,
+            center_y,
+        )
+        .map(|inner| RoseEngineLatheRun { inner })
+        .map_err(|e| pyo3::exceptions::PyValueError::new_err(e.to_string()))
+    }
+
     /// Generate all passes of the rose engine pattern
     fn generate(&mut self) {
         self.inner.generate();
