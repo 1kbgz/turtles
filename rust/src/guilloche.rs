@@ -1,3 +1,4 @@
+use crate::clous_de_paris::{ClousDeParisConfig, ClousDeParisLayer};
 use crate::common::{validate_radius, ExportConfig, Point2D, SpirographError};
 use crate::diamant::{DiamantConfig, DiamantLayer};
 use crate::draperie::{DraperieConfig, DraperieLayer};
@@ -69,6 +70,7 @@ pub struct GuillochePattern {
     huiteight_layers: Vec<HuitEightLayer>,
     limacon_layers: Vec<LimaconLayer>,
     paon_layers: Vec<PaonLayer>,
+    clous_de_paris_layers: Vec<ClousDeParisLayer>,
 }
 
 impl GuillochePattern {
@@ -85,6 +87,7 @@ impl GuillochePattern {
             huiteight_layers: Vec::new(),
             limacon_layers: Vec::new(),
             paon_layers: Vec::new(),
+            clous_de_paris_layers: Vec::new(),
         })
     }
 
@@ -322,6 +325,42 @@ impl GuillochePattern {
         Ok(())
     }
 
+    /// Add a clous de Paris (hobnail) pattern layer
+    pub fn add_clous_de_paris_layer(&mut self, cdp: ClousDeParisLayer) {
+        self.clous_de_paris_layers.push(cdp);
+    }
+
+    /// Add a clous de Paris layer positioned at a given angle and distance from center
+    pub fn add_clous_de_paris_at_polar(
+        &mut self,
+        config: ClousDeParisConfig,
+        angle: f64,
+        distance: f64,
+    ) -> Result<(), SpirographError> {
+        let cdp = ClousDeParisLayer::new_at_polar(config, angle, distance)?;
+        self.clous_de_paris_layers.push(cdp);
+        Ok(())
+    }
+
+    /// Add a clous de Paris layer positioned at a clock position
+    ///
+    /// # Arguments
+    /// * `config` - Clous de Paris configuration
+    /// * `hour` - Hour position (1-12, where 12 is at top)
+    /// * `minute` - Minute position (0-59)
+    /// * `distance` - Distance from center of watch face
+    pub fn add_clous_de_paris_at_clock(
+        &mut self,
+        config: ClousDeParisConfig,
+        hour: u32,
+        minute: u32,
+        distance: f64,
+    ) -> Result<(), SpirographError> {
+        let cdp = ClousDeParisLayer::new_at_clock(config, hour, minute, distance)?;
+        self.clous_de_paris_layers.push(cdp);
+        Ok(())
+    }
+
     /// Generate all layers
     pub fn generate(&mut self) {
         for layer in &mut self.spirograph_layers {
@@ -345,6 +384,9 @@ impl GuillochePattern {
         for layer in &mut self.paon_layers {
             layer.generate();
         }
+        for layer in &mut self.clous_de_paris_layers {
+            layer.generate();
+        }
     }
 
     /// Get total layer count (spirographs + flinqué + diamant + limaçon)
@@ -356,6 +398,7 @@ impl GuillochePattern {
             + self.huiteight_layers.len()
             + self.limacon_layers.len()
             + self.paon_layers.len()
+            + self.clous_de_paris_layers.len()
     }
 
     /// Get all spirograph layer points (for rendering)
@@ -396,6 +439,14 @@ impl GuillochePattern {
         self.paon_layers.iter().map(|p| p.lines()).collect()
     }
 
+    /// Get all clous de Paris layer lines (for rendering)
+    pub fn clous_de_paris_lines(&self) -> Vec<&Vec<Vec<Point2D>>> {
+        self.clous_de_paris_layers
+            .iter()
+            .map(|c| c.lines())
+            .collect()
+    }
+
     /// Export all layers to separate files with the given base name
     pub fn export_all(
         &self,
@@ -409,6 +460,7 @@ impl GuillochePattern {
             && self.huiteight_layers.is_empty()
             && self.limacon_layers.is_empty()
             && self.paon_layers.is_empty()
+            && self.clous_de_paris_layers.is_empty()
         {
             return Err(SpirographError::ExportError(
                 "No layers to export. Add layers first.".to_string(),

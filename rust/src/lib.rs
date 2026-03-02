@@ -12,6 +12,8 @@ pub mod guilloche;
 pub mod huiteight;
 // Limaçon pattern generation
 pub mod limacon;
+// Clous de Paris (Hobnail) pattern generation
+pub mod clous_de_paris;
 // Paon (Peacock) pattern generation
 pub mod paon;
 pub mod spirograph;
@@ -21,6 +23,7 @@ pub mod rose_engine;
 pub mod watch_face;
 
 // Re-export main types for convenience
+pub use clous_de_paris::{ClousDeParisConfig, ClousDeParisLayer};
 pub use common::{
     clock_to_cartesian, polar_to_cartesian, validate_radius, ExportConfig, Point2D, Point3D,
     SpirographError,

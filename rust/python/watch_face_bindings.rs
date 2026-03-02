@@ -1,5 +1,7 @@
 use pyo3::prelude::*;
 use turtles::{
+    ClousDeParisConfig as BaseClousDeParisConfig,
+    ClousDeParisLayer as BaseClousDeParisLayer,
     DiamantConfig as BaseDiamantConfig,
     DiamantLayer as BaseDiamantLayer,
     DraperieConfig as BaseDraperieConfig,
@@ -19,6 +21,7 @@ use turtles::{
     WatchFace as BaseWatchFace,
 };
 
+use crate::clous_de_paris_bindings::ClousDeParisLayer;
 use crate::diamant_bindings::DiamantLayer;
 use crate::draperie_bindings::DraperieLayer;
 use crate::guilloche_bindings::FlinqueLayer;
@@ -417,6 +420,41 @@ impl WatchFace {
         };
         self.inner
             .add_paon_at_clock(config, hour, minute, distance)
+            .map_err(|e| pyo3::exceptions::PyValueError::new_err(e.to_string()))
+    }
+
+    /// Add a clous de Paris (hobnail) pattern layer
+    fn add_clous_de_paris_layer(&mut self, cdp: &ClousDeParisLayer) -> PyResult<()> {
+        let new_layer = BaseClousDeParisLayer::new_with_center(
+            cdp.inner.config.clone(),
+            cdp.inner.center_x,
+            cdp.inner.center_y,
+        )
+        .map_err(|e| pyo3::exceptions::PyValueError::new_err(e.to_string()))?;
+        self.inner.add_clous_de_paris_layer(new_layer);
+        Ok(())
+    }
+
+    /// Add a clous de Paris layer positioned at a clock position
+    #[pyo3(signature = (hour, minute, distance, spacing=1.0, radius=22.0, angle=std::f64::consts::FRAC_PI_4, resolution=200))]
+    fn add_clous_de_paris_at_clock(
+        &mut self,
+        hour: u32,
+        minute: u32,
+        distance: f64,
+        spacing: f64,
+        radius: f64,
+        angle: f64,
+        resolution: usize,
+    ) -> PyResult<()> {
+        let config = BaseClousDeParisConfig {
+            spacing,
+            radius,
+            angle,
+            resolution,
+        };
+        self.inner
+            .add_clous_de_paris_at_clock(config, hour, minute, distance)
             .map_err(|e| pyo3::exceptions::PyValueError::new_err(e.to_string()))
     }
 

@@ -1,3 +1,4 @@
+use crate::clous_de_paris::{ClousDeParisConfig, ClousDeParisLayer};
 use crate::common::{ExportConfig, Point2D, SpirographError};
 use crate::diamant::{DiamantConfig, DiamantLayer};
 use crate::draperie::{DraperieConfig, DraperieLayer};
@@ -249,6 +250,23 @@ impl WatchFace {
             .add_paon_at_clock(config, hour, minute, distance)
     }
 
+    /// Add a clous de Paris (hobnail) pattern layer
+    pub fn add_clous_de_paris_layer(&mut self, cdp: ClousDeParisLayer) {
+        self.guilloche.add_clous_de_paris_layer(cdp);
+    }
+
+    /// Add a clous de Paris layer at a clock position
+    pub fn add_clous_de_paris_at_clock(
+        &mut self,
+        config: ClousDeParisConfig,
+        hour: u32,
+        minute: u32,
+        distance: f64,
+    ) -> Result<(), SpirographError> {
+        self.guilloche
+            .add_clous_de_paris_at_clock(config, hour, minute, distance)
+    }
+
     /// Generate all layers
     pub fn generate(&mut self) {
         self.guilloche.generate();
@@ -474,6 +492,30 @@ impl WatchFace {
             }
         }
 
+        // Render clous de Paris layers from guilloche
+        for line_set in self.get_clous_de_paris_lines() {
+            for line_points in line_set {
+                if line_points.is_empty() {
+                    continue;
+                }
+
+                let mut data = Data::new().move_to((line_points[0].x, line_points[0].y));
+                for point in line_points.iter().skip(1) {
+                    data = data.line_to((point.x, point.y));
+                }
+
+                let path = Path::new()
+                    .set("fill", "none")
+                    .set("stroke", "#1a1a1a")
+                    .set("stroke-width", 0.03)
+                    .set("stroke-linecap", "round")
+                    .set("stroke-linejoin", "round")
+                    .set("d", data);
+
+                pattern_group = pattern_group.add(path);
+            }
+        }
+
         document = document.add(pattern_group);
 
         // Add outer bezel ring if configured
@@ -539,6 +581,10 @@ impl WatchFace {
 
     fn get_paon_lines(&self) -> Vec<&Vec<Vec<Point2D>>> {
         self.guilloche.paon_lines()
+    }
+
+    fn get_clous_de_paris_lines(&self) -> Vec<&Vec<Vec<Point2D>>> {
+        self.guilloche.clous_de_paris_lines()
     }
 }
 
