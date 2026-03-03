@@ -3,6 +3,7 @@ __version__ = "0.1.0"
 # Import all classes from the Rust extension
 from .turtles import (
     ClousDeParisLayer,
+    CubeLayer,
     CuttingBit,
     DiamantLayer,
     DraperieLayer,
@@ -25,6 +26,7 @@ __all__ = (
     "CuttingBit",
     "RosettePattern",
     "ClousDeParisLayer",
+    "CubeLayer",
     "DiamantLayer",
     "DraperieLayer",
     "FlinqueLayer",
@@ -530,8 +532,65 @@ class WatchFace:
         """
         self._watch_face.add_huiteight_layer(layer)
 
+    def add_cube(
+        self,
+        spacing: float = 0.5,
+        radius: float = None,
+        angle: float = 0.0,
+        hour: int = 12,
+        minute: int = 0,
+        distance: float = 0.0,
+        resolution: int = 200,
+        cuts_per_group: int = 12,
+        gap_per_group: int = 6,
+        amplitude: float = 0.0,
+        leg_angle: float = 30.0,
+    ):
+        """Add a cube (tumbling blocks) guilloché pattern.
+
+        The cube pattern is created by parallel zigzag (triangular-wave) groove
+        cuts grouped in sets, with phase-shifted gaps producing the optical
+        illusion of three-dimensional cubes.
+
+        Args:
+            spacing: Distance between adjacent zigzag lines in mm.
+            radius: Radius of the circular clipping region in mm. Defaults to watch face radius.
+            angle: Base rotation angle in radians.
+            hour: Hour position for center (1-12, default 12 = centered).
+            minute: Minute position for center (0-59).
+            distance: Distance from center (0 = centered on watch face).
+            resolution: Number of sample points per line.
+            cuts_per_group: Number of zigzag lines per cutting group.
+            gap_per_group: Number of line-spacings of empty gap between groups.
+            amplitude: Half peak-to-trough zigzag height in mm (0 = auto so diamonds close).
+            leg_angle: Angle of each zigzag leg from horizontal in degrees (smaller = flatter).
+        """
+        if radius is None:
+            radius = self.radius
+        self._watch_face.add_cube_at_clock(
+            hour=hour,
+            minute=minute,
+            distance=distance,
+            spacing=spacing,
+            radius=radius,
+            angle=angle,
+            resolution=resolution,
+            cuts_per_group=cuts_per_group,
+            gap_per_group=gap_per_group,
+            amplitude=amplitude,
+            leg_angle=leg_angle,
+        )
+
+    def add_cube_layer(self, layer):
+        """Add a pre-configured CubeLayer to the watch face.
+
+        Args:
+            layer: A CubeLayer instance.
+        """
+        self._watch_face.add_cube_layer(layer)
+
     def add(self, layer):
-        """Add a spirograph, flinque, diamant, draperie, huiteight, limacon, paon, or clous_de_paris layer."""
+        """Add a spirograph, flinque, diamant, draperie, huiteight, limacon, paon, clous_de_paris, or cube layer."""
         if isinstance(layer, FlinqueLayer):
             self._watch_face.add_flinque_layer(layer)
         elif isinstance(layer, DiamantLayer):
@@ -546,6 +605,8 @@ class WatchFace:
             self._watch_face.add_paon_layer(layer)
         elif isinstance(layer, ClousDeParisLayer):
             self._watch_face.add_clous_de_paris_layer(layer)
+        elif isinstance(layer, CubeLayer):
+            self._watch_face.add_cube_layer(layer)
         else:
             self._watch_face.add_layer(layer)
 

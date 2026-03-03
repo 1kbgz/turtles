@@ -3,6 +3,7 @@ use pyo3::prelude::*;
 mod diamant_bindings;
 mod draperie_bindings;
 mod clous_de_paris_bindings;
+mod cube_bindings;
 mod guilloche_bindings;
 mod huiteight_bindings;
 mod limacon_bindings;
@@ -12,6 +13,7 @@ mod spirograph_bindings;
 mod watch_face_bindings;
 
 pub use clous_de_paris_bindings::ClousDeParisLayer;
+pub use cube_bindings::CubeLayer;
 pub use diamant_bindings::DiamantLayer;
 pub use draperie_bindings::DraperieLayer;
 pub use guilloche_bindings::{FlinqueLayer, GuillochePattern};
@@ -49,6 +51,9 @@ fn turtles(_py: Python, m: &Bound<PyModule>) -> PyResult<()> {
 
     // Clous de Paris (hobnail) pattern layer
     m.add_class::<ClousDeParisLayer>().unwrap();
+
+    // Cube (tumbling blocks) pattern layer
+    m.add_class::<CubeLayer>().unwrap();
 
     // Limaçon pattern layer
     m.add_class::<LimaconLayer>().unwrap();

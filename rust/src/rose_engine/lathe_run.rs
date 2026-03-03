@@ -1,5 +1,6 @@
 use crate::clous_de_paris::ClousDeParisConfig;
 use crate::common::{Point2D, SpirographError};
+use crate::cube::CubeConfig;
 use crate::diamant::DiamantConfig;
 use crate::draperie::DraperieConfig;
 use crate::flinque::FlinqueConfig;
@@ -8,6 +9,59 @@ use crate::limacon::LimaconConfig;
 use crate::paon::{paon_wave_fn, PaonConfig};
 use crate::rose_engine::{CuttingBit, RoseEngineConfig, RoseEngineLathe, RosettePattern};
 use std::f64::consts::PI;
+
+/// Find t ∈ [0,1] where the segment (x1,y1)→(x2,y2) crosses circle x²+y²=r².
+fn seg_circle_t(x1: f64, y1: f64, x2: f64, y2: f64, r: f64) -> Option<f64> {
+    let dx = x2 - x1;
+    let dy = y2 - y1;
+    let a = dx * dx + dy * dy;
+    if a < 1e-12 {
+        return None;
+    }
+    let b = 2.0 * (x1 * dx + y1 * dy);
+    let c = x1 * x1 + y1 * y1 - r * r;
+    let disc = b * b - 4.0 * a * c;
+    if disc < 0.0 {
+        return None;
+    }
+    let sq = disc.sqrt();
+    let t1 = (-b - sq) / (2.0 * a);
+    let t2 = (-b + sq) / (2.0 * a);
+    if (0.0..=1.0).contains(&t1) {
+        Some(t1)
+    } else if (0.0..=1.0).contains(&t2) {
+        Some(t2)
+    } else {
+        None
+    }
+}
+
+/// Find both t-values in [0,1] where the segment crosses the circle.
+fn seg_circle_t_both(x1: f64, y1: f64, x2: f64, y2: f64, r: f64) -> Vec<f64> {
+    let dx = x2 - x1;
+    let dy = y2 - y1;
+    let a = dx * dx + dy * dy;
+    if a < 1e-12 {
+        return vec![];
+    }
+    let b = 2.0 * (x1 * dx + y1 * dy);
+    let c = x1 * x1 + y1 * y1 - r * r;
+    let disc = b * b - 4.0 * a * c;
+    if disc < 0.0 {
+        return vec![];
+    }
+    let sq = disc.sqrt();
+    let t1 = (-b - sq) / (2.0 * a);
+    let t2 = (-b + sq) / (2.0 * a);
+    let mut out = Vec::new();
+    if (0.0..=1.0).contains(&t1) {
+        out.push(t1);
+    }
+    if (0.0..=1.0).contains(&t2) && (t2 - t1).abs() > 1e-12 {
+        out.push(t2);
+    }
+    out
+}
 
 /// A multi-pass rose engine lathe run that creates complex guilloché patterns
 /// by making multiple overlapping cuts at different rotations.
@@ -82,6 +136,12 @@ pub struct RoseEngineLatheRun {
     /// straight lines clipped to a circle, matching the mathematical
     /// `ClousDeParisLayer` point-for-point.
     grid_clous_de_paris: Option<ClousDeParisConfig>,
+
+    /// Optional cube (tumbling blocks) configuration.
+    /// When set, `generate()` produces three sets of parallel straight lines
+    /// at 60° offsets clipped to a circle, matching the mathematical
+    /// `CubeLayer` point-for-point.
+    grid_cube: Option<CubeConfig>,
 
     // Generated data
     passes: Vec<RoseEngineLathe>,
@@ -171,6 +231,7 @@ impl RoseEngineLatheRun {
             concentric_flinque: None,
             circular_huiteight: None,
             grid_clous_de_paris: None,
+            grid_cube: None,
             passes: Vec::new(),
             segmented_lines: Vec::new(),
             generated: false,
@@ -609,6 +670,54 @@ impl RoseEngineLatheRun {
         Ok(run)
     }
 
+    /// Create a rose engine cube (tumbling blocks) pattern that produces
+    /// identical output to the mathematical `CubeLayer`.
+    ///
+    /// ## Physical model
+    ///
+    /// On a physical straight-line engine the cube pattern is produced by
+    /// making parallel zigzag groove cuts grouped in sets of `cuts_per_group`,
+    /// with equal-sized gaps between groups.  Alternating groups are
+    /// phase-shifted by half a zigzag period so that peaks nest into troughs,
+    /// creating the interlocking diamond-shaped cube faces.
+    ///
+    /// # Arguments
+    /// * `spacing`         - Distance between adjacent zigzag lines in mm
+    /// * `radius`          - Clipping circle radius
+    /// * `angle`           - Base grid rotation angle in radians
+    /// * `resolution`      - Points per line
+    /// * `cuts_per_group`  - Number of zigzag lines per cutting group
+    /// * `center_x` / `center_y` - Pattern centre
+    pub fn new_cube(
+        spacing: f64,
+        radius: f64,
+        angle: f64,
+        resolution: usize,
+        cuts_per_group: usize,
+        gap_per_group: usize,
+        amplitude: f64,
+        leg_angle: f64,
+        center_x: f64,
+        center_y: f64,
+    ) -> Result<Self, SpirographError> {
+        let cube_config = CubeConfig {
+            spacing,
+            radius,
+            angle,
+            resolution,
+            cuts_per_group,
+            gap_per_group,
+            amplitude,
+            leg_angle,
+        };
+
+        let re_config = RoseEngineConfig::new(radius, 0.0);
+        let bit = CuttingBit::v_shaped(30.0, 0.02);
+        let mut run = Self::new_with_segments(re_config, bit, 1, 1, center_x, center_y)?;
+        run.grid_cube = Some(cube_config);
+        Ok(run)
+    }
+
     /// Evaluate the phase-shape function at parameter `t`.
     ///
     /// * **dome mode** (`circular_phase > 0`):
@@ -872,6 +981,124 @@ impl RoseEngineLatheRun {
 
                     if line_points.len() >= 2 {
                         self.segmented_lines.push(line_points);
+                    }
+                }
+            }
+
+            self.generated = true;
+            return;
+        }
+
+        // ── Cube mode: parallel zigzag lines with grouping ──────────────
+        if let Some(ref cube_cfg) = self.grid_cube {
+            let r = cube_cfg.radius;
+            let s = cube_cfg.spacing;
+            let cuts = cube_cfg.cuts_per_group;
+            let gap = cube_cfg.gap_per_group;
+            let base_angle = cube_cfg.angle;
+
+            let amplitude = if cube_cfg.amplitude > 0.0 {
+                cube_cfg.amplitude
+            } else {
+                ((gap as f64) + 1.0) * s / 2.0
+            };
+            let leg_rad = cube_cfg.leg_angle.to_radians();
+            let period = 4.0 * amplitude / leg_rad.tan();
+            let half_period = period / 2.0;
+            let group_cycle = (cuts as f64 + gap as f64) * s;
+
+            let cos_a = base_angle.cos();
+            let sin_a = base_angle.sin();
+            let r_sq = r * r;
+
+            let n_groups = (r / group_cycle).ceil() as i32 + 2;
+
+            for g in -n_groups..=n_groups {
+                let group_base = (g as f64) * group_cycle;
+                let phase = if g.rem_euclid(2) == 0 { 0.0 } else { 0.5 };
+
+                for i in 0..(cuts as i32) {
+                    let baseline = group_base + (i as f64) * s;
+
+                    if baseline - amplitude > r || baseline + amplitude < -r {
+                        continue;
+                    }
+
+                    let x_extent = r + period;
+                    let phase_offset = phase * period;
+
+                    let k_start = ((-x_extent + phase_offset) / half_period).floor() as i32;
+                    let k_end = ((x_extent + phase_offset) / half_period).ceil() as i32;
+
+                    let cap = (k_end - k_start + 1).max(0) as usize;
+                    let mut vertices: Vec<(f64, f64)> = Vec::with_capacity(cap);
+                    for k in k_start..=k_end {
+                        let x = (k as f64) * half_period - phase_offset;
+                        let sign = if k.rem_euclid(2) == 0 { 1.0 } else { -1.0 };
+                        let y = baseline + amplitude * sign;
+                        vertices.push((x, y));
+                    }
+
+                    // Clip to circle and collect segments
+                    let mut current_segment: Vec<Point2D> = Vec::new();
+
+                    for v_idx in 0..vertices.len() {
+                        let (x, y) = vertices[v_idx];
+                        let inside = x * x + y * y <= r_sq;
+
+                        if v_idx > 0 {
+                            let (px, py) = vertices[v_idx - 1];
+                            let prev_inside = px * px + py * py <= r_sq;
+
+                            if prev_inside && !inside {
+                                if let Some(t) = seg_circle_t(px, py, x, y, r) {
+                                    let ix = px + t * (x - px);
+                                    let iy = py + t * (y - py);
+                                    let rx = self.center_x + ix * cos_a - iy * sin_a;
+                                    let ry = self.center_y + ix * sin_a + iy * cos_a;
+                                    current_segment.push(Point2D::new(rx, ry));
+                                }
+                                if current_segment.len() >= 2 {
+                                    self.segmented_lines
+                                        .push(std::mem::take(&mut current_segment));
+                                }
+                                current_segment.clear();
+                            } else if !prev_inside && inside {
+                                if let Some(t) = seg_circle_t(px, py, x, y, r) {
+                                    let ix = px + t * (x - px);
+                                    let iy = py + t * (y - py);
+                                    let rx = self.center_x + ix * cos_a - iy * sin_a;
+                                    let ry = self.center_y + ix * sin_a + iy * cos_a;
+                                    current_segment.push(Point2D::new(rx, ry));
+                                }
+                            } else if !prev_inside && !inside {
+                                let both = seg_circle_t_both(px, py, x, y, r);
+                                if both.len() == 2 {
+                                    let t1 = both[0];
+                                    let t2 = both[1];
+                                    let ix1 = px + t1 * (x - px);
+                                    let iy1 = py + t1 * (y - py);
+                                    let ix2 = px + t2 * (x - px);
+                                    let iy2 = py + t2 * (y - py);
+                                    let rx1 = self.center_x + ix1 * cos_a - iy1 * sin_a;
+                                    let ry1 = self.center_y + ix1 * sin_a + iy1 * cos_a;
+                                    let rx2 = self.center_x + ix2 * cos_a - iy2 * sin_a;
+                                    let ry2 = self.center_y + ix2 * sin_a + iy2 * cos_a;
+                                    self.segmented_lines
+                                        .push(vec![Point2D::new(rx1, ry1), Point2D::new(rx2, ry2)]);
+                                }
+                            }
+                        }
+
+                        if inside {
+                            let rx = self.center_x + x * cos_a - y * sin_a;
+                            let ry = self.center_y + x * sin_a + y * cos_a;
+                            current_segment.push(Point2D::new(rx, ry));
+                        }
+                    }
+
+                    if current_segment.len() >= 2 {
+                        self.segmented_lines.push(current_segment);
                     }
                 }
             }
