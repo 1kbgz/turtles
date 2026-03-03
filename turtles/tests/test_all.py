@@ -1356,3 +1356,247 @@ def test_clous_de_paris_invalid_params():
         assert False, "Should have raised ValueError for negative radius"
     except ValueError:
         pass
+
+
+# ── Cube (tumbling blocks) pattern tests ───────────────────────────────
+
+
+def test_cube_layer():
+    """Test basic CubeLayer creation and generation"""
+    from turtles import CubeLayer
+
+    layer = CubeLayer(spacing=2.0, radius=15.0, resolution=50)
+    layer.generate()
+    lines = layer.get_lines()
+    assert len(lines) > 0
+    for line in lines:
+        assert len(line) >= 2
+
+
+def test_cube_svg_export():
+    """Test CubeLayer SVG export"""
+    from turtles import CubeLayer
+
+    layer = CubeLayer(spacing=2.0, radius=15.0, resolution=50)
+    layer.generate()
+
+    with tempfile.TemporaryDirectory() as tmpdir:
+        svg_path = os.path.join(tmpdir, "cube_test.svg")
+        layer.to_svg(svg_path)
+        assert os.path.exists(svg_path)
+        assert os.path.getsize(svg_path) > 0
+
+
+def test_cube_layer_with_center():
+    """Test CubeLayer.with_center()"""
+    from turtles import CubeLayer
+
+    layer = CubeLayer.with_center(5.0, -3.0, spacing=2.0, radius=10.0, resolution=50)
+    assert abs(layer.center_x - 5.0) < 1e-10
+    assert abs(layer.center_y - (-3.0)) < 1e-10
+    layer.generate()
+    lines = layer.get_lines()
+    assert len(lines) > 0
+
+
+def test_cube_layer_at_clock():
+    """Test CubeLayer.at_clock()"""
+    from turtles import CubeLayer
+
+    layer = CubeLayer.at_clock(3, 0, 15.0, spacing=2.0, radius=10.0, resolution=50)
+    assert layer.center_x > 0.0
+    layer.generate()
+    lines = layer.get_lines()
+    assert len(lines) > 0
+
+
+def test_cube_lines_within_circle():
+    """Test that all generated cube points lie within the clipping circle"""
+    from turtles import CubeLayer
+
+    layer = CubeLayer(spacing=3.0, radius=10.0, resolution=200)
+    layer.generate()
+    lines = layer.get_lines()
+
+    for line in lines:
+        for x, y in line:
+            dist = (x * x + y * y) ** 0.5
+            assert dist <= 10.0 + 1e-5, f"Point ({x}, {y}) is outside the circle (dist={dist})"
+
+
+def test_cube_three_directions():
+    """Test that the cube pattern produces zigzag lines with grouping"""
+    from turtles import CubeLayer
+
+    layer = CubeLayer(spacing=2.0, radius=20.0, angle=0.0, resolution=50, cuts_per_group=4, gap_per_group=4)
+    layer.generate()
+    lines = layer.get_lines()
+    # Should have multiple zigzag segments
+    assert len(lines) >= 4
+
+
+def test_cube_default_amplitude():
+    """Test that default amplitude is 0 (auto-compute)"""
+    from turtles import CubeLayer
+
+    layer = CubeLayer(spacing=3.0, radius=15.0)
+    assert layer.amplitude == 0.0
+
+
+def test_cube_custom_amplitude():
+    """Test that CubeLayer accepts custom amplitude and leg_angle"""
+    from turtles import CubeLayer
+
+    layer = CubeLayer(spacing=2.0, radius=15.0, amplitude=5.0, leg_angle=30.0)
+    layer.generate()
+    assert len(layer.get_lines()) > 0
+    assert layer.amplitude == 5.0
+    assert layer.leg_angle == 30.0
+
+
+def test_cube_watchface_add():
+    """Test adding CubeLayer via WatchFace.add()"""
+    from turtles import CubeLayer
+
+    wf = WatchFace(radius=38.0)
+    wf.add_inner()
+    wf.add_outer()
+    wf.add_center_hole()
+
+    layer = CubeLayer(spacing=2.0, radius=15.0, resolution=50)
+    wf.add(layer)
+    wf.generate()
+
+    with tempfile.TemporaryDirectory() as tmpdir:
+        svg_path = os.path.join(tmpdir, "cube_watchface.svg")
+        wf.to_svg(svg_path)
+        assert os.path.exists(svg_path)
+
+
+def test_cube_watchface_add_method():
+    """Test WatchFace.add_cube() convenience method"""
+    wf = WatchFace(radius=38.0)
+    wf.add_inner()
+    wf.add_outer()
+    wf.add_center_hole()
+    wf.add_cube(spacing=2.0, radius=15.0, resolution=50)
+    wf.generate()
+
+    with tempfile.TemporaryDirectory() as tmpdir:
+        svg_path = os.path.join(tmpdir, "cube_add_method.svg")
+        wf.to_svg(svg_path)
+        assert os.path.exists(svg_path)
+
+
+def test_cube_matches_rose_engine():
+    """Test that mathematical CubeLayer and RoseEngineLatheRun.cube() produce identical output"""
+    import math
+
+    from turtles import CubeLayer, RoseEngineLatheRun
+
+    spacing = 3.0
+    radius = 15.0
+    angle = math.pi / 6.0
+    resolution = 50
+    cuts_per_group = 4
+    gap_per_group = 4
+    amplitude = 8.0
+    leg_angle = 50.0
+
+    # Create mathematical CubeLayer
+    math_layer = CubeLayer(
+        spacing=spacing,
+        radius=radius,
+        angle=angle,
+        resolution=resolution,
+        cuts_per_group=cuts_per_group,
+        gap_per_group=gap_per_group,
+        amplitude=amplitude,
+        leg_angle=leg_angle,
+    )
+    math_layer.generate()
+
+    # Create equivalent rose engine cube
+    rose_run = RoseEngineLatheRun.cube(
+        spacing=spacing,
+        radius=radius,
+        angle=angle,
+        resolution=resolution,
+        cuts_per_group=cuts_per_group,
+        gap_per_group=gap_per_group,
+        amplitude=amplitude,
+        leg_angle=leg_angle,
+    )
+    rose_run.generate()
+
+    math_lines = math_layer.get_lines()
+    rose_lines = rose_run.get_lines()
+
+    assert len(math_lines) == len(rose_lines), f"Expected {len(math_lines)} lines, got {len(rose_lines)}"
+
+    for i, (ml, rl) in enumerate(zip(math_lines, rose_lines)):
+        assert len(ml) == len(rl), f"Line {i}: point count differs {len(ml)} vs {len(rl)}"
+        for j, (mp, rp) in enumerate(zip(ml, rl)):
+            dist = ((mp[0] - rp[0]) ** 2 + (mp[1] - rp[1]) ** 2) ** 0.5
+            assert dist < 1e-10, f"Line {i}, point {j}: math=({mp[0]:.6f},{mp[1]:.6f}), rose=({rp[0]:.6f},{rp[1]:.6f}), dist={dist}"
+
+
+def test_cube_different_angles():
+    """Test that different base angles produce different patterns"""
+    import math
+
+    from turtles import CubeLayer
+
+    layer_0 = CubeLayer(spacing=1.0, radius=10.0, angle=0.0, resolution=20)
+    layer_30 = CubeLayer(spacing=1.0, radius=10.0, angle=math.pi / 6.0, resolution=20)
+
+    layer_0.generate()
+    layer_30.generate()
+
+    lines_0 = layer_0.get_lines()
+    lines_30 = layer_30.get_lines()
+
+    # Both should produce lines
+    assert len(lines_0) > 0
+    assert len(lines_30) > 0
+
+    # Coordinates should differ
+    differs = False
+    min_len = min(len(lines_0), len(lines_30))
+    for l0, l30 in zip(lines_0[:min_len], lines_30[:min_len]):
+        for p0, p30 in zip(l0, l30):
+            if abs(p0[0] - p30[0]) > 1e-6 or abs(p0[1] - p30[1]) > 1e-6:
+                differs = True
+                break
+        if differs:
+            break
+    assert differs, "Different angles should produce different coordinates"
+
+
+def test_cube_invalid_params():
+    """Test that invalid parameters raise errors"""
+    from turtles import CubeLayer
+
+    try:
+        CubeLayer(spacing=0.0)
+        assert False, "Should have raised ValueError for zero spacing"
+    except ValueError:
+        pass
+
+    try:
+        CubeLayer(spacing=-1.0)
+        assert False, "Should have raised ValueError for negative spacing"
+    except ValueError:
+        pass
+
+    try:
+        CubeLayer(radius=0.0)
+        assert False, "Should have raised ValueError for zero radius"
+    except ValueError:
+        pass
+
+    try:
+        CubeLayer(radius=-5.0)
+        assert False, "Should have raised ValueError for negative radius"
+    except ValueError:
+        pass

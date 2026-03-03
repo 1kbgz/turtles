@@ -728,6 +728,42 @@ impl RoseEngineLatheRun {
         .map_err(|e| pyo3::exceptions::PyValueError::new_err(e.to_string()))
     }
 
+    /// Create a rose engine cube (tumbling blocks) pattern that produces
+    /// identical output to the mathematical CubeLayer.
+    ///
+    /// Models a physical straight-line engine making parallel zigzag groove
+    /// cuts grouped in sets, with phase-shifted gaps that create the optical
+    /// illusion of 3D cubes.
+    #[staticmethod]
+    #[pyo3(signature = (spacing=0.5, radius=22.0, angle=0.0, resolution=200, cuts_per_group=8, gap_per_group=8, amplitude=0.0, leg_angle=30.0, center_x=0.0, center_y=0.0))]
+    fn cube(
+        spacing: f64,
+        radius: f64,
+        angle: f64,
+        resolution: usize,
+        cuts_per_group: usize,
+        gap_per_group: usize,
+        amplitude: f64,
+        leg_angle: f64,
+        center_x: f64,
+        center_y: f64,
+    ) -> PyResult<Self> {
+        BaseRoseEngineLatheRun::new_cube(
+            spacing,
+            radius,
+            angle,
+            resolution,
+            cuts_per_group,
+            gap_per_group,
+            amplitude,
+            leg_angle,
+            center_x,
+            center_y,
+        )
+        .map(|inner| RoseEngineLatheRun { inner })
+        .map_err(|e| pyo3::exceptions::PyValueError::new_err(e.to_string()))
+    }
+
     /// Generate all passes of the rose engine pattern
     fn generate(&mut self) {
         self.inner.generate();

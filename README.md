@@ -44,6 +44,10 @@ A library for generating spirograph and guilloché patterns.
 
 <img src="https://raw.githubusercontent.com/1kbgz/turtles/refs/heads/main/docs/img/clous_de_paris_square.png" width=500>
 
+### Cube
+
+<img src="https://raw.githubusercontent.com/1kbgz/turtles/refs/heads/main/docs/img/cube.png" width=500>
+
 ### Export Formats
 
 - **SVG** - 2D vector output for laser engraving and visualization

@@ -1,5 +1,6 @@
 use crate::clous_de_paris::{ClousDeParisConfig, ClousDeParisLayer};
 use crate::common::{validate_radius, ExportConfig, Point2D, SpirographError};
+use crate::cube::{CubeConfig, CubeLayer};
 use crate::diamant::{DiamantConfig, DiamantLayer};
 use crate::draperie::{DraperieConfig, DraperieLayer};
 use crate::flinque::{FlinqueConfig, FlinqueLayer};
@@ -71,6 +72,7 @@ pub struct GuillochePattern {
     limacon_layers: Vec<LimaconLayer>,
     paon_layers: Vec<PaonLayer>,
     clous_de_paris_layers: Vec<ClousDeParisLayer>,
+    cube_layers: Vec<CubeLayer>,
 }
 
 impl GuillochePattern {
@@ -88,6 +90,7 @@ impl GuillochePattern {
             limacon_layers: Vec::new(),
             paon_layers: Vec::new(),
             clous_de_paris_layers: Vec::new(),
+            cube_layers: Vec::new(),
         })
     }
 
@@ -361,6 +364,42 @@ impl GuillochePattern {
         Ok(())
     }
 
+    /// Add a cube (tumbling blocks) pattern layer
+    pub fn add_cube_layer(&mut self, cube: CubeLayer) {
+        self.cube_layers.push(cube);
+    }
+
+    /// Add a cube layer positioned at a given angle and distance from center
+    pub fn add_cube_at_polar(
+        &mut self,
+        config: CubeConfig,
+        angle: f64,
+        distance: f64,
+    ) -> Result<(), SpirographError> {
+        let cube = CubeLayer::new_at_polar(config, angle, distance)?;
+        self.cube_layers.push(cube);
+        Ok(())
+    }
+
+    /// Add a cube layer positioned at a clock position
+    ///
+    /// # Arguments
+    /// * `config` - Cube configuration
+    /// * `hour` - Hour position (1-12, where 12 is at top)
+    /// * `minute` - Minute position (0-59)
+    /// * `distance` - Distance from center of watch face
+    pub fn add_cube_at_clock(
+        &mut self,
+        config: CubeConfig,
+        hour: u32,
+        minute: u32,
+        distance: f64,
+    ) -> Result<(), SpirographError> {
+        let cube = CubeLayer::new_at_clock(config, hour, minute, distance)?;
+        self.cube_layers.push(cube);
+        Ok(())
+    }
+
     /// Generate all layers
     pub fn generate(&mut self) {
         for layer in &mut self.spirograph_layers {
@@ -387,6 +426,9 @@ impl GuillochePattern {
         for layer in &mut self.clous_de_paris_layers {
             layer.generate();
         }
+        for layer in &mut self.cube_layers {
+            layer.generate();
+        }
     }
 
     /// Get total layer count (spirographs + flinqué + diamant + limaçon)
@@ -399,6 +441,7 @@ impl GuillochePattern {
             + self.limacon_layers.len()
             + self.paon_layers.len()
             + self.clous_de_paris_layers.len()
+            + self.cube_layers.len()
     }
 
     /// Get all spirograph layer points (for rendering)
@@ -447,6 +490,11 @@ impl GuillochePattern {
             .collect()
     }
 
+    /// Get all cube layer lines (for rendering)
+    pub fn cube_lines(&self) -> Vec<&Vec<Vec<Point2D>>> {
+        self.cube_layers.iter().map(|c| c.lines()).collect()
+    }
+
     /// Export all layers to separate files with the given base name
     pub fn export_all(
         &self,
@@ -461,6 +509,7 @@ impl GuillochePattern {
             && self.limacon_layers.is_empty()
             && self.paon_layers.is_empty()
             && self.clous_de_paris_layers.is_empty()
+            && self.cube_layers.is_empty()
         {
             return Err(SpirographError::ExportError(
                 "No layers to export. Add layers first.".to_string(),

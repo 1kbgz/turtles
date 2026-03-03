@@ -14,6 +14,8 @@ pub mod huiteight;
 pub mod limacon;
 // Clous de Paris (Hobnail) pattern generation
 pub mod clous_de_paris;
+// Cube (tumbling blocks) pattern generation
+pub mod cube;
 // Paon (Peacock) pattern generation
 pub mod paon;
 pub mod spirograph;
@@ -28,6 +30,7 @@ pub use common::{
     clock_to_cartesian, polar_to_cartesian, validate_radius, ExportConfig, Point2D, Point3D,
     SpirographError,
 };
+pub use cube::{CubeConfig, CubeLayer};
 pub use diamant::{DiamantConfig, DiamantLayer};
 pub use draperie::{DraperieConfig, DraperieLayer};
 pub use flinque::{FlinqueConfig, FlinqueLayer};

@@ -1,5 +1,6 @@
 use crate::clous_de_paris::{ClousDeParisConfig, ClousDeParisLayer};
 use crate::common::{ExportConfig, Point2D, SpirographError};
+use crate::cube::{CubeConfig, CubeLayer};
 use crate::diamant::{DiamantConfig, DiamantLayer};
 use crate::draperie::{DraperieConfig, DraperieLayer};
 use crate::flinque::{FlinqueConfig, FlinqueLayer};
@@ -267,6 +268,23 @@ impl WatchFace {
             .add_clous_de_paris_at_clock(config, hour, minute, distance)
     }
 
+    /// Add a cube (tumbling blocks) pattern layer
+    pub fn add_cube_layer(&mut self, cube: CubeLayer) {
+        self.guilloche.add_cube_layer(cube);
+    }
+
+    /// Add a cube layer at a clock position
+    pub fn add_cube_at_clock(
+        &mut self,
+        config: CubeConfig,
+        hour: u32,
+        minute: u32,
+        distance: f64,
+    ) -> Result<(), SpirographError> {
+        self.guilloche
+            .add_cube_at_clock(config, hour, minute, distance)
+    }
+
     /// Generate all layers
     pub fn generate(&mut self) {
         self.guilloche.generate();
@@ -516,6 +534,30 @@ impl WatchFace {
             }
         }
 
+        // Render cube layers from guilloche
+        for line_set in self.get_cube_lines() {
+            for line_points in line_set {
+                if line_points.is_empty() {
+                    continue;
+                }
+
+                let mut data = Data::new().move_to((line_points[0].x, line_points[0].y));
+                for point in line_points.iter().skip(1) {
+                    data = data.line_to((point.x, point.y));
+                }
+
+                let path = Path::new()
+                    .set("fill", "none")
+                    .set("stroke", "#1a1a1a")
+                    .set("stroke-width", 0.03)
+                    .set("stroke-linecap", "round")
+                    .set("stroke-linejoin", "round")
+                    .set("d", data);
+
+                pattern_group = pattern_group.add(path);
+            }
+        }
+
         document = document.add(pattern_group);
 
         // Add outer bezel ring if configured
@@ -585,6 +627,10 @@ impl WatchFace {
 
     fn get_clous_de_paris_lines(&self) -> Vec<&Vec<Vec<Point2D>>> {
         self.guilloche.clous_de_paris_lines()
+    }
+
+    fn get_cube_lines(&self) -> Vec<&Vec<Vec<Point2D>>> {
+        self.guilloche.cube_lines()
     }
 }
 

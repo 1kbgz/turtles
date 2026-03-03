@@ -2,6 +2,8 @@ use pyo3::prelude::*;
 use turtles::{
     ClousDeParisConfig as BaseClousDeParisConfig,
     ClousDeParisLayer as BaseClousDeParisLayer,
+    CubeConfig as BaseCubeConfig,
+    CubeLayer as BaseCubeLayer,
     DiamantConfig as BaseDiamantConfig,
     DiamantLayer as BaseDiamantLayer,
     DraperieConfig as BaseDraperieConfig,
@@ -22,6 +24,7 @@ use turtles::{
 };
 
 use crate::clous_de_paris_bindings::ClousDeParisLayer;
+use crate::cube_bindings::CubeLayer;
 use crate::diamant_bindings::DiamantLayer;
 use crate::draperie_bindings::DraperieLayer;
 use crate::guilloche_bindings::FlinqueLayer;
@@ -455,6 +458,49 @@ impl WatchFace {
         };
         self.inner
             .add_clous_de_paris_at_clock(config, hour, minute, distance)
+            .map_err(|e| pyo3::exceptions::PyValueError::new_err(e.to_string()))
+    }
+
+    /// Add a cube (tumbling blocks) pattern layer
+    fn add_cube_layer(&mut self, cube: &CubeLayer) -> PyResult<()> {
+        let new_layer = BaseCubeLayer::new_with_center(
+            cube.inner.config.clone(),
+            cube.inner.center_x,
+            cube.inner.center_y,
+        )
+        .map_err(|e| pyo3::exceptions::PyValueError::new_err(e.to_string()))?;
+        self.inner.add_cube_layer(new_layer);
+        Ok(())
+    }
+
+    /// Add a cube layer positioned at a clock position
+    #[pyo3(signature = (hour, minute, distance, spacing=0.5, radius=22.0, angle=0.0, resolution=200, cuts_per_group=8, gap_per_group=8, amplitude=0.0, leg_angle=30.0))]
+    fn add_cube_at_clock(
+        &mut self,
+        hour: u32,
+        minute: u32,
+        distance: f64,
+        spacing: f64,
+        radius: f64,
+        angle: f64,
+        resolution: usize,
+        cuts_per_group: usize,
+        gap_per_group: usize,
+        amplitude: f64,
+        leg_angle: f64,
+    ) -> PyResult<()> {
+        let config = BaseCubeConfig {
+            spacing,
+            radius,
+            angle,
+            resolution,
+            cuts_per_group,
+            gap_per_group,
+            amplitude,
+            leg_angle,
+        };
+        self.inner
+            .add_cube_at_clock(config, hour, minute, distance)
             .map_err(|e| pyo3::exceptions::PyValueError::new_err(e.to_string()))
     }
 
