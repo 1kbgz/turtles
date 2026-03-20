@@ -146,6 +146,7 @@ target
 outputs/
 multirun/
 
+<<<<<<< before updating
 *.stl
 *.svg
 !examples/svg/*.svg
@@ -153,3 +154,9 @@ multirun/
 
 # Testing
 /tmp*.py
+=======
+# AI
+ROADMAP.md
+AGENTS.md
+.github/hooks/sdlc.json
+>>>>>>> after updating
