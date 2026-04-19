@@ -151,7 +151,7 @@ multirun/
 ROADMAP.md
 AGENTS.md
 .github/hooks/sdlc.json
-<<<<<<< before updating
+.superpowers
 
 *.stl
 *.svg
@@ -160,6 +160,3 @@ AGENTS.md
 
 # Testing
 /tmp*.py
-=======
-.superpowers
->>>>>>> after updating
