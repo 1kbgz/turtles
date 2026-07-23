@@ -19,20 +19,20 @@ from .turtles import (
 )
 
 __all__ = (
-    "WatchFace",
-    "RoseEngineLathe",
-    "RoseEngineLatheRun",
-    "RoseEngineConfig",
-    "CuttingBit",
-    "RosettePattern",
     "ClousDeParisLayer",
     "CubeLayer",
+    "CuttingBit",
     "DiamantLayer",
     "DraperieLayer",
     "FlinqueLayer",
     "HuitEightLayer",
     "LimaconLayer",
     "PaonLayer",
+    "RoseEngineConfig",
+    "RoseEngineLathe",
+    "RoseEngineLatheRun",
+    "RosettePattern",
+    "WatchFace",
 )
 
 
@@ -91,7 +91,6 @@ class WatchFace:
             subdial_radius: Radius of the subdial itself.
         """
         # TODO: Implement subdial rendering
-        ...
 
     def add_window(self, hour: int, minute: int, width: float, height: float, angle: float = 0.0):
         """Add a date/day/etc window at the specified hour and minute position.
@@ -108,7 +107,6 @@ class WatchFace:
             angle: Angle of the window in degrees.
         """
         # TODO: Implement window rendering
-        ...
 
     def add_hole(self, hour: int, minute: int, radius: float, hole_radius: float):
         """Add a hole at the specified hour and minute position.
@@ -131,8 +129,8 @@ class WatchFace:
     def add_clous_de_paris(
         self,
         spacing: float = 1.0,
-        radius: float = None,
-        angle: float = None,
+        radius: float | None = None,
+        angle: float | None = None,
         hour: int = 12,
         minute: int = 0,
         distance: float = 0.0,
@@ -179,7 +177,7 @@ class WatchFace:
 
     def add_flinque(
         self,
-        radius: float = None,
+        radius: float | None = None,
         hour: int = 12,
         minute: int = 0,
         distance: float = 0.0,
@@ -227,7 +225,7 @@ class WatchFace:
     def add_diamant(
         self,
         num_circles: int = 72,
-        circle_radius: float = None,
+        circle_radius: float | None = None,
         hour: int = 12,
         minute: int = 0,
         distance: float = 0.0,
@@ -269,8 +267,8 @@ class WatchFace:
     def add_limacon(
         self,
         num_curves: int = 72,
-        base_radius: float = None,
-        amplitude: float = None,
+        base_radius: float | None = None,
+        amplitude: float | None = None,
         hour: int = 12,
         minute: int = 0,
         distance: float = 0.0,
@@ -315,10 +313,10 @@ class WatchFace:
     def add_draperie(
         self,
         num_rings: int = 96,
-        base_radius: float = None,
+        base_radius: float | None = None,
         radius_step: float = 0.44,
         wave_frequency: float = 12.0,
-        phase_shift: float = None,
+        phase_shift: float | None = None,
         phase_oscillations: float = 2.5,
         hour: int = 12,
         minute: int = 0,
@@ -379,10 +377,10 @@ class WatchFace:
     def add_draperie_sharp(
         self,
         num_rings: int = 96,
-        base_radius: float = None,
+        base_radius: float | None = None,
         radius_step: float = 0.44,
         wave_frequency: float = 12.0,
-        phase_shift: float = None,
+        phase_shift: float | None = None,
         phase_oscillations: float = 2.5,
         hour: int = 12,
         minute: int = 0,
@@ -427,7 +425,7 @@ class WatchFace:
     def add_paon(
         self,
         num_lines: int = 500,
-        radius: float = None,
+        radius: float | None = None,
         amplitude: float = 0.1,
         wave_frequency: float = 15.0,
         phase_rate: float = 9.0,
@@ -487,7 +485,7 @@ class WatchFace:
     def add_huiteight(
         self,
         num_curves: int = 72,
-        scale: float = None,
+        scale: float | None = None,
         hour: int = 12,
         minute: int = 0,
         distance: float = 0.0,
@@ -535,7 +533,7 @@ class WatchFace:
     def add_cube(
         self,
         spacing: float = 0.5,
-        radius: float = None,
+        radius: float | None = None,
         angle: float = 0.0,
         hour: int = 12,
         minute: int = 0,
