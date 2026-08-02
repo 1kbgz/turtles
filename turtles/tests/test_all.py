@@ -1,9 +1,5 @@
-<<<<<<< before updating
 import os
 import tempfile
-=======
-from turtles import *
->>>>>>> after updating
 
 from turtles import WatchFace
 from turtles.turtles import GuillochePattern, HorizontalSpirograph, SphericalSpirograph, VerticalSpirograph
