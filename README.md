@@ -1,4 +1,9 @@
-# turtles
+<a href="https://github.com/1kbgz/turtles">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="https://github.com/1kbgz/turtles/raw/main/docs/img/logo-dark.png?raw=true">
+    <img alt="turtles logo, top view of a green turtle with a spirograph/guilloche shell" src="https://github.com/1kbgz/turtles/raw/main/docs/img/logo-light.png?raw=true" width="800">
+  </picture>
+</a>
 
 [![Build Status](https://github.com/1kbgz/turtles/actions/workflows/build.yaml/badge.svg?branch=main&event=push)](https://github.com/1kbgz/turtles/actions/workflows/build.yaml)
 [![codecov](https://codecov.io/gh/1kbgz/turtles/branch/main/graph/badge.svg)](https://codecov.io/gh/1kbgz/turtles)
