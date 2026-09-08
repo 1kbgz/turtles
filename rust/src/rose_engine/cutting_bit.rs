@@ -130,19 +130,29 @@ impl CuttingBit {
     /// * `num_points` - Number of points to generate for the profile
     ///
     /// # Returns
-    /// Vector of points defining the bit profile from -width/2 to +width/2
+    /// Vector of points defining the bit profile from -width/2 to +width/2.
+    ///
+    /// `y` is **depth into the material**: `y = 0` is the workpiece surface at
+    /// the outer edges of the cut, and `y` increases downwards toward the
+    /// deepest point of the bit. Every shape follows this convention.
     pub fn cross_section(&self, num_points: usize) -> Vec<Point2D> {
         let mut points = Vec::with_capacity(num_points);
         let half_width = self.width / 2.0;
 
         match &self.shape {
             BitShape::VShaped { angle } => {
-                // V-shaped profile: two straight lines meeting at a point
+                // V-shaped profile: two straight lines meeting at a point.
+                //
+                // This was `y = |x| / tan(θ/2)`, putting the tip at y = 0 and
+                // the *edges* at maximum - upside-down relative to Round and
+                // Elliptical, whose centres are deepest. Measuring from the
+                // edges inwards puts the tip deepest, matching its siblings and
+                // the documented "y is depth into the material" convention.
                 let angle_rad = angle.to_radians();
                 for i in 0..num_points {
                     let t = (i as f64) / ((num_points - 1) as f64);
                     let x = -half_width + t * self.width;
-                    let y = x.abs() / (angle_rad / 2.0).tan();
+                    let y = (half_width - x.abs()) / (angle_rad / 2.0).tan();
                     points.push(Point2D::new(x, y));
                 }
             }
@@ -302,12 +312,57 @@ mod tests {
     #[test]
     fn test_cross_section_v_shaped() {
         let bit = CuttingBit::v_shaped(90.0, 2.0);
-        let profile = bit.cross_section(10);
-        assert_eq!(profile.len(), 10);
+        // Use an ODD count so a sample lands exactly on x = 0. With an even
+        // count `profile[len/2]` sits at x = +0.11, which is why the previous
+        // version of this test passed against an inverted profile.
+        let profile = bit.cross_section(11);
+        assert_eq!(profile.len(), 11);
 
-        // Center point should be deepest
-        let center = &profile[profile.len() / 2];
-        assert!(center.y > 0.0);
+        let centre = &profile[profile.len() / 2];
+        assert!(centre.x.abs() < 1e-12, "expected a sample at x = 0");
+
+        // Tip is deepest; edges sit at the surface.
+        assert!(centre.y > 0.0, "V-bit tip must be the deepest point");
+        assert!(profile[0].y.abs() < 1e-9);
+        assert!(profile[profile.len() - 1].y.abs() < 1e-9);
+        for p in &profile {
+            assert!(
+                p.y <= centre.y + 1e-9,
+                "no point may be deeper than the tip"
+            );
+        }
+        // half_width / tan(45 deg) = 1.0
+        assert!((centre.y - 1.0).abs() < 1e-9);
+    }
+
+    /// Round, Elliptical and V-shaped must all agree on which way is "down".
+    #[test]
+    fn test_all_bit_profiles_share_depth_convention() {
+        let bits = [
+            CuttingBit::v_shaped(90.0, 2.0),
+            CuttingBit::round(2.0),
+            CuttingBit::elliptical(2.0, 2.0),
+        ];
+        for bit in &bits {
+            let profile = bit.cross_section(21);
+            let centre = &profile[profile.len() / 2];
+            assert!(centre.x.abs() < 1e-12);
+            assert!(
+                centre.y > 0.0,
+                "{:?}: centre must be the deepest point",
+                bit.shape
+            );
+            assert!(
+                profile[0].y <= centre.y,
+                "{:?}: edge deeper than centre",
+                bit.shape
+            );
+            assert!(
+                profile[profile.len() - 1].y <= centre.y,
+                "{:?}: edge deeper than centre",
+                bit.shape
+            );
+        }
     }
 
     #[test]

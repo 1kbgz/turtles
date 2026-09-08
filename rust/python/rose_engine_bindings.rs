@@ -355,7 +355,7 @@ impl RoseEngineLathe {
     fn new(config: PyRef<RoseEngineConfig>, bit: PyRef<CuttingBit>) -> PyResult<Self> {
         BaseRoseEngineLathe::new(config.inner.clone(), bit.inner.clone())
             .map(|inner| RoseEngineLathe { inner })
-            .map_err(|e| pyo3::exceptions::PyValueError::new_err(e.to_string()))
+            .map_err(crate::errors::to_py_err)
     }
 
     /// Create a rose engine lathe with custom center position
@@ -373,7 +373,7 @@ impl RoseEngineLathe {
             center_y,
         )
         .map(|inner| RoseEngineLathe { inner })
-        .map_err(|e| pyo3::exceptions::PyValueError::new_err(e.to_string()))
+        .map_err(crate::errors::to_py_err)
     }
 
     /// Generate the rose engine pattern
@@ -384,7 +384,7 @@ impl RoseEngineLathe {
     /// Export pattern as SVG
     fn to_svg(&self, filename: &str) -> PyResult<()> {
         self.inner.to_svg(filename)
-            .map_err(|e| pyo3::exceptions::PyIOError::new_err(e.to_string()))
+            .map_err(crate::errors::to_py_err)
     }
 
     /// Export pattern as STL file
@@ -396,7 +396,7 @@ impl RoseEngineLathe {
             tool_radius: 0.0,
         };
         self.inner.to_stl(filename, &config)
-            .map_err(|e| pyo3::exceptions::PyIOError::new_err(e.to_string()))
+            .map_err(crate::errors::to_py_err)
     }
 
     /// Export pattern as STEP file
@@ -408,7 +408,7 @@ impl RoseEngineLathe {
             tool_radius: 0.0,
         };
         self.inner.to_step(filename, &config)
-            .map_err(|e| pyo3::exceptions::PyIOError::new_err(e.to_string()))
+            .map_err(crate::errors::to_py_err)
     }
 
     fn __repr__(&self) -> String {
@@ -478,7 +478,7 @@ impl RoseEngineLatheRun {
             inner.phase_exponent = phase_exponent;
             RoseEngineLatheRun { inner }
         })
-        .map_err(|e| pyo3::exceptions::PyValueError::new_err(e.to_string()))
+        .map_err(crate::errors::to_py_err)
     }
 
     /// Create a multi-pass rose engine lathe run with custom center position
@@ -501,7 +501,7 @@ impl RoseEngineLatheRun {
             center_y,
         )
         .map(|inner| RoseEngineLatheRun { inner })
-        .map_err(|e| pyo3::exceptions::PyValueError::new_err(e.to_string()))
+        .map_err(crate::errors::to_py_err)
     }
 
     /// Create a rose engine draperie pattern that produces identical output
@@ -541,7 +541,7 @@ impl RoseEngineLatheRun {
             center_y,
         )
         .map(|inner| RoseEngineLatheRun { inner })
-        .map_err(|e| pyo3::exceptions::PyValueError::new_err(e.to_string()))
+        .map_err(crate::errors::to_py_err)
     }
 
     /// Create a rose engine paon (peacock) pattern that produces identical
@@ -578,7 +578,7 @@ impl RoseEngineLatheRun {
             center_y,
         )
         .map(|inner| RoseEngineLatheRun { inner })
-        .map_err(|e| pyo3::exceptions::PyValueError::new_err(e.to_string()))
+        .map_err(crate::errors::to_py_err)
     }
 
     /// Create a rose engine diamant (diamond) pattern that produces identical
@@ -606,7 +606,7 @@ impl RoseEngineLatheRun {
             center_y,
         )
         .map(|inner| RoseEngineLatheRun { inner })
-        .map_err(|e| pyo3::exceptions::PyValueError::new_err(e.to_string()))
+        .map_err(crate::errors::to_py_err)
     }
 
     /// Create a rose engine limaçon pattern that produces identical output
@@ -635,7 +635,7 @@ impl RoseEngineLatheRun {
             center_y,
         )
         .map(|inner| RoseEngineLatheRun { inner })
-        .map_err(|e| pyo3::exceptions::PyValueError::new_err(e.to_string()))
+        .map_err(crate::errors::to_py_err)
     }
 
     /// Create a rose engine flinqué (engine-turned) pattern that produces
@@ -667,7 +667,7 @@ impl RoseEngineLatheRun {
             center_y,
         )
         .map(|inner| RoseEngineLatheRun { inner })
-        .map_err(|e| pyo3::exceptions::PyValueError::new_err(e.to_string()))
+        .map_err(crate::errors::to_py_err)
     }
 
     /// Create a rose engine huit-eight (figure-eight) pattern that produces
@@ -698,7 +698,7 @@ impl RoseEngineLatheRun {
             cluster_spread,
         )
         .map(|inner| RoseEngineLatheRun { inner })
-        .map_err(|e| pyo3::exceptions::PyValueError::new_err(e.to_string()))
+        .map_err(crate::errors::to_py_err)
     }
 
     /// Create a rose engine clous de Paris (hobnail) pattern that produces
@@ -725,7 +725,7 @@ impl RoseEngineLatheRun {
             center_y,
         )
         .map(|inner| RoseEngineLatheRun { inner })
-        .map_err(|e| pyo3::exceptions::PyValueError::new_err(e.to_string()))
+        .map_err(crate::errors::to_py_err)
     }
 
     /// Create a rose engine cube (tumbling blocks) pattern that produces
@@ -761,7 +761,7 @@ impl RoseEngineLatheRun {
             center_y,
         )
         .map(|inner| RoseEngineLatheRun { inner })
-        .map_err(|e| pyo3::exceptions::PyValueError::new_err(e.to_string()))
+        .map_err(crate::errors::to_py_err)
     }
 
     /// Generate all passes of the rose engine pattern
@@ -772,7 +772,7 @@ impl RoseEngineLatheRun {
     /// Export combined pattern as SVG
     fn to_svg(&self, filename: &str) -> PyResult<()> {
         self.inner.to_svg(filename)
-            .map_err(|e| pyo3::exceptions::PyIOError::new_err(e.to_string()))
+            .map_err(crate::errors::to_py_err)
     }
 
     /// Get the number of passes

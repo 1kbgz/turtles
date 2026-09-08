@@ -1,4 +1,4 @@
-use crate::common::{ExportConfig, Point2D, SpirographError};
+use crate::common::{compute_bounds, validate_finite, ExportConfig, Point2D, SpirographError};
 use crate::rose_engine::config::RoseEngineConfig;
 use crate::rose_engine::cutting_bit::CuttingBit;
 use std::f64::consts::PI;
@@ -90,23 +90,9 @@ impl RoseEngineLathe {
         center_x: f64,
         center_y: f64,
     ) -> Result<Self, SpirographError> {
-        if config.base_radius <= 0.0 {
-            return Err(SpirographError::InvalidParameter(
-                "base_radius must be positive".to_string(),
-            ));
-        }
-
-        if config.amplitude < 0.0 {
-            return Err(SpirographError::InvalidParameter(
-                "amplitude must be non-negative".to_string(),
-            ));
-        }
-
-        if config.resolution < 10 {
-            return Err(SpirographError::InvalidParameter(
-                "resolution must be at least 10".to_string(),
-            ));
-        }
+        config.validate()?;
+        validate_finite("center_x", center_x)?;
+        validate_finite("center_y", center_y)?;
 
         Ok(RoseEngineLathe {
             config,
@@ -287,19 +273,7 @@ impl RoseEngineLathe {
         use svg::Document;
 
         // Find bounds
-        let mut min_x = f64::INFINITY;
-        let mut max_x = f64::NEG_INFINITY;
-        let mut min_y = f64::INFINITY;
-        let mut max_y = f64::NEG_INFINITY;
-
-        for line in &self.rendered.lines {
-            for point in line {
-                min_x = min_x.min(point.x);
-                max_x = max_x.max(point.x);
-                min_y = min_y.min(point.y);
-                max_y = max_y.max(point.y);
-            }
-        }
+        let (min_x, min_y, max_x, max_y) = compute_bounds(&self.rendered.lines)?;
 
         let margin = 5.0;
         let width = max_x - min_x + 2.0 * margin;

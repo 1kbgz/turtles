@@ -19,18 +19,36 @@ def test_horizontal_spirograph():
 
 
 def test_horizontal_spirograph_invalid_radius():
-    """Test that invalid radius raises error"""
-    try:
-        _ = HorizontalSpirograph(
-            outer_radius=50.0,  # Invalid: > 44mm
+    """Test that a non-physical radius raises error.
+
+    A spirograph is a *layer*, not a watch case, so the 26-44mm dial rule does
+    not apply to it -- that would make the sub-dial constructors unusable. It
+    still must reject radii that cannot describe a shape at all.
+    """
+    for bad in (0.0, -40.0, float("nan"), float("inf")):
+        try:
+            _ = HorizontalSpirograph(
+                outer_radius=bad,
+                radius_ratio=0.75,
+                point_distance=0.6,
+                rotations=50,
+                resolution=360,
+            )
+            assert False, f"Should have raised ValueError for radius={bad}"
+        except ValueError as e:
+            assert "outer_radius" in str(e)
+
+    # An out-of-case radius is accepted at the layer level.
+    assert (
+        HorizontalSpirograph(
+            outer_radius=50.0,
             radius_ratio=0.75,
             point_distance=0.6,
             rotations=50,
             resolution=360,
         )
-        assert False, "Should have raised ValueError"
-    except ValueError as e:
-        assert "26mm and 44mm" in str(e)
+        is not None
+    )
 
 
 def test_vertical_spirograph():

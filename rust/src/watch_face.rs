@@ -322,7 +322,7 @@ impl WatchFace {
 
         // Clip all pattern content to the dial circle
         {
-            use ::svg::node::element::{ClipPath, Group};
+            use ::svg::node::element::ClipPath;
 
             let clip_circle = Circle::new().set("cx", 0).set("cy", 0).set("r", radius);
             let clip = ClipPath::new().set("id", "dial-clip").add(clip_circle);
@@ -351,7 +351,11 @@ impl WatchFace {
             for point in points.iter().skip(1) {
                 data = data.line_to((point.x, point.y));
             }
-            data = data.close();
+            // Do NOT close the path. A spirograph only returns to its start when
+            // `rotations` is an exact multiple of the curve's closure period; for
+            // any other value `close()` draws a straight chord from the last point
+            // back to the first, straight across the pattern. The standalone
+            // exporter in `spirograph.rs` already deliberately omits this.
 
             let color = colors[i % colors.len()];
             let stroke_width = stroke_widths[i % stroke_widths.len()];

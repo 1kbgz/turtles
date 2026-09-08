@@ -1,11 +1,10 @@
 use crate::clous_de_paris::ClousDeParisConfig;
-use crate::common::{Point2D, SpirographError};
+use crate::common::{compute_bounds, validate_finite, Point2D, SpirographError};
 use crate::cube::CubeConfig;
 use crate::diamant::DiamantConfig;
 use crate::draperie::DraperieConfig;
 use crate::flinque::FlinqueConfig;
 use crate::huiteight::HuitEightConfig;
-use crate::limacon::LimaconConfig;
 use crate::paon::{paon_wave_fn, PaonConfig};
 use crate::rose_engine::{CuttingBit, RoseEngineConfig, RoseEngineLathe, RosettePattern};
 use std::f64::consts::PI;
@@ -119,7 +118,6 @@ pub struct RoseEngineLatheRun {
     /// Optional limacon configuration.
     /// When set, `generate()` produces limaçon polar curves, matching
     /// the mathematical `LimaconLayer` point-for-point.
-    polar_limacon: Option<LimaconConfig>,
 
     /// Optional flinque (engine-turned) configuration.
     /// When set, `generate()` produces concentric chevron rings, matching
@@ -147,6 +145,14 @@ pub struct RoseEngineLatheRun {
     passes: Vec<RoseEngineLathe>,
     segmented_lines: Vec<Vec<Point2D>>,
     generated: bool,
+    /// Passes that failed to construct during `generate()`.
+    ///
+    /// `generate()` cannot return a `Result` without breaking every caller, and
+    /// it used to drop failing passes on the floor via `if let Ok(..)`, so a
+    /// concentric run whose inner rings collapse to a non-positive radius would
+    /// silently render fewer rings than requested. Failures are recorded here
+    /// and surfaced through [`RoseEngineLatheRun::generation_errors`].
+    pass_errors: Vec<String>,
 }
 
 impl RoseEngineLatheRun {
@@ -213,6 +219,12 @@ impl RoseEngineLatheRun {
             ));
         }
 
+        // Previously the only check here was `base_radius`, so a NaN amplitude
+        // or a resolution of 0 reached geometry generation unvalidated.
+        config.validate()?;
+        validate_finite("center_x", center_x)?;
+        validate_finite("center_y", center_y)?;
+
         Ok(RoseEngineLatheRun {
             base_config: config,
             cutting_bit,
@@ -227,7 +239,6 @@ impl RoseEngineLatheRun {
             center_y,
             linear_paon: None,
             circular_diamant: None,
-            polar_limacon: None,
             concentric_flinque: None,
             circular_huiteight: None,
             grid_clous_de_paris: None,
@@ -235,6 +246,7 @@ impl RoseEngineLatheRun {
             passes: Vec::new(),
             segmented_lines: Vec::new(),
             generated: false,
+            pass_errors: Vec::new(),
         })
     }
 
@@ -749,6 +761,7 @@ impl RoseEngineLatheRun {
     pub fn generate(&mut self) {
         self.passes.clear();
         self.segmented_lines.clear();
+        self.pass_errors.clear();
 
         // ── Diamant mode: concentric circles tangent to centre ────────
         if let Some(ref diamant_cfg) = self.circular_diamant {
@@ -785,11 +798,14 @@ impl RoseEngineLatheRun {
             let res = he_cfg.resolution;
 
             // Build rotation angles (matches HuitEightLayer::generate exactly)
+            // See the comment there: the lemniscate's 180° rotational symmetry
+            // means rotations must span a half turn, not a full one.
+            let half_turn = PI;
             let rotations: Vec<f64> = if he_cfg.num_clusters > 0 && he_cfg.num_clusters < n {
                 let nc = he_cfg.num_clusters;
                 let curves_per_cluster = n / nc;
                 let remainder = n % nc;
-                let sector = 2.0 * PI / (nc as f64);
+                let sector = half_turn / (nc as f64);
                 let spread = if he_cfg.cluster_spread > 0.0 {
                     he_cfg.cluster_spread
                 } else {
@@ -811,7 +827,7 @@ impl RoseEngineLatheRun {
                 }
                 rots
             } else {
-                let angle_step = 2.0 * PI / (n as f64);
+                let angle_step = half_turn / (n as f64);
                 (0..n).map(|i| (i as f64) * angle_step).collect()
             };
 
@@ -1131,28 +1147,43 @@ impl RoseEngineLatheRun {
             }
 
             // Create and generate the lathe for this pass
-            if let Ok(mut lathe) = RoseEngineLathe::new_with_center(
+            match RoseEngineLathe::new_with_center(
                 pass_config,
                 self.cutting_bit.clone(),
                 self.center_x,
                 self.center_y,
             ) {
-                lathe.generate();
+                Ok(mut lathe) => {
+                    lathe.generate();
 
-                // Get the complete circular path from this pass
-                let rendered = lathe.rendered_output();
-                if !rendered.lines.is_empty() && !rendered.lines[0].is_empty() {
-                    let complete_path = &rendered.lines[0];
+                    // Get the complete circular path from this pass
+                    let rendered = lathe.rendered_output();
+                    if !rendered.lines.is_empty() && !rendered.lines[0].is_empty() {
+                        let complete_path = &rendered.lines[0];
 
-                    // Segment this path into multiple arcs with gaps
-                    self.segment_path(complete_path);
+                        // Segment this path into multiple arcs with gaps
+                        self.segment_path(complete_path);
+                    }
+
+                    self.passes.push(lathe);
                 }
-
-                self.passes.push(lathe);
+                Err(e) => {
+                    // Do not fail the whole run - earlier passes may be valid -
+                    // but do not pretend it succeeded either.
+                    self.pass_errors.push(format!("pass {}: {}", i, e));
+                }
             }
         }
 
         self.generated = true;
+    }
+
+    /// Errors from individual passes that failed during [`Self::generate`].
+    ///
+    /// Empty when every requested pass was produced. A non-empty result means
+    /// the rendered pattern has fewer passes than `num_passes` requested.
+    pub fn generation_errors(&self) -> &[String] {
+        &self.pass_errors
     }
 
     /// Segment a complete circular path into multiple arcs with gaps
@@ -1207,19 +1238,7 @@ impl RoseEngineLatheRun {
         let all_lines = &self.segmented_lines;
 
         // Find bounds
-        let mut min_x = f64::INFINITY;
-        let mut max_x = f64::NEG_INFINITY;
-        let mut min_y = f64::INFINITY;
-        let mut max_y = f64::NEG_INFINITY;
-
-        for line in all_lines {
-            for point in line {
-                min_x = min_x.min(point.x);
-                max_x = max_x.max(point.x);
-                min_y = min_y.min(point.y);
-                max_y = max_y.max(point.y);
-            }
-        }
+        let (min_x, min_y, max_x, max_y) = compute_bounds(all_lines)?;
 
         let margin = 5.0;
         let width = max_x - min_x + 2.0 * margin;

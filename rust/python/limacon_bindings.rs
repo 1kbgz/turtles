@@ -32,7 +32,7 @@ impl LimaconLayer {
         };
         BaseLimaconLayer::new(config)
             .map(|inner| LimaconLayer { inner })
-            .map_err(|e| pyo3::exceptions::PyValueError::new_err(e.to_string()))
+            .map_err(crate::errors::to_py_err)
     }
 
     /// Create a limaçon layer with a custom center point
@@ -54,7 +54,7 @@ impl LimaconLayer {
         };
         BaseLimaconLayer::new_with_center(config, center_x, center_y)
             .map(|inner| LimaconLayer { inner })
-            .map_err(|e| pyo3::exceptions::PyValueError::new_err(e.to_string()))
+            .map_err(crate::errors::to_py_err)
     }
 
     /// Create a limaçon layer positioned at a given angle and distance from origin
@@ -76,7 +76,7 @@ impl LimaconLayer {
         };
         BaseLimaconLayer::new_at_polar(config, angle, distance)
             .map(|inner| LimaconLayer { inner })
-            .map_err(|e| pyo3::exceptions::PyValueError::new_err(e.to_string()))
+            .map_err(crate::errors::to_py_err)
     }
 
     /// Create a limaçon layer positioned at a clock position (like hour hand)
@@ -108,7 +108,7 @@ impl LimaconLayer {
         };
         BaseLimaconLayer::new_at_clock(config, hour, minute, distance)
             .map(|inner| LimaconLayer { inner })
-            .map_err(|e| pyo3::exceptions::PyValueError::new_err(e.to_string()))
+            .map_err(crate::errors::to_py_err)
     }
 
     /// Generate the limaçon pattern
@@ -120,7 +120,7 @@ impl LimaconLayer {
     fn to_svg(&self, filename: &str) -> PyResult<()> {
         self.inner
             .to_svg(filename)
-            .map_err(|e| pyo3::exceptions::PyIOError::new_err(e.to_string()))
+            .map_err(crate::errors::to_py_err)
     }
 
     /// Get the number of curves in the pattern

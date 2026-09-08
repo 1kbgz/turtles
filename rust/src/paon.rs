@@ -1,6 +1,9 @@
 use std::f64::consts::PI;
 
-use crate::common::{clock_to_cartesian, polar_to_cartesian, Point2D, SpirographError};
+use crate::common::{
+    clock_to_cartesian, polar_to_cartesian, validate_finite, validate_non_negative,
+    validate_positive, Point2D, SpirographError,
+};
 
 /// Compute the paon waveform value at angle `theta`.
 ///
@@ -150,21 +153,25 @@ impl PaonLayer {
             ));
         }
 
-        if config.radius <= 0.0 {
-            return Err(SpirographError::InvalidParameter(
-                "radius must be positive".to_string(),
-            ));
-        }
+        validate_positive("radius", config.radius)?;
+        validate_non_negative("amplitude", config.amplitude)?;
+        validate_finite("wave_frequency", config.wave_frequency)?;
+        validate_finite("phase_rate", config.phase_rate)?;
+        validate_positive("fan_angle", config.fan_angle)?;
+        validate_finite("center_x", center_x)?;
+        validate_finite("center_y", center_y)?;
+
+        // `vanishing_point` scales the distance from the circle bottom down to
+        // the fan's vanishing point. At exactly 0 the vanishing point lands on
+        // the circle itself, making `dist_near` zero: `angle_max` becomes
+        // `atan(0/0) = NaN` and `ln(dist / 0)` diverges, so every generated
+        // point is NaN and the layer renders empty. Negative values take the
+        // logarithm of a negative number, likewise NaN.
+        validate_positive("vanishing_point", config.vanishing_point)?;
 
         if config.resolution < 10 {
             return Err(SpirographError::InvalidParameter(
                 "resolution must be at least 10".to_string(),
-            ));
-        }
-
-        if config.amplitude < 0.0 {
-            return Err(SpirographError::InvalidParameter(
-                "amplitude must be non-negative".to_string(),
             ));
         }
 

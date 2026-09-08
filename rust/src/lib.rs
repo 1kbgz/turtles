@@ -23,12 +23,15 @@ pub mod spirograph;
 pub mod rose_engine;
 // Watch face wrapper
 pub mod watch_face;
+// ISO-10303-21 (STEP) export
+pub mod step;
 
 // Re-export main types for convenience
 pub use clous_de_paris::{ClousDeParisConfig, ClousDeParisLayer};
 pub use common::{
-    clock_to_cartesian, polar_to_cartesian, validate_radius, ExportConfig, Point2D, Point3D,
-    SpirographError,
+    checked_element_count, clock_to_cartesian, polar_to_cartesian, validate_finite,
+    validate_non_negative, validate_positive, validate_radius, validate_range, ExportConfig,
+    Point2D, Point3D, SpirographError, MAX_ELEMENTS,
 };
 pub use cube::{CubeConfig, CubeLayer};
 pub use diamant::{DiamantConfig, DiamantLayer};

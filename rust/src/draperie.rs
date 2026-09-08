@@ -1,6 +1,9 @@
 use std::f64::consts::PI;
 
-use crate::common::{clock_to_cartesian, polar_to_cartesian, Point2D, SpirographError};
+use crate::common::{
+    clock_to_cartesian, polar_to_cartesian, validate_finite, validate_non_negative,
+    validate_positive, Point2D, SpirographError,
+};
 
 /// Configuration for the Draperie (Drapery) guilloché pattern
 ///
@@ -181,16 +184,16 @@ impl DraperieLayer {
             ));
         }
 
-        if config.radius_step <= 0.0 {
-            return Err(SpirographError::InvalidParameter(
-                "radius_step must be positive".to_string(),
-            ));
-        }
-
-        if config.base_radius <= 0.0 {
-            return Err(SpirographError::InvalidParameter(
-                "base_radius must be positive".to_string(),
-            ));
+        validate_positive("radius_step", config.radius_step)?;
+        validate_positive("base_radius", config.base_radius)?;
+        validate_finite("wave_frequency", config.wave_frequency)?;
+        validate_finite("phase_oscillations", config.phase_oscillations)?;
+        validate_non_negative("circular_phase", config.circular_phase)?;
+        validate_finite("center_x", center_x)?;
+        validate_finite("center_y", center_y)?;
+        validate_finite("phase_shift", config.phase_shift)?;
+        if let Some(amplitude) = config.amplitude {
+            validate_non_negative("amplitude", amplitude)?;
         }
 
         if config.resolution < 10 {

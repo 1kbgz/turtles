@@ -1,6 +1,9 @@
 use std::f64::consts::PI;
 
-use crate::common::{clock_to_cartesian, polar_to_cartesian, Point2D, SpirographError};
+use crate::common::{
+    clock_to_cartesian, polar_to_cartesian, validate_finite, validate_non_negative,
+    validate_positive, Point2D, SpirographError,
+};
 
 /// Configuration for the Huit-Eight (Figure-Eight) guilloché pattern
 ///
@@ -49,7 +52,12 @@ pub struct HuitEightConfig {
 impl Default for HuitEightConfig {
     fn default() -> Self {
         HuitEightConfig {
-            num_curves: 72,
+            // Halved from 72 when the duplicate-curve bug was fixed. Rotations
+            // used to span a full turn, so a lemniscate's 180-degree symmetry
+            // made curves i and i+n/2 identical: 72 curves drew only 36 distinct
+            // strokes. Now that all n are distinct, 36 reproduces the density
+            // this default was originally tuned for.
+            num_curves: 36,
             scale: 20.0,
             resolution: 360,
             num_clusters: 0,
@@ -118,11 +126,10 @@ impl HuitEightLayer {
         center_x: f64,
         center_y: f64,
     ) -> Result<Self, SpirographError> {
-        if config.scale <= 0.0 {
-            return Err(SpirographError::InvalidParameter(
-                "scale must be positive".to_string(),
-            ));
-        }
+        validate_positive("scale", config.scale)?;
+        validate_non_negative("cluster_spread", config.cluster_spread)?;
+        validate_finite("center_x", center_x)?;
+        validate_finite("center_y", center_y)?;
 
         if config.num_curves == 0 {
             return Err(SpirographError::InvalidParameter(
@@ -187,12 +194,21 @@ impl HuitEightLayer {
         let a = self.config.scale;
         let n = self.config.num_curves;
 
+        // A lemniscate of Bernoulli is symmetric under a 180° rotation about
+        // the origin, so rotating one by θ and by θ+π draws exactly the same
+        // stroke. Rotations are therefore distributed over a HALF turn, [0, π).
+        // Distributing over a full turn (as `diamant.rs` correctly does, since
+        // there each circle's *centre* moves to a distinct point) made curves
+        // `i` and `i + n/2` exact duplicates for even `n` - at the default
+        // `num_curves = 72` that silently halved the pattern's density.
+        let half_turn = PI;
+
         // Build the list of rotation angles.
         let rotations: Vec<f64> = if self.config.num_clusters > 0 && self.config.num_clusters < n {
             let nc = self.config.num_clusters;
             let curves_per_cluster = n / nc;
             let remainder = n % nc;
-            let sector = 2.0 * PI / (nc as f64);
+            let sector = half_turn / (nc as f64);
             let spread = if self.config.cluster_spread > 0.0 {
                 self.config.cluster_spread
             } else {
@@ -215,7 +231,7 @@ impl HuitEightLayer {
             rots
         } else {
             // Uniform distribution
-            let angle_step = 2.0 * PI / (n as f64);
+            let angle_step = half_turn / (n as f64);
             (0..n).map(|i| (i as f64) * angle_step).collect()
         };
 
@@ -321,10 +337,53 @@ impl HuitEightLayer {
 mod tests {
     use super::*;
 
+    /// A lemniscate is symmetric under a 180° rotation, so two rotations that
+    /// differ by π draw the identical stroke. Rotations must therefore span
+    /// [0, π); spanning [0, 2π) made curves i and i+n/2 exact duplicates.
+    #[test]
+    fn test_huiteight_curves_are_all_distinct() {
+        fn point_set(curve: &[Point2D]) -> Vec<(i64, i64)> {
+            let mut v: Vec<(i64, i64)> = curve
+                .iter()
+                .map(|p| ((p.x * 1e6) as i64, (p.y * 1e6) as i64))
+                .collect();
+            v.sort_unstable();
+            v.dedup();
+            v
+        }
+
+        // Even counts are where the duplication bit; include a clustered case
+        // with an even cluster count for the same reason.
+        for (n, clusters) in [(72usize, 0usize), (72, 6), (12, 0), (12, 4), (71, 0)] {
+            let config = HuitEightConfig {
+                num_curves: n,
+                scale: 30.0,
+                resolution: 180,
+                num_clusters: clusters,
+                cluster_spread: 0.0,
+            };
+            let mut layer = HuitEightLayer::new(config).unwrap();
+            layer.generate();
+
+            let mut seen: Vec<Vec<(i64, i64)>> = Vec::new();
+            for curve in layer.lines() {
+                let s = point_set(curve);
+                assert!(
+                    !seen.contains(&s),
+                    "duplicate curve for num_curves={}, num_clusters={}",
+                    n,
+                    clusters
+                );
+                seen.push(s);
+            }
+            assert_eq!(seen.len(), n);
+        }
+    }
+
     #[test]
     fn test_huiteight_config_default() {
         let config = HuitEightConfig::default();
-        assert_eq!(config.num_curves, 72);
+        assert_eq!(config.num_curves, 36);
         assert_eq!(config.scale, 20.0);
         assert_eq!(config.resolution, 360);
     }

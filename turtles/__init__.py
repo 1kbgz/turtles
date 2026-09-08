@@ -8,6 +8,8 @@ from .turtles import (
     DiamantLayer,
     DraperieLayer,
     FlinqueLayer,
+    GuillochePattern,
+    HorizontalSpirograph,
     HuitEightLayer,
     LimaconLayer,
     PaonLayer,
@@ -15,6 +17,8 @@ from .turtles import (
     RoseEngineLathe,
     RoseEngineLatheRun,
     RosettePattern,
+    SphericalSpirograph,
+    VerticalSpirograph,
     WatchFace as RustWatchFace,
 )
 
@@ -25,6 +29,8 @@ __all__ = (
     "DiamantLayer",
     "DraperieLayer",
     "FlinqueLayer",
+    "GuillochePattern",
+    "HorizontalSpirograph",
     "HuitEightLayer",
     "LimaconLayer",
     "PaonLayer",
@@ -32,6 +38,8 @@ __all__ = (
     "RoseEngineLathe",
     "RoseEngineLatheRun",
     "RosettePattern",
+    "SphericalSpirograph",
+    "VerticalSpirograph",
     "WatchFace",
 )
 
@@ -89,8 +97,13 @@ class WatchFace:
             minute: Minute position (0-59)
             radius: Radius relative to the center of the watch face for the subdial center.
             subdial_radius: Radius of the subdial itself.
+
+        Raises:
+            NotImplementedError: Subdial rendering is not implemented yet. This
+                method previously returned ``None`` without doing anything, so
+                callers silently exported a watch face with no subdial.
         """
-        # TODO: Implement subdial rendering
+        raise NotImplementedError("add_subdial is not implemented yet")
 
     def add_window(self, hour: int, minute: int, width: float, height: float, angle: float = 0.0):
         """Add a date/day/etc window at the specified hour and minute position.
@@ -105,8 +118,13 @@ class WatchFace:
             width: Width of the window.
             height: Height of the window.
             angle: Angle of the window in degrees.
+
+        Raises:
+            NotImplementedError: Window rendering is not implemented yet. This
+                method previously returned ``None`` without doing anything, so
+                callers silently exported a watch face with no window.
         """
-        # TODO: Implement window rendering
+        raise NotImplementedError("add_window is not implemented yet")
 
     def add_hole(self, hour: int, minute: int, radius: float, hole_radius: float):
         """Add a hole at the specified hour and minute position.
@@ -484,7 +502,7 @@ class WatchFace:
 
     def add_huiteight(
         self,
-        num_curves: int = 72,
+        num_curves: int = 36,
         scale: float | None = None,
         hour: int = 12,
         minute: int = 0,

@@ -1,6 +1,9 @@
 use std::f64::consts::PI;
 
-use crate::common::{clock_to_cartesian, polar_to_cartesian, Point2D, SpirographError};
+use crate::common::{
+    clock_to_cartesian, polar_to_cartesian, validate_finite, validate_positive, Point2D,
+    SpirographError,
+};
 
 /// Configuration for the Limaçon guilloché pattern
 ///
@@ -80,11 +83,10 @@ impl LimaconLayer {
         center_x: f64,
         center_y: f64,
     ) -> Result<Self, SpirographError> {
-        if config.base_radius <= 0.0 {
-            return Err(SpirographError::InvalidParameter(
-                "base_radius must be positive".to_string(),
-            ));
-        }
+        validate_positive("base_radius", config.base_radius)?;
+        validate_finite("amplitude", config.amplitude)?;
+        validate_finite("center_x", center_x)?;
+        validate_finite("center_y", center_y)?;
 
         if config.num_curves == 0 {
             return Err(SpirographError::InvalidParameter(
