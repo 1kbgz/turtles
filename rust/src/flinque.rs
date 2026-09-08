@@ -1,6 +1,9 @@
 use std::f64::consts::PI;
 
-use crate::common::{clock_to_cartesian, polar_to_cartesian, Point2D, SpirographError};
+use crate::common::{
+    clock_to_cartesian, compute_bounds, polar_to_cartesian, validate_finite, validate_non_negative,
+    validate_positive, Point2D, SpirographError,
+};
 
 /// Configuration for radial sunburst flinqué pattern (engine-turned guilloche)
 #[derive(Debug, Clone)]
@@ -54,10 +57,31 @@ impl FlinqueLayer {
     ) -> Result<Self, SpirographError> {
         // For flinque layers, we don't validate against watch radius constraints
         // since they may be subdials or smaller elements
-        if radius <= 0.0 {
+        validate_positive("radius", radius)?;
+        validate_non_negative("wave_amplitude", config.wave_amplitude)?;
+        validate_finite("wave_frequency", config.wave_frequency)?;
+        validate_finite("center_x", center_x)?;
+        validate_finite("center_y", center_y)?;
+
+        // `generate()` computes `points_per_ring = num_petals * 80` and then
+        // `angle = 2*PI * i / points_per_ring`. With `num_petals == 0` the loop
+        // still runs once at i == 0, evaluating 0.0/0.0 = NaN, and every ring
+        // is filled with NaN points that flow into the exported geometry.
+        if config.num_petals == 0 {
             return Err(SpirographError::InvalidParameter(
-                "radius must be positive".to_string(),
+                "num_petals must be at least 1".to_string(),
             ));
+        }
+        if config.num_waves == 0 {
+            return Err(SpirographError::InvalidParameter(
+                "num_waves must be at least 1".to_string(),
+            ));
+        }
+        if !(0.0..=1.0).contains(&config.inner_radius_ratio) {
+            return Err(SpirographError::InvalidParameter(format!(
+                "inner_radius_ratio must be between 0 and 1, got {}",
+                config.inner_radius_ratio
+            )));
         }
 
         Ok(FlinqueLayer {
@@ -170,6 +194,54 @@ impl FlinqueLayer {
     /// Get the generated lines
     pub fn lines(&self) -> &Vec<Vec<Point2D>> {
         &self.lines
+    }
+
+    /// Export the pattern to SVG format
+    ///
+    /// Every other layer type exposes `to_svg`; flinqué was the only one
+    /// without it, so a flinqué layer could not be rendered on its own.
+    pub fn to_svg(&self, filename: &str) -> Result<(), SpirographError> {
+        use svg::node::element::{path::Data, Path};
+        use svg::Document;
+
+        if self.lines.is_empty() {
+            return Err(SpirographError::ExportError(
+                "Pattern not generated. Call generate() first.".to_string(),
+            ));
+        }
+
+        let (min_x, min_y, max_x, max_y) = compute_bounds(&self.lines)?;
+
+        let margin = 5.0;
+        let width = max_x - min_x + 2.0 * margin;
+        let height = max_y - min_y + 2.0 * margin;
+
+        let mut document = Document::new()
+            .set("width", format!("{}mm", width))
+            .set("height", format!("{}mm", height))
+            .set("viewBox", (min_x - margin, min_y - margin, width, height));
+
+        for line in &self.lines {
+            if line.is_empty() {
+                continue;
+            }
+
+            let mut data = Data::new().move_to((line[0].x, line[0].y));
+            for point in line.iter().skip(1) {
+                data = data.line_to((point.x, point.y));
+            }
+
+            let path = Path::new()
+                .set("d", data)
+                .set("fill", "none")
+                .set("stroke", "black")
+                .set("stroke-width", 0.05);
+
+            document = document.add(path);
+        }
+
+        svg::save(filename, &document)
+            .map_err(|e| SpirographError::ExportError(format!("Failed to write SVG: {}", e)))
     }
 }
 

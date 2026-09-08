@@ -46,7 +46,7 @@ impl WatchFace {
     fn new(radius: f64) -> PyResult<Self> {
         BaseWatchFace::new(radius)
             .map(|inner| WatchFace { inner })
-            .map_err(|e| pyo3::exceptions::PyValueError::new_err(e.to_string()))
+            .map_err(crate::errors::to_py_err)
     }
 
     #[getter]
@@ -91,7 +91,7 @@ impl WatchFace {
                 h_spiro.inner.rotations,
                 h_spiro.inner.resolution,
             )
-            .map_err(|e| pyo3::exceptions::PyValueError::new_err(e.to_string()))?;
+            .map_err(crate::errors::to_py_err)?;
             self.inner.add_horizontal_layer(new_spiro);
             return Ok(());
         }
@@ -106,7 +106,7 @@ impl WatchFace {
                 v_spiro.inner.wave_amplitude,
                 v_spiro.inner.wave_frequency,
             )
-            .map_err(|e| pyo3::exceptions::PyValueError::new_err(e.to_string()))?;
+            .map_err(crate::errors::to_py_err)?;
             self.inner.add_vertical_layer(new_spiro);
             return Ok(());
         }
@@ -120,7 +120,7 @@ impl WatchFace {
                 s_spiro.inner.resolution,
                 s_spiro.inner.dome_height,
             )
-            .map_err(|e| pyo3::exceptions::PyValueError::new_err(e.to_string()))?;
+            .map_err(crate::errors::to_py_err)?;
             self.inner.add_spherical_layer(new_spiro);
             return Ok(());
         }
@@ -165,19 +165,19 @@ impl WatchFace {
             "horizontal" => {
                 let spiro = BaseHorizontalSpirograph::new_at_clock(
                     outer_radius, radius_ratio, point_distance, rotations, resolution, hour, minute, distance
-                ).map_err(|e| pyo3::exceptions::PyValueError::new_err(e.to_string()))?;
+                ).map_err(crate::errors::to_py_err)?;
                 self.inner.add_horizontal_layer(spiro);
             }
             "vertical" => {
                 let spiro = BaseVerticalSpirograph::new_at_clock(
                     outer_radius, radius_ratio, point_distance, rotations, resolution, wave_amplitude, wave_frequency, hour, minute, distance
-                ).map_err(|e| pyo3::exceptions::PyValueError::new_err(e.to_string()))?;
+                ).map_err(crate::errors::to_py_err)?;
                 self.inner.add_vertical_layer(spiro);
             }
             "spherical" => {
                 let spiro = BaseSphericalSpirograph::new_at_clock(
                     outer_radius, radius_ratio, point_distance, rotations, resolution, dome_height, hour, minute, distance
-                ).map_err(|e| pyo3::exceptions::PyValueError::new_err(e.to_string()))?;
+                ).map_err(crate::errors::to_py_err)?;
                 self.inner.add_spherical_layer(spiro);
             }
             _ => {
@@ -197,7 +197,7 @@ impl WatchFace {
             flinque.inner.center_x,
             flinque.inner.center_y,
         )
-        .map_err(|e| pyo3::exceptions::PyValueError::new_err(e.to_string()))?;
+        .map_err(crate::errors::to_py_err)?;
         self.inner.add_flinque_layer(new_layer);
         Ok(())
     }
@@ -225,7 +225,7 @@ impl WatchFace {
         };
         self.inner
             .add_flinque_at_clock(radius, config, hour, minute, distance)
-            .map_err(|e| pyo3::exceptions::PyValueError::new_err(e.to_string()))
+            .map_err(crate::errors::to_py_err)
     }
 
     /// Add a diamant (diamond pattern) layer
@@ -235,7 +235,7 @@ impl WatchFace {
             diamant.inner.center_x,
             diamant.inner.center_y,
         )
-        .map_err(|e| pyo3::exceptions::PyValueError::new_err(e.to_string()))?;
+        .map_err(crate::errors::to_py_err)?;
         self.inner.add_diamant_layer(new_layer);
         Ok(())
     }
@@ -258,7 +258,7 @@ impl WatchFace {
         };
         self.inner
             .add_diamant_at_clock(config, hour, minute, distance)
-            .map_err(|e| pyo3::exceptions::PyValueError::new_err(e.to_string()))
+            .map_err(crate::errors::to_py_err)
     }
 
     /// Add a draperie (drapery pattern) layer
@@ -268,7 +268,7 @@ impl WatchFace {
             draperie.inner.center_x,
             draperie.inner.center_y,
         )
-        .map_err(|e| pyo3::exceptions::PyValueError::new_err(e.to_string()))?;
+        .map_err(crate::errors::to_py_err)?;
         self.inner.add_draperie_layer(new_layer);
         Ok(())
     }
@@ -306,7 +306,7 @@ impl WatchFace {
         };
         self.inner
             .add_draperie_at_clock(config, hour, minute, distance)
-            .map_err(|e| pyo3::exceptions::PyValueError::new_err(e.to_string()))
+            .map_err(crate::errors::to_py_err)
     }
 
     /// Add a huit-eight (figure-eight) pattern layer
@@ -316,7 +316,7 @@ impl WatchFace {
             huiteight.inner.center_x,
             huiteight.inner.center_y,
         )
-        .map_err(|e| pyo3::exceptions::PyValueError::new_err(e.to_string()))?;
+        .map_err(crate::errors::to_py_err)?;
         self.inner.add_huiteight_layer(new_layer);
         Ok(())
     }
@@ -343,7 +343,7 @@ impl WatchFace {
         };
         self.inner
             .add_huiteight_at_clock(config, hour, minute, distance)
-            .map_err(|e| pyo3::exceptions::PyValueError::new_err(e.to_string()))
+            .map_err(crate::errors::to_py_err)
     }
 
     /// Add a limaçon pattern layer
@@ -353,7 +353,7 @@ impl WatchFace {
             limacon.inner.center_x,
             limacon.inner.center_y,
         )
-        .map_err(|e| pyo3::exceptions::PyValueError::new_err(e.to_string()))?;
+        .map_err(crate::errors::to_py_err)?;
         self.inner.add_limacon_layer(new_layer);
         Ok(())
     }
@@ -378,7 +378,7 @@ impl WatchFace {
         };
         self.inner
             .add_limacon_at_clock(config, hour, minute, distance)
-            .map_err(|e| pyo3::exceptions::PyValueError::new_err(e.to_string()))
+            .map_err(crate::errors::to_py_err)
     }
 
     /// Add a paon (peacock pattern) layer
@@ -388,7 +388,7 @@ impl WatchFace {
             paon.inner.center_x,
             paon.inner.center_y,
         )
-        .map_err(|e| pyo3::exceptions::PyValueError::new_err(e.to_string()))?;
+        .map_err(crate::errors::to_py_err)?;
         self.inner.add_paon_layer(new_layer);
         Ok(())
     }
@@ -423,7 +423,7 @@ impl WatchFace {
         };
         self.inner
             .add_paon_at_clock(config, hour, minute, distance)
-            .map_err(|e| pyo3::exceptions::PyValueError::new_err(e.to_string()))
+            .map_err(crate::errors::to_py_err)
     }
 
     /// Add a clous de Paris (hobnail) pattern layer
@@ -433,7 +433,7 @@ impl WatchFace {
             cdp.inner.center_x,
             cdp.inner.center_y,
         )
-        .map_err(|e| pyo3::exceptions::PyValueError::new_err(e.to_string()))?;
+        .map_err(crate::errors::to_py_err)?;
         self.inner.add_clous_de_paris_layer(new_layer);
         Ok(())
     }
@@ -458,7 +458,7 @@ impl WatchFace {
         };
         self.inner
             .add_clous_de_paris_at_clock(config, hour, minute, distance)
-            .map_err(|e| pyo3::exceptions::PyValueError::new_err(e.to_string()))
+            .map_err(crate::errors::to_py_err)
     }
 
     /// Add a cube (tumbling blocks) pattern layer
@@ -468,7 +468,7 @@ impl WatchFace {
             cube.inner.center_x,
             cube.inner.center_y,
         )
-        .map_err(|e| pyo3::exceptions::PyValueError::new_err(e.to_string()))?;
+        .map_err(crate::errors::to_py_err)?;
         self.inner.add_cube_layer(new_layer);
         Ok(())
     }
@@ -501,7 +501,7 @@ impl WatchFace {
         };
         self.inner
             .add_cube_at_clock(config, hour, minute, distance)
-            .map_err(|e| pyo3::exceptions::PyValueError::new_err(e.to_string()))
+            .map_err(crate::errors::to_py_err)
     }
 
     /// Generate all layers
@@ -519,7 +519,7 @@ impl WatchFace {
     fn to_svg(&self, filename: &str) -> PyResult<()> {
         self.inner
             .to_svg(filename)
-            .map_err(|e| pyo3::exceptions::PyIOError::new_err(e.to_string()))
+            .map_err(crate::errors::to_py_err)
     }
 
     /// Export to STL
@@ -532,7 +532,7 @@ impl WatchFace {
         };
         self.inner
             .to_stl(filename, &config)
-            .map_err(|e| pyo3::exceptions::PyIOError::new_err(e.to_string()))
+            .map_err(crate::errors::to_py_err)
     }
 
     /// Export to STEP
@@ -545,7 +545,7 @@ impl WatchFace {
         };
         self.inner
             .to_step(filename, &config)
-            .map_err(|e| pyo3::exceptions::PyIOError::new_err(e.to_string()))
+            .map_err(crate::errors::to_py_err)
     }
 
     fn __repr__(&self) -> String {

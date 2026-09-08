@@ -5,12 +5,70 @@ pub use crate::common::{
     clock_to_cartesian, validate_radius, ExportConfig, Point2D, Point3D, SpirographError,
 };
 
+use crate::common::{validate_finite, validate_non_negative, validate_positive, MAX_ELEMENTS};
+
+/// Validates the parameters shared by all three spirograph variants.
+///
+/// Factored out so the horizontal, vertical and spherical constructors cannot
+/// drift apart: previously only `HorizontalSpirograph` checked `point_distance`,
+/// and none of them rejected NaN, a zero `resolution`, or a `rotations *
+/// resolution` product large enough to overflow.
+fn validate_spirograph_params(
+    outer_radius: f64,
+    radius_ratio: f64,
+    point_distance: f64,
+    rotations: usize,
+    resolution: usize,
+    center_x: f64,
+    center_y: f64,
+) -> Result<(), SpirographError> {
+    // A spirograph is a *layer*, not a watch case, so it gets a permissive
+    // positivity check rather than the 26-44 mm dial rule. That rule is
+    // enforced where it belongs - on the dial itself, in `GuillochePattern` and
+    // `WatchFace`. Forcing it here made the `new_at_clock` / `new_at_polar`
+    // sub-dial constructors useless, since no realistic sub-dial (a 6 mm
+    // chronograph counter, say) could ever be built. `FlinqueLayer` already
+    // documents and bypasses the same constraint for the same reason.
+    validate_positive("outer_radius", outer_radius)?;
+    validate_finite("radius_ratio", radius_ratio)?;
+    validate_non_negative("point_distance", point_distance)?;
+    validate_finite("point_distance", point_distance)?;
+    validate_finite("center_x", center_x)?;
+    validate_finite("center_y", center_y)?;
+
+    if radius_ratio <= 0.0 || radius_ratio >= 1.0 {
+        return Err(SpirographError::InvalidParameter(
+            "radius_ratio must be between 0 and 1 (exclusive)".to_string(),
+        ));
+    }
+
+    if rotations == 0 {
+        return Err(SpirographError::InvalidParameter(
+            "rotations must be at least 1".to_string(),
+        ));
+    }
+
+    if resolution == 0 {
+        return Err(SpirographError::InvalidParameter(
+            "resolution must be at least 1".to_string(),
+        ));
+    }
+
+    match rotations.checked_mul(resolution) {
+        Some(total) if total <= MAX_ELEMENTS => Ok(()),
+        _ => Err(SpirographError::InvalidParameter(format!(
+            "rotations * resolution must not exceed {}, got {} * {}",
+            MAX_ELEMENTS, rotations, resolution
+        ))),
+    }
+}
+
 /// Horizontal Spirograph - Traditional hypotrochoid/epitrochoid patterns
 #[derive(Debug, Clone)]
 pub struct HorizontalSpirograph {
-    pub outer_radius: f64,   // R - outer circle radius (26-44mm)
-    pub radius_ratio: f64,   // r/R - inner circle radius ratio
-    pub point_distance: f64, // d - drawing point distance
+    pub outer_radius: f64,   // R - fixed circle radius
+    pub radius_ratio: f64,   // r/R - rolling circle radius as a fraction of R
+    pub point_distance: f64, // d/r - pen offset as a fraction of the rolling circle radius
     pub rotations: usize,    // Number of rotations/revolutions
     pub resolution: usize,   // Points per revolution
     pub center_x: f64,       // X coordinate of center point
@@ -48,19 +106,15 @@ impl HorizontalSpirograph {
         center_x: f64,
         center_y: f64,
     ) -> Result<Self, SpirographError> {
-        validate_radius(outer_radius)?;
-
-        if radius_ratio <= 0.0 || radius_ratio >= 1.0 {
-            return Err(SpirographError::InvalidParameter(
-                "radius_ratio must be between 0 and 1".to_string(),
-            ));
-        }
-
-        if point_distance < 0.0 {
-            return Err(SpirographError::InvalidParameter(
-                "point_distance must be positive".to_string(),
-            ));
-        }
+        validate_spirograph_params(
+            outer_radius,
+            radius_ratio,
+            point_distance,
+            rotations,
+            resolution,
+            center_x,
+            center_y,
+        )?;
 
         Ok(HorizontalSpirograph {
             outer_radius,
@@ -103,7 +157,9 @@ impl HorizontalSpirograph {
     /// # Arguments
     /// * `outer_radius` - Outer circle radius
     /// * `radius_ratio` - Inner/outer radius ratio
-    /// * `point_distance` - Drawing point distance
+    /// * `point_distance` - Pen offset as a fraction of the rolling circle's
+    ///   radius (0 = centre, 1 = on the rim). Values above 1 place the pen
+    ///   outside the rolling circle, which is still a valid curve.
     /// * `rotations` - Number of rotations
     /// * `resolution` - Points per revolution
     /// * `hour` - Hour position (1-12, where 12 is at top)
@@ -135,7 +191,11 @@ impl HorizontalSpirograph {
     pub fn generate(&mut self) -> &Vec<Point2D> {
         let inner_radius = self.outer_radius * self.radius_ratio;
         let outer_r = self.outer_radius;
-        let d = self.point_distance;
+        // `point_distance` is a FRACTION of the rolling circle's radius, matching
+        // the `radius_ratio` convention, not an absolute millimetre value. Using
+        // it raw made the pen offset ~0.6 mm against a 9.5 mm arm - a 6% wobble -
+        // so every spirograph degenerated into a plain circle.
+        let d = self.point_distance * inner_radius;
 
         let total_points = self.rotations * self.resolution;
         self.points.clear();
@@ -251,13 +311,17 @@ impl VerticalSpirograph {
         center_x: f64,
         center_y: f64,
     ) -> Result<Self, SpirographError> {
-        validate_radius(outer_radius)?;
-
-        if radius_ratio <= 0.0 || radius_ratio >= 1.0 {
-            return Err(SpirographError::InvalidParameter(
-                "radius_ratio must be between 0 and 1".to_string(),
-            ));
-        }
+        validate_spirograph_params(
+            outer_radius,
+            radius_ratio,
+            point_distance,
+            rotations,
+            resolution,
+            center_x,
+            center_y,
+        )?;
+        validate_non_negative("wave_amplitude", wave_amplitude)?;
+        validate_finite("wave_frequency", wave_frequency)?;
 
         Ok(VerticalSpirograph {
             outer_radius,
@@ -336,7 +400,11 @@ impl VerticalSpirograph {
     pub fn generate(&mut self) -> &Vec<Point2D> {
         let inner_radius = self.outer_radius * self.radius_ratio;
         let outer_r = self.outer_radius;
-        let d = self.point_distance;
+        // `point_distance` is a FRACTION of the rolling circle's radius, matching
+        // the `radius_ratio` convention, not an absolute millimetre value. Using
+        // it raw made the pen offset ~0.6 mm against a 9.5 mm arm - a 6% wobble -
+        // so every spirograph degenerated into a plain circle.
+        let d = self.point_distance * inner_radius;
 
         let total_points = self.rotations * self.resolution;
         self.points.clear();
@@ -448,13 +516,21 @@ impl SphericalSpirograph {
         center_x: f64,
         center_y: f64,
     ) -> Result<Self, SpirographError> {
-        validate_radius(outer_radius)?;
+        validate_spirograph_params(
+            outer_radius,
+            radius_ratio,
+            point_distance,
+            rotations,
+            resolution,
+            center_x,
+            center_y,
+        )?;
 
-        if radius_ratio <= 0.0 || radius_ratio >= 1.0 {
-            return Err(SpirographError::InvalidParameter(
-                "radius_ratio must be between 0 and 1".to_string(),
-            ));
-        }
+        // `generate()` derives `sphere_radius = (R^2 + h^2) / (2h)`. At h == 0
+        // that is infinite, and the subsequent `z = sphere_radius * cos(..) -
+        // (sphere_radius - h)` evaluates to `inf - inf = NaN`, poisoning every
+        // 3D point. A negative height silently inverts the dome.
+        validate_positive("dome_height", dome_height)?;
 
         Ok(SphericalSpirograph {
             outer_radius,
@@ -532,7 +608,11 @@ impl SphericalSpirograph {
     pub fn generate(&mut self) -> &Vec<Point3D> {
         let inner_radius = self.outer_radius * self.radius_ratio;
         let outer_r = self.outer_radius;
-        let d = self.point_distance;
+        // `point_distance` is a FRACTION of the rolling circle's radius, matching
+        // the `radius_ratio` convention, not an absolute millimetre value. Using
+        // it raw made the pen offset ~0.6 mm against a 9.5 mm arm - a 6% wobble -
+        // so every spirograph degenerated into a plain circle.
+        let d = self.point_distance * inner_radius;
 
         let total_points = self.rotations * self.resolution;
         self.points_2d.clear();
@@ -557,9 +637,15 @@ impl SphericalSpirograph {
             self.points_2d
                 .push(Point2D::new(x_2d + self.center_x, y_2d + self.center_y));
 
-            // Project onto sphere
+            // Project onto sphere.
+            //
+            // `radius_from_center` can exceed `sphere_radius` when the traced
+            // point reaches beyond the dome's own radius (the ratio peaks when
+            // dome_height == outer_radius). `asin` is only defined on [-1, 1]
+            // and returns NaN outside it, so clamp before projecting; the
+            // clamped value corresponds to the dome's equator.
             let radius_from_center = (x_2d * x_2d + y_2d * y_2d).sqrt();
-            let angle_from_top = (radius_from_center / sphere_radius).asin();
+            let angle_from_top = (radius_from_center / sphere_radius).clamp(-1.0, 1.0).asin();
 
             let z = sphere_radius * angle_from_top.cos() - (sphere_radius - self.dome_height);
             let xy_scale =
@@ -619,6 +705,7 @@ impl SphericalSpirograph {
 /// Module for SVG export
 mod svg_export {
     use super::*;
+    use crate::common::compute_bounds;
     use ::svg::node::element::path::Data;
     use ::svg::node::element::Path;
     use ::svg::Document;
@@ -647,11 +734,23 @@ mod svg_export {
             .set("stroke-width", 0.1)
             .set("d", data);
 
-        let size = radius * 2.5;
+        // Fit the canvas to the actual geometry. This was a fixed
+        // `radius * 2.5` half-extent, i.e. a canvas 5x the nominal radius, so a
+        // 53mm curve was drawn on a 190mm page and appeared as a speck. Every
+        // other module fits its bounds; `radius` is kept only as a floor so a
+        // degenerate curve still gets a sensible page.
+        let lines = [points.to_vec()];
+        let (min_x, min_y, max_x, max_y) =
+            compute_bounds(&lines).map_err(|e| -> Box<dyn std::error::Error> { Box::new(e) })?;
+
+        let margin = 5.0;
+        let width = (max_x - min_x).max(radius * 0.1) + 2.0 * margin;
+        let height = (max_y - min_y).max(radius * 0.1) + 2.0 * margin;
+
         let document = Document::new()
-            .set("viewBox", (-size, -size, size * 2.0, size * 2.0))
-            .set("width", format!("{}mm", size * 2.0))
-            .set("height", format!("{}mm", size * 2.0))
+            .set("viewBox", (min_x - margin, min_y - margin, width, height))
+            .set("width", format!("{}mm", width))
+            .set("height", format!("{}mm", height))
             .add(path);
 
         ::svg::save(filename, &document)?;
@@ -744,48 +843,21 @@ mod stl {
     }
 }
 
-/// Module for STEP export (basic implementation)
+/// STEP export adapters.
+///
+/// The actual ISO-10303-21 serialisation lives in `crate::step`; these wrappers
+/// only lift the 2D/3D point lists into the polyline form it expects.
 mod step {
     use super::*;
-    use chrono::Utc;
+    use crate::common::Point3D;
 
     pub fn export_step(
         filename: &str,
         points: &[Point2D],
         _config: &ExportConfig,
     ) -> Result<(), Box<dyn std::error::Error>> {
-        // Basic STEP file generation
-        // This is a simplified implementation - full STEP support would require a proper CAD library
-        let mut content = String::new();
-
-        // Use current timestamp for file metadata
-        let timestamp = Utc::now().format("%Y-%m-%dT%H:%M:%S").to_string();
-
-        content.push_str("ISO-10303-21;\n");
-        content.push_str("HEADER;\n");
-        content.push_str("FILE_DESCRIPTION(('Spirograph Pattern'),'2;1');\n");
-        content.push_str(&format!(
-            "FILE_NAME('spirograph.stp','{}',(''),(''),'','','');\n",
-            timestamp
-        ));
-        content.push_str("FILE_SCHEMA(('AUTOMOTIVE_DESIGN'));\n");
-        content.push_str("ENDSEC;\n");
-        content.push_str("DATA;\n");
-
-        // Add points as a polyline
-        for (i, point) in points.iter().enumerate() {
-            content.push_str(&format!(
-                "#{}=CARTESIAN_POINT('',({}.,{}.,0.));\n",
-                i + 1,
-                point.x,
-                point.y
-            ));
-        }
-
-        content.push_str("ENDSEC;\n");
-        content.push_str("END-ISO-10303-21;\n");
-
-        std::fs::write(filename, content)?;
+        let path: Vec<Point3D> = points.iter().map(|p| Point3D::new(p.x, p.y, 0.0)).collect();
+        crate::step::write_step_polylines(filename, "Spirograph Pattern", &[path])?;
         Ok(())
     }
 
@@ -794,35 +866,11 @@ mod step {
         points: &[Point3D],
         _config: &ExportConfig,
     ) -> Result<(), Box<dyn std::error::Error>> {
-        let mut content = String::new();
-
-        let timestamp = Utc::now().format("%Y-%m-%dT%H:%M:%S").to_string();
-
-        content.push_str("ISO-10303-21;\n");
-        content.push_str("HEADER;\n");
-        content.push_str("FILE_DESCRIPTION(('Spherical Spirograph Pattern'),'2;1');\n");
-        content.push_str(&format!(
-            "FILE_NAME('spherical_spirograph.stp','{}',(''),(''),'','','');\n",
-            timestamp
-        ));
-        content.push_str("FILE_SCHEMA(('AUTOMOTIVE_DESIGN'));\n");
-        content.push_str("ENDSEC;\n");
-        content.push_str("DATA;\n");
-
-        for (i, point) in points.iter().enumerate() {
-            content.push_str(&format!(
-                "#{}=CARTESIAN_POINT('',({}.,{}.,{}.));\n",
-                i + 1,
-                point.x,
-                point.y,
-                point.z
-            ));
-        }
-
-        content.push_str("ENDSEC;\n");
-        content.push_str("END-ISO-10303-21;\n");
-
-        std::fs::write(filename, content)?;
+        crate::step::write_step_polylines(
+            filename,
+            "Spherical Spirograph Pattern",
+            &[points.to_vec()],
+        )?;
         Ok(())
     }
 }
@@ -830,6 +878,39 @@ mod step {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    /// `new_at_clock` / `new_at_polar` exist to place a spirograph as a
+    /// sub-dial, which naturally wants a small radius (a 6 mm chronograph
+    /// counter). The 26-44 mm watch-case rule belongs on the dial itself, not
+    /// on the elements drawn inside it - `FlinqueLayer` already documents and
+    /// bypasses it for exactly this reason.
+    #[test]
+    fn test_subdial_sized_spirographs_are_allowed() {
+        assert!(
+            HorizontalSpirograph::new_at_clock(6.0, 0.75, 0.6, 5, 360, 3, 0, 12.0).is_ok(),
+            "6mm chronograph sub-dial must be constructible"
+        );
+        assert!(
+            VerticalSpirograph::new_at_polar(8.0, 0.6, 0.5, 5, 360, 2.0, 5.0, 0.0, 12.0).is_ok()
+        );
+        assert!(SphericalSpirograph::new_at_polar(9.0, 0.75, 0.6, 5, 360, 10.0, 0.0, 12.0).is_ok());
+
+        // Still rejects genuinely nonsensical radii.
+        assert!(HorizontalSpirograph::new_at_clock(0.0, 0.75, 0.6, 5, 360, 3, 0, 12.0).is_err());
+        assert!(HorizontalSpirograph::new_at_clock(-5.0, 0.75, 0.6, 5, 360, 3, 0, 12.0).is_err());
+        assert!(
+            HorizontalSpirograph::new_at_clock(f64::NAN, 0.75, 0.6, 5, 360, 3, 0, 12.0).is_err()
+        );
+    }
+
+    /// The watch-case rule still applies to the dial itself.
+    #[test]
+    fn test_dial_radius_still_constrained() {
+        use crate::guilloche::GuillochePattern;
+        assert!(GuillochePattern::new(38.0).is_ok());
+        assert!(GuillochePattern::new(50.0).is_err());
+        assert!(GuillochePattern::new(6.0).is_err());
+    }
 
     #[test]
     fn test_validate_radius() {
@@ -845,8 +926,13 @@ mod tests {
         let spiro = HorizontalSpirograph::new(40.0, 0.75, 0.6, 50, 360);
         assert!(spiro.is_ok());
 
-        let spiro_bad_radius = HorizontalSpirograph::new(50.0, 0.75, 0.6, 50, 360);
-        assert!(spiro_bad_radius.is_err());
+        // A spirograph is a layer, not a watch case: an out-of-case radius is
+        // no longer rejected here (the 26-44 mm rule lives on the dial - see
+        // `test_dial_radius_still_constrained`), but a non-physical one is.
+        assert!(HorizontalSpirograph::new(50.0, 0.75, 0.6, 50, 360).is_ok());
+        assert!(HorizontalSpirograph::new(0.0, 0.75, 0.6, 50, 360).is_err());
+        assert!(HorizontalSpirograph::new(-40.0, 0.75, 0.6, 50, 360).is_err());
+        assert!(HorizontalSpirograph::new(f64::NAN, 0.75, 0.6, 50, 360).is_err());
     }
 
     #[test]

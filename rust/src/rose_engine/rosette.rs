@@ -101,6 +101,15 @@ impl RosettePattern {
                 eccentricity,
                 rotation,
             } => {
+                // `eccentricity` becomes the reciprocal minor axis below, so a
+                // zero/negative/non-finite value yields inf or NaN displacement
+                // that silently poisons every downstream point. These variants
+                // are public struct variants constructed directly by callers,
+                // so there is no constructor to validate in; degrade to a plain
+                // circle instead.
+                if !eccentricity.is_finite() || *eccentricity <= 0.0 || !rotation.is_finite() {
+                    return 0.0;
+                }
                 // Ellipse formula: r(θ) = a*b / sqrt((b*cos(θ))² + (a*sin(θ))²)
                 // We want displacement, so normalize to get variation from mean
                 let rotated_angle = angle - rotation;
@@ -112,8 +121,19 @@ impl RosettePattern {
 
                 let r = (a * b) / ((b * cos_a).powi(2) + (a * sin_a).powi(2)).sqrt();
 
-                // Normalize so the mean is 0 and range is roughly -1 to 1
-                (r - 1.0) * eccentricity
+                // Map r, which sweeps exactly [b, a] = [1/ecc, 1], onto [-1, 1].
+                //
+                // The previous expression was `(r - 1.0) * eccentricity`, which
+                // spans `[1 - ecc, 0]`: one-sided (never positive, so the mean
+                // is not 0) and unbounded in magnitude - at `ecc = 5` it reached
+                // -4, i.e. 4x the amplitude every other pattern produces, which
+                // `radius_at_angle` then multiplies by `amplitude` and can drive
+                // the radius negative.
+                let span = a - b;
+                if span <= f64::EPSILON {
+                    return 0.0; // ecc == 1: a circle has no elliptical variation
+                }
+                2.0 * (r - b) / span - 1.0
             }
 
             RosettePattern::Sinusoidal { frequency } => (angle * frequency).sin(),
@@ -138,6 +158,11 @@ impl RosettePattern {
             }
 
             RosettePattern::GrainDeRiz { grain_size, rows } => {
+                // `angle / grain_size` is inf for grain_size == 0 and sin(inf)
+                // is NaN, which propagates into every exported coordinate.
+                if !grain_size.is_finite() || *grain_size == 0.0 {
+                    return 0.0;
+                }
                 // Rice grain: small oval shapes in concentric rows
                 // Create pointed ovals using modulated sine wave
                 let row_angle = angle * (*rows as f64);
@@ -177,12 +202,20 @@ impl RosettePattern {
                 (wave1.abs() + wave2.abs()) / 2.0 * 2.0 - 1.0
             }
 
-            RosettePattern::Custom { table, samples } => {
+            RosettePattern::Custom { table, samples: _ } => {
+                // Index off `table.len()`, never off the `samples` field: the
+                // two can disagree when a caller builds the variant directly,
+                // and using `samples` then indexes out of bounds and panics.
+                // An empty table has no defined displacement at all.
+                if table.is_empty() {
+                    return 0.0;
+                }
+                let len = table.len();
                 // Interpolate from lookup table
                 let normalized_angle = angle.rem_euclid(2.0 * PI) / (2.0 * PI);
-                let index_f = normalized_angle * (*samples as f64);
-                let index = index_f.floor() as usize % *samples;
-                let next_index = (index + 1) % *samples;
+                let index_f = normalized_angle * (len as f64);
+                let index = (index_f.floor() as usize) % len;
+                let next_index = (index + 1) % len;
                 let t = index_f - index_f.floor();
 
                 // Linear interpolation
@@ -196,6 +229,7 @@ impl RosettePattern {
     /// # Arguments
     /// * `func` - Function that takes angle (0 to 2π) and returns displacement (-1.0 to 1.0)
     /// * `samples` - Number of samples to use for the lookup table (default: 1000)
+    ///   A value of 0 produces an empty table whose displacement is always 0.0.
     ///
     /// # Example
     /// ```
@@ -275,6 +309,142 @@ mod tests {
     }
 
     #[test]
+    fn test_custom_pattern_mismatched_samples_does_not_panic() {
+        // `samples` lies about the table length; indexing off it would panic.
+        let pattern = RosettePattern::Custom {
+            table: vec![0.0, 1.0, 0.0, -1.0],
+            samples: 1000,
+        };
+        for i in 0..64 {
+            let d = pattern.displacement(i as f64 * 0.1);
+            assert!(d.is_finite());
+        }
+    }
+
+    #[test]
+    fn test_custom_pattern_empty_table_is_zero() {
+        let pattern = RosettePattern::from_function(|a| a.sin(), 0);
+        assert_eq!(pattern.displacement(1.234), 0.0);
+        assert_eq!(
+            RosettePattern::Custom {
+                table: Vec::new(),
+                samples: 10
+            }
+            .displacement(0.5),
+            0.0
+        );
+    }
+
+    /// Every rosette must stay inside [-1, 1]: `radius_at_angle` multiplies the
+    /// displacement by `amplitude`, so a pattern that overshoots silently
+    /// applies more modulation than the caller asked for.
+    #[test]
+    fn test_all_patterns_respect_unit_displacement_range() {
+        let patterns = [
+            RosettePattern::Circular,
+            RosettePattern::Elliptical {
+                eccentricity: 1.0,
+                rotation: 0.0,
+            },
+            RosettePattern::Elliptical {
+                eccentricity: 2.0,
+                rotation: 0.0,
+            },
+            RosettePattern::Elliptical {
+                eccentricity: 5.0,
+                rotation: 0.7,
+            },
+            RosettePattern::Elliptical {
+                eccentricity: 10.0,
+                rotation: 0.0,
+            },
+            RosettePattern::Sinusoidal { frequency: 6.0 },
+            RosettePattern::MultiLobe { lobes: 6 },
+            RosettePattern::Epicycloid { petals: 5 },
+        ];
+        for pattern in &patterns {
+            for i in 0..2000 {
+                let d = pattern.displacement(2.0 * PI * (i as f64) / 2000.0);
+                assert!(
+                    (-1.0 - 1e-9..=1.0 + 1e-9).contains(&d),
+                    "{:?} produced displacement {} outside [-1, 1]",
+                    pattern,
+                    d
+                );
+            }
+        }
+    }
+
+    /// The ellipse must swing symmetrically about zero, not sit entirely on one
+    /// side of it - the old formula spanned [1-ecc, 0].
+    #[test]
+    fn test_elliptical_is_centred_and_full_scale() {
+        for ecc in [1.5, 2.0, 5.0, 10.0] {
+            let p = RosettePattern::Elliptical {
+                eccentricity: ecc,
+                rotation: 0.0,
+            };
+            let vals: Vec<f64> = (0..2000)
+                .map(|i| p.displacement(2.0 * PI * (i as f64) / 2000.0))
+                .collect();
+            let lo = vals.iter().cloned().fold(f64::INFINITY, f64::min);
+            let hi = vals.iter().cloned().fold(f64::NEG_INFINITY, f64::max);
+            assert!(
+                (lo + 1.0).abs() < 1e-6,
+                "ecc={} min={} expected -1",
+                ecc,
+                lo
+            );
+            assert!(
+                (hi - 1.0).abs() < 1e-6,
+                "ecc={} max={} expected +1",
+                ecc,
+                hi
+            );
+        }
+        // ecc == 1 is a circle: no variation at all.
+        let circle = RosettePattern::Elliptical {
+            eccentricity: 1.0,
+            rotation: 0.0,
+        };
+        for i in 0..100 {
+            assert_eq!(circle.displacement(i as f64 * 0.1), 0.0);
+        }
+    }
+
+    #[test]
+    fn test_degenerate_patterns_stay_finite() {
+        let cases = [
+            RosettePattern::Elliptical {
+                eccentricity: 0.0,
+                rotation: 0.0,
+            },
+            RosettePattern::Elliptical {
+                eccentricity: -2.0,
+                rotation: 0.0,
+            },
+            RosettePattern::Elliptical {
+                eccentricity: f64::NAN,
+                rotation: 0.0,
+            },
+            RosettePattern::GrainDeRiz {
+                grain_size: 0.0,
+                rows: 5,
+            },
+            RosettePattern::GrainDeRiz {
+                grain_size: f64::INFINITY,
+                rows: 5,
+            },
+        ];
+        for pattern in &cases {
+            for i in 0..32 {
+                let d = pattern.displacement(i as f64 * 0.2);
+                assert!(d.is_finite(), "{:?} produced non-finite {}", pattern, d);
+            }
+        }
+    }
+
+    #[test]
     fn test_draperie_pattern_range() {
         // Verify displacement values stay within [-1.0, 1.0] for various angles
         let pattern = RosettePattern::Draperie {
@@ -287,7 +457,7 @@ mod tests {
             let angle = (i as f64) * 2.0 * PI / 100.0;
             let displacement = pattern.displacement(angle);
             assert!(
-                displacement >= -1.0 && displacement <= 1.0,
+                (-1.0..=1.0).contains(&displacement),
                 "Displacement {} at angle {} is out of range [-1.0, 1.0]",
                 displacement,
                 angle

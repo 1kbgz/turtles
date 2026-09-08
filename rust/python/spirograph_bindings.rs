@@ -25,7 +25,7 @@ impl HorizontalSpirograph {
     ) -> PyResult<Self> {
         BaseHorizontalSpirograph::new(outer_radius, radius_ratio, point_distance, rotations, resolution)
             .map(|inner| HorizontalSpirograph { inner })
-            .map_err(|e| pyo3::exceptions::PyValueError::new_err(e.to_string()))
+            .map_err(crate::errors::to_py_err)
     }
     
     /// Generate the spirograph pattern points
@@ -38,7 +38,7 @@ impl HorizontalSpirograph {
     #[pyo3(signature = (filename))]
     fn to_svg(&self, filename: &str) -> PyResult<()> {
         self.inner.to_svg(filename)
-            .map_err(|e| pyo3::exceptions::PyIOError::new_err(e.to_string()))
+            .map_err(crate::errors::to_py_err)
     }
     
     /// Export pattern as STEP file
@@ -50,7 +50,7 @@ impl HorizontalSpirograph {
             tool_radius: 0.0,
         };
         self.inner.to_step(filename, &config)
-            .map_err(|e| pyo3::exceptions::PyIOError::new_err(e.to_string()))
+            .map_err(crate::errors::to_py_err)
     }
     
     /// Export pattern as STL file
@@ -62,7 +62,7 @@ impl HorizontalSpirograph {
             tool_radius: 0.0,
         };
         self.inner.to_stl(filename, &config)
-            .map_err(|e| pyo3::exceptions::PyIOError::new_err(e.to_string()))
+            .map_err(crate::errors::to_py_err)
     }
     
     fn __repr__(&self) -> PyResult<String> {
@@ -106,7 +106,7 @@ impl VerticalSpirograph {
             wave_frequency,
         )
         .map(|inner| VerticalSpirograph { inner })
-        .map_err(|e| pyo3::exceptions::PyValueError::new_err(e.to_string()))
+        .map_err(crate::errors::to_py_err)
     }
     
     fn generate(&mut self) -> PyResult<()> {
@@ -117,7 +117,7 @@ impl VerticalSpirograph {
     #[pyo3(signature = (filename))]
     fn to_svg(&self, filename: &str) -> PyResult<()> {
         self.inner.to_svg(filename)
-            .map_err(|e| pyo3::exceptions::PyIOError::new_err(e.to_string()))
+            .map_err(crate::errors::to_py_err)
     }
     
     #[pyo3(signature = (filename, depth=0.1))]
@@ -128,7 +128,7 @@ impl VerticalSpirograph {
             tool_radius: 0.0,
         };
         self.inner.to_step(filename, &config)
-            .map_err(|e| pyo3::exceptions::PyIOError::new_err(e.to_string()))
+            .map_err(crate::errors::to_py_err)
     }
     
     #[pyo3(signature = (filename, depth=0.1, base_thickness=2.0))]
@@ -139,7 +139,7 @@ impl VerticalSpirograph {
             tool_radius: 0.0,
         };
         self.inner.to_stl(filename, &config)
-            .map_err(|e| pyo3::exceptions::PyIOError::new_err(e.to_string()))
+            .map_err(crate::errors::to_py_err)
     }
     
     fn __repr__(&self) -> PyResult<String> {
@@ -183,7 +183,7 @@ impl SphericalSpirograph {
             dome_height,
         )
         .map(|inner| SphericalSpirograph { inner })
-        .map_err(|e| pyo3::exceptions::PyValueError::new_err(e.to_string()))
+        .map_err(crate::errors::to_py_err)
     }
     
     fn generate(&mut self) -> PyResult<()> {
@@ -194,7 +194,7 @@ impl SphericalSpirograph {
     #[pyo3(signature = (filename))]
     fn to_svg(&self, filename: &str) -> PyResult<()> {
         self.inner.to_svg(filename)
-            .map_err(|e| pyo3::exceptions::PyIOError::new_err(e.to_string()))
+            .map_err(crate::errors::to_py_err)
     }
     
     #[pyo3(signature = (filename, depth=0.1))]
@@ -205,7 +205,7 @@ impl SphericalSpirograph {
             tool_radius: 0.0,
         };
         self.inner.to_step(filename, &config)
-            .map_err(|e| pyo3::exceptions::PyIOError::new_err(e.to_string()))
+            .map_err(crate::errors::to_py_err)
     }
     
     #[pyo3(signature = (filename, depth=0.1, base_thickness=2.0))]
@@ -216,7 +216,7 @@ impl SphericalSpirograph {
             tool_radius: 0.0,
         };
         self.inner.to_stl(filename, &config)
-            .map_err(|e| pyo3::exceptions::PyIOError::new_err(e.to_string()))
+            .map_err(crate::errors::to_py_err)
     }
     
     fn __repr__(&self) -> PyResult<String> {

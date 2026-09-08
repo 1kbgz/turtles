@@ -29,7 +29,7 @@ impl DiamantLayer {
         };
         BaseDiamantLayer::new(config)
             .map(|inner| DiamantLayer { inner })
-            .map_err(|e| pyo3::exceptions::PyValueError::new_err(e.to_string()))
+            .map_err(crate::errors::to_py_err)
     }
 
     /// Create a diamant layer with a custom center point
@@ -49,7 +49,7 @@ impl DiamantLayer {
         };
         BaseDiamantLayer::new_with_center(config, center_x, center_y)
             .map(|inner| DiamantLayer { inner })
-            .map_err(|e| pyo3::exceptions::PyValueError::new_err(e.to_string()))
+            .map_err(crate::errors::to_py_err)
     }
 
     /// Create a diamant layer positioned at a given angle and distance from origin
@@ -69,7 +69,7 @@ impl DiamantLayer {
         };
         BaseDiamantLayer::new_at_polar(config, angle, distance)
             .map(|inner| DiamantLayer { inner })
-            .map_err(|e| pyo3::exceptions::PyValueError::new_err(e.to_string()))
+            .map_err(crate::errors::to_py_err)
     }
 
     /// Create a diamant layer positioned at a clock position (like hour hand)
@@ -98,7 +98,7 @@ impl DiamantLayer {
         };
         BaseDiamantLayer::new_at_clock(config, hour, minute, distance)
             .map(|inner| DiamantLayer { inner })
-            .map_err(|e| pyo3::exceptions::PyValueError::new_err(e.to_string()))
+            .map_err(crate::errors::to_py_err)
     }
 
     /// Generate the diamant pattern
@@ -120,7 +120,7 @@ impl DiamantLayer {
     fn to_svg(&self, filename: &str) -> PyResult<()> {
         self.inner
             .to_svg(filename)
-            .map_err(|e| pyo3::exceptions::PyIOError::new_err(e.to_string()))
+            .map_err(crate::errors::to_py_err)
     }
 
     /// Get the number of circles in the pattern

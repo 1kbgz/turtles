@@ -47,7 +47,7 @@ impl FlinqueLayer {
         };
         BaseFlinqueLayer::new(radius, config)
             .map(|inner| FlinqueLayer { inner })
-            .map_err(|e| pyo3::exceptions::PyValueError::new_err(e.to_string()))
+            .map_err(crate::errors::to_py_err)
     }
 
     /// Create a flinqué layer with a custom center point
@@ -72,7 +72,7 @@ impl FlinqueLayer {
         };
         BaseFlinqueLayer::new_with_center(radius, config, center_x, center_y)
             .map(|inner| FlinqueLayer { inner })
-            .map_err(|e| pyo3::exceptions::PyValueError::new_err(e.to_string()))
+            .map_err(crate::errors::to_py_err)
     }
 
     /// Create a flinqué layer positioned at a given angle and distance from origin
@@ -97,7 +97,7 @@ impl FlinqueLayer {
         };
         BaseFlinqueLayer::new_at_polar(radius, config, angle, distance)
             .map(|inner| FlinqueLayer { inner })
-            .map_err(|e| pyo3::exceptions::PyValueError::new_err(e.to_string()))
+            .map_err(crate::errors::to_py_err)
     }
 
     /// Create a flinqué layer positioned at a clock position (like hour hand)
@@ -129,7 +129,7 @@ impl FlinqueLayer {
         };
         BaseFlinqueLayer::new_at_clock(radius, config, hour, minute, distance)
             .map(|inner| FlinqueLayer { inner })
-            .map_err(|e| pyo3::exceptions::PyValueError::new_err(e.to_string()))
+            .map_err(crate::errors::to_py_err)
     }
 
     #[getter]
@@ -150,6 +150,13 @@ impl FlinqueLayer {
     /// Generate the flinqué pattern
     fn generate(&mut self) {
         self.inner.generate();
+    }
+
+    /// Export the pattern to SVG format
+    fn to_svg(&self, filename: &str) -> PyResult<()> {
+        self.inner
+            .to_svg(filename)
+            .map_err(crate::errors::to_py_err)
     }
 
     /// Get the generated pattern lines as a list of point lists
@@ -186,7 +193,7 @@ impl GuillochePattern {
     fn new(radius: f64) -> PyResult<Self> {
         BaseGuillochePattern::new(radius)
             .map(|inner| GuillochePattern { inner })
-            .map_err(|e| pyo3::exceptions::PyValueError::new_err(e.to_string()))
+            .map_err(crate::errors::to_py_err)
     }
 
     // Add attr access of radius
@@ -206,7 +213,7 @@ impl GuillochePattern {
                 h_spiro.inner.point_distance,
                 h_spiro.inner.rotations,
                 h_spiro.inner.resolution,
-            ).map_err(|e| pyo3::exceptions::PyValueError::new_err(e.to_string()))?;
+            ).map_err(crate::errors::to_py_err)?;
             self.inner.add_horizontal_layer(new_spiro);
             return Ok(());
         }
@@ -220,7 +227,7 @@ impl GuillochePattern {
                 v_spiro.inner.resolution,
                 v_spiro.inner.wave_amplitude,
                 v_spiro.inner.wave_frequency,
-            ).map_err(|e| pyo3::exceptions::PyValueError::new_err(e.to_string()))?;
+            ).map_err(crate::errors::to_py_err)?;
             self.inner.add_vertical_layer(new_spiro);
             return Ok(());
         }
@@ -233,7 +240,7 @@ impl GuillochePattern {
                 s_spiro.inner.rotations,
                 s_spiro.inner.resolution,
                 s_spiro.inner.dome_height,
-            ).map_err(|e| pyo3::exceptions::PyValueError::new_err(e.to_string()))?;
+            ).map_err(crate::errors::to_py_err)?;
             self.inner.add_spherical_layer(new_spiro);
             return Ok(());
         }
@@ -250,7 +257,7 @@ impl GuillochePattern {
             flinque.inner.config.clone(),
             flinque.inner.center_x,
             flinque.inner.center_y,
-        ).map_err(|e| pyo3::exceptions::PyValueError::new_err(e.to_string()))?;
+        ).map_err(crate::errors::to_py_err)?;
         self.inner.add_flinque_layer(new_layer);
         Ok(())
     }
@@ -276,7 +283,7 @@ impl GuillochePattern {
             inner_radius_ratio,
         };
         self.inner.add_flinque_at_polar(radius, config, angle, distance)
-            .map_err(|e| pyo3::exceptions::PyValueError::new_err(e.to_string()))
+            .map_err(crate::errors::to_py_err)
     }
 
     /// Add a flinqué layer positioned at a clock position (like hour hand)
@@ -307,7 +314,7 @@ impl GuillochePattern {
             inner_radius_ratio,
         };
         self.inner.add_flinque_at_clock(radius, config, hour, minute, distance)
-            .map_err(|e| pyo3::exceptions::PyValueError::new_err(e.to_string()))
+            .map_err(crate::errors::to_py_err)
     }
 
     /// Add a spirograph layer positioned at a given angle and distance from origin
@@ -343,19 +350,19 @@ impl GuillochePattern {
             "horizontal" => {
                 let spiro = BaseHorizontalSpirograph::new_at_polar(
                     outer_radius, radius_ratio, point_distance, rotations, resolution, angle, distance
-                ).map_err(|e| pyo3::exceptions::PyValueError::new_err(e.to_string()))?;
+                ).map_err(crate::errors::to_py_err)?;
                 self.inner.add_horizontal_layer(spiro);
             }
             "vertical" => {
                 let spiro = BaseVerticalSpirograph::new_at_polar(
                     outer_radius, radius_ratio, point_distance, rotations, resolution, wave_amplitude, wave_frequency, angle, distance
-                ).map_err(|e| pyo3::exceptions::PyValueError::new_err(e.to_string()))?;
+                ).map_err(crate::errors::to_py_err)?;
                 self.inner.add_vertical_layer(spiro);
             }
             "spherical" => {
                 let spiro = BaseSphericalSpirograph::new_at_polar(
                     outer_radius, radius_ratio, point_distance, rotations, resolution, dome_height, angle, distance
-                ).map_err(|e| pyo3::exceptions::PyValueError::new_err(e.to_string()))?;
+                ).map_err(crate::errors::to_py_err)?;
                 self.inner.add_spherical_layer(spiro);
             }
             _ => {
@@ -402,19 +409,19 @@ impl GuillochePattern {
             "horizontal" => {
                 let spiro = BaseHorizontalSpirograph::new_at_clock(
                     outer_radius, radius_ratio, point_distance, rotations, resolution, hour, minute, distance
-                ).map_err(|e| pyo3::exceptions::PyValueError::new_err(e.to_string()))?;
+                ).map_err(crate::errors::to_py_err)?;
                 self.inner.add_horizontal_layer(spiro);
             }
             "vertical" => {
                 let spiro = BaseVerticalSpirograph::new_at_clock(
                     outer_radius, radius_ratio, point_distance, rotations, resolution, wave_amplitude, wave_frequency, hour, minute, distance
-                ).map_err(|e| pyo3::exceptions::PyValueError::new_err(e.to_string()))?;
+                ).map_err(crate::errors::to_py_err)?;
                 self.inner.add_vertical_layer(spiro);
             }
             "spherical" => {
                 let spiro = BaseSphericalSpirograph::new_at_clock(
                     outer_radius, radius_ratio, point_distance, rotations, resolution, dome_height, hour, minute, distance
-                ).map_err(|e| pyo3::exceptions::PyValueError::new_err(e.to_string()))?;
+                ).map_err(crate::errors::to_py_err)?;
                 self.inner.add_spherical_layer(spiro);
             }
             _ => {
@@ -432,7 +439,7 @@ impl GuillochePattern {
             diamant.inner.config.clone(),
             diamant.inner.center_x,
             diamant.inner.center_y,
-        ).map_err(|e| pyo3::exceptions::PyValueError::new_err(e.to_string()))?;
+        ).map_err(crate::errors::to_py_err)?;
         self.inner.add_diamant_layer(new_layer);
         Ok(())
     }
@@ -453,7 +460,7 @@ impl GuillochePattern {
             resolution,
         };
         self.inner.add_diamant_at_polar(config, angle, distance)
-            .map_err(|e| pyo3::exceptions::PyValueError::new_err(e.to_string()))
+            .map_err(crate::errors::to_py_err)
     }
 
     /// Add a diamant layer positioned at a clock position (like hour hand)
@@ -481,7 +488,7 @@ impl GuillochePattern {
             resolution,
         };
         self.inner.add_diamant_at_clock(config, hour, minute, distance)
-            .map_err(|e| pyo3::exceptions::PyValueError::new_err(e.to_string()))
+            .map_err(crate::errors::to_py_err)
     }
 
     /// Add a limacon (limaçon pattern) layer to the pattern
@@ -490,7 +497,7 @@ impl GuillochePattern {
             limacon.inner.config.clone(),
             limacon.inner.center_x,
             limacon.inner.center_y,
-        ).map_err(|e| pyo3::exceptions::PyValueError::new_err(e.to_string()))?;
+        ).map_err(crate::errors::to_py_err)?;
         self.inner.add_limacon_layer(new_layer);
         Ok(())
     }
@@ -513,7 +520,7 @@ impl GuillochePattern {
             resolution,
         };
         self.inner.add_limacon_at_polar(config, angle, distance)
-            .map_err(|e| pyo3::exceptions::PyValueError::new_err(e.to_string()))
+            .map_err(crate::errors::to_py_err)
     }
 
     /// Add a limacon layer positioned at a clock position (like hour hand)
@@ -535,7 +542,7 @@ impl GuillochePattern {
             resolution,
         };
         self.inner.add_limacon_at_clock(config, hour, minute, distance)
-            .map_err(|e| pyo3::exceptions::PyValueError::new_err(e.to_string()))
+            .map_err(crate::errors::to_py_err)
     }
 
     /// Add a paon (peacock pattern) layer to the pattern
@@ -544,7 +551,7 @@ impl GuillochePattern {
             paon.inner.config.clone(),
             paon.inner.center_x,
             paon.inner.center_y,
-        ).map_err(|e| pyo3::exceptions::PyValueError::new_err(e.to_string()))?;
+        ).map_err(crate::errors::to_py_err)?;
         self.inner.add_paon_layer(new_layer);
         Ok(())
     }
@@ -577,7 +584,7 @@ impl GuillochePattern {
             vanishing_point,
         };
         self.inner.add_paon_at_polar(config, angle, distance)
-            .map_err(|e| pyo3::exceptions::PyValueError::new_err(e.to_string()))
+            .map_err(crate::errors::to_py_err)
     }
 
     /// Add a paon layer positioned at a clock position
@@ -609,7 +616,7 @@ impl GuillochePattern {
             vanishing_point,
         };
         self.inner.add_paon_at_clock(config, hour, minute, distance)
-            .map_err(|e| pyo3::exceptions::PyValueError::new_err(e.to_string()))
+            .map_err(crate::errors::to_py_err)
     }
 
     /// Generate all layers
@@ -627,14 +634,14 @@ impl GuillochePattern {
             tool_radius: 0.0,
         };
         self.inner.export_all(base_name, &config)
-            .map_err(|e| pyo3::exceptions::PyIOError::new_err(e.to_string()))
+            .map_err(crate::errors::to_py_err)
     }
 
     /// Export svg only
     #[pyo3(signature = (filename))]
     fn to_svg(&self, filename: &str) -> PyResult<()> {
         self.inner.export_combined_svg(filename)
-            .map_err(|e| pyo3::exceptions::PyIOError::new_err(e.to_string()))
+            .map_err(crate::errors::to_py_err)
     }
 
     /// Export step only
@@ -646,7 +653,7 @@ impl GuillochePattern {
             tool_radius: 0.0,
         };
         self.inner.export_combined_step(filename, &config)
-            .map_err(|e| pyo3::exceptions::PyIOError::new_err(e.to_string()))
+            .map_err(crate::errors::to_py_err)
     }
 
     /// Export stl only
@@ -658,7 +665,7 @@ impl GuillochePattern {
             tool_radius: 0.0,
         };
         self.inner.export_combined_stl(filename, &config)
-            .map_err(|e| pyo3::exceptions::PyIOError::new_err(e.to_string()))
+            .map_err(crate::errors::to_py_err)
     }
 
     fn __repr__(&self) -> PyResult<String> {

@@ -36,7 +36,7 @@ impl ClousDeParisLayer {
         };
         BaseClousDeParisLayer::new(config)
             .map(|inner| ClousDeParisLayer { inner })
-            .map_err(|e| pyo3::exceptions::PyValueError::new_err(e.to_string()))
+            .map_err(crate::errors::to_py_err)
     }
 
     /// Create a clous de Paris layer with a custom center point
@@ -58,7 +58,7 @@ impl ClousDeParisLayer {
         };
         BaseClousDeParisLayer::new_with_center(config, center_x, center_y)
             .map(|inner| ClousDeParisLayer { inner })
-            .map_err(|e| pyo3::exceptions::PyValueError::new_err(e.to_string()))
+            .map_err(crate::errors::to_py_err)
     }
 
     /// Create a clous de Paris layer positioned at a given angle and distance from origin
@@ -80,7 +80,7 @@ impl ClousDeParisLayer {
         };
         BaseClousDeParisLayer::new_at_polar(config, angle, distance)
             .map(|inner| ClousDeParisLayer { inner })
-            .map_err(|e| pyo3::exceptions::PyValueError::new_err(e.to_string()))
+            .map_err(crate::errors::to_py_err)
     }
 
     /// Create a clous de Paris layer positioned at a clock position (like hour hand)
@@ -108,7 +108,7 @@ impl ClousDeParisLayer {
         };
         BaseClousDeParisLayer::new_at_clock(config, hour, minute, distance)
             .map(|inner| ClousDeParisLayer { inner })
-            .map_err(|e| pyo3::exceptions::PyValueError::new_err(e.to_string()))
+            .map_err(crate::errors::to_py_err)
     }
 
     /// Generate the clous de Paris pattern
@@ -120,7 +120,7 @@ impl ClousDeParisLayer {
     fn to_svg(&self, filename: &str) -> PyResult<()> {
         self.inner
             .to_svg(filename)
-            .map_err(|e| pyo3::exceptions::PyIOError::new_err(e.to_string()))
+            .map_err(crate::errors::to_py_err)
     }
 
     /// Get all generated lines as list of list of (x, y) tuples

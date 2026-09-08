@@ -1,6 +1,9 @@
 use std::f64::consts::PI;
 
-use crate::common::{clock_to_cartesian, polar_to_cartesian, Point2D, SpirographError};
+use crate::common::{
+    checked_element_count, clock_to_cartesian, polar_to_cartesian, validate_finite,
+    validate_positive, Point2D, SpirographError,
+};
 
 /// Configuration for the Clous de Paris (Hobnail) guilloché pattern
 ///
@@ -88,17 +91,17 @@ impl ClousDeParisLayer {
         center_x: f64,
         center_y: f64,
     ) -> Result<Self, SpirographError> {
-        if config.spacing <= 0.0 {
-            return Err(SpirographError::InvalidParameter(
-                "spacing must be positive".to_string(),
-            ));
-        }
+        validate_positive("spacing", config.spacing)?;
+        validate_positive("radius", config.radius)?;
+        validate_finite("angle", config.angle)?;
+        validate_finite("center_x", center_x)?;
+        validate_finite("center_y", center_y)?;
 
-        if config.radius <= 0.0 {
-            return Err(SpirographError::InvalidParameter(
-                "radius must be positive".to_string(),
-            ));
-        }
+        // Reject configurations whose derived line count would be unbounded.
+        // `generate()` computes `(radius / spacing).ceil()`; a tiny spacing
+        // makes that astronomically large, and the `as i32` cast saturates
+        // rather than erroring, producing a multi-billion iteration loop.
+        checked_element_count("radius / spacing", (config.radius / config.spacing).ceil())?;
 
         if config.resolution < 2 {
             return Err(SpirographError::InvalidParameter(

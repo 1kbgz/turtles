@@ -1,5 +1,7 @@
 use crate::clous_de_paris::{ClousDeParisConfig, ClousDeParisLayer};
-use crate::common::{validate_radius, ExportConfig, Point2D, SpirographError};
+use crate::common::{
+    clip_lines_to_radius, validate_radius, ExportConfig, Point2D, Point3D, SpirographError,
+};
 use crate::cube::{CubeConfig, CubeLayer};
 use crate::diamant::{DiamantConfig, DiamantLayer};
 use crate::draperie::{DraperieConfig, DraperieLayer};
@@ -495,6 +497,46 @@ impl GuillochePattern {
         self.cube_layers.iter().map(|c| c.lines()).collect()
     }
 
+    /// Collect every layer's geometry as a flat list of polylines.
+    ///
+    /// Used by the combined exporters so that they cannot silently omit a
+    /// layer family - the previous STL/STEP exporters iterated only
+    /// `spirograph_layers`, so a flinqué- or diamant-only pattern produced a
+    /// valid but completely empty file.
+    pub fn all_paths(&self) -> Vec<Vec<Point2D>> {
+        let mut paths: Vec<Vec<Point2D>> = Vec::new();
+        for layer in &self.spirograph_layers {
+            paths.push(layer.points_2d());
+        }
+        for group in [
+            self.flinque_lines(),
+            self.diamant_lines(),
+            self.draperie_lines(),
+            self.huiteight_lines(),
+            self.limacon_lines(),
+            self.paon_lines(),
+            self.clous_de_paris_lines(),
+            self.cube_lines(),
+        ] {
+            for layer_lines in group {
+                for line in layer_lines {
+                    paths.push(line.clone());
+                }
+            }
+        }
+        paths
+    }
+
+    /// Every layer's geometry, clipped to the dial boundary.
+    ///
+    /// The manufacturing exporters must use this rather than [`Self::all_paths`].
+    /// An SVG `clip-path` only hides ink in a viewer; STL and STEP carry raw
+    /// coordinates, so an overflowing pattern was previously *machined* outside
+    /// the dial it belongs to (measured: a 42 mm mesh on a 38 mm dial).
+    pub fn clipped_paths(&self) -> Vec<Vec<Point2D>> {
+        clip_lines_to_radius(&self.all_paths(), self.radius)
+    }
+
     /// Export all layers to separate files with the given base name
     pub fn export_all(
         &self,
@@ -531,7 +573,7 @@ impl GuillochePattern {
     /// Export combined SVG with all layers
     pub fn export_combined_svg(&self, filename: &str) -> Result<(), SpirographError> {
         use ::svg::node::element::path::Data;
-        use ::svg::node::element::{Circle, Path};
+        use ::svg::node::element::{Circle, ClipPath, Group, Path};
         use ::svg::Document;
 
         let size = self.radius * 2.5;
@@ -550,6 +592,22 @@ impl GuillochePattern {
             .set("stroke-width", 0.3);
 
         document = document.add(dial_circle);
+
+        // Everything the pattern draws lives in a clipped group. The combined
+        // exporter previously applied no clipping whatsoever, so a layer that
+        // overflowed its dial (a limaçon reaching 42mm on a 38mm face) drew
+        // straight over the bezel. `watch_face.rs` already did this; the two
+        // exporters simply disagreed.
+        let clip_circle = Circle::new()
+            .set("cx", 0)
+            .set("cy", 0)
+            .set("r", self.radius);
+        document = document.add(
+            ClipPath::new()
+                .set("id", "guilloche-dial-clip")
+                .add(clip_circle),
+        );
+        let mut pattern_group = Group::new().set("clip-path", "url(#guilloche-dial-clip)");
 
         // Guilloche line colors - subtle dark tones that simulate engraved metal
         // Using varying shades creates depth and visual interest
@@ -576,7 +634,11 @@ impl GuillochePattern {
             for point in points.iter().skip(1) {
                 data = data.line_to((point.x, point.y));
             }
-            data = data.close();
+            // Do NOT close the path. A spirograph only returns to its start when
+            // `rotations` is an exact multiple of the curve's closure period; for
+            // any other value `close()` draws a straight chord from the last point
+            // back to the first, straight across the pattern. The standalone
+            // exporter in `spirograph.rs` already deliberately omits this.
 
             let color = colors[i % colors.len()];
             let stroke_width = stroke_widths[i % stroke_widths.len()];
@@ -588,7 +650,7 @@ impl GuillochePattern {
                 .set("stroke-linejoin", "round")
                 .set("d", data);
 
-            document = document.add(path);
+            pattern_group = pattern_group.add(path);
         }
 
         // Render flinqué layers
@@ -611,7 +673,7 @@ impl GuillochePattern {
                     .set("stroke-linejoin", "round")
                     .set("d", data);
 
-                document = document.add(path);
+                pattern_group = pattern_group.add(path);
             }
         }
 
@@ -635,7 +697,7 @@ impl GuillochePattern {
                     .set("stroke-linejoin", "round")
                     .set("d", data);
 
-                document = document.add(path);
+                pattern_group = pattern_group.add(path);
             }
         }
 
@@ -659,7 +721,7 @@ impl GuillochePattern {
                     .set("stroke-linejoin", "round")
                     .set("d", data);
 
-                document = document.add(path);
+                pattern_group = pattern_group.add(path);
             }
         }
 
@@ -683,7 +745,7 @@ impl GuillochePattern {
                     .set("stroke-linejoin", "round")
                     .set("d", data);
 
-                document = document.add(path);
+                pattern_group = pattern_group.add(path);
             }
         }
 
@@ -707,9 +769,83 @@ impl GuillochePattern {
                     .set("stroke-linejoin", "round")
                     .set("d", data);
 
-                document = document.add(path);
+                pattern_group = pattern_group.add(path);
             }
         }
+
+        // Render limaçon layers
+        for limacon_layer in &self.limacon_layers {
+            for curve_points in limacon_layer.lines() {
+                if curve_points.is_empty() {
+                    continue;
+                }
+
+                let mut data = Data::new().move_to((curve_points[0].x, curve_points[0].y));
+                for point in curve_points.iter().skip(1) {
+                    data = data.line_to((point.x, point.y));
+                }
+
+                let path = Path::new()
+                    .set("fill", "none")
+                    .set("stroke", "#1a1a1a")
+                    .set("stroke-width", 0.03)
+                    .set("stroke-linecap", "round")
+                    .set("stroke-linejoin", "round")
+                    .set("d", data);
+
+                pattern_group = pattern_group.add(path);
+            }
+        }
+
+        // Render clous de Paris layers
+        for clous_layer in &self.clous_de_paris_layers {
+            for line_points in clous_layer.lines() {
+                if line_points.is_empty() {
+                    continue;
+                }
+
+                let mut data = Data::new().move_to((line_points[0].x, line_points[0].y));
+                for point in line_points.iter().skip(1) {
+                    data = data.line_to((point.x, point.y));
+                }
+
+                let path = Path::new()
+                    .set("fill", "none")
+                    .set("stroke", "#1a1a1a")
+                    .set("stroke-width", 0.03)
+                    .set("stroke-linecap", "round")
+                    .set("stroke-linejoin", "round")
+                    .set("d", data);
+
+                pattern_group = pattern_group.add(path);
+            }
+        }
+
+        // Render cube layers
+        for cube_layer in &self.cube_layers {
+            for line_points in cube_layer.lines() {
+                if line_points.is_empty() {
+                    continue;
+                }
+
+                let mut data = Data::new().move_to((line_points[0].x, line_points[0].y));
+                for point in line_points.iter().skip(1) {
+                    data = data.line_to((point.x, point.y));
+                }
+
+                let path = Path::new()
+                    .set("fill", "none")
+                    .set("stroke", "#1a1a1a")
+                    .set("stroke-width", 0.03)
+                    .set("stroke-linecap", "round")
+                    .set("stroke-linejoin", "round")
+                    .set("d", data);
+
+                pattern_group = pattern_group.add(path);
+            }
+        }
+
+        document = document.add(pattern_group);
 
         // Add outer bezel ring
         let bezel = Circle::new()
@@ -736,6 +872,11 @@ impl GuillochePattern {
     }
 
     /// Export combined STL with all layers
+    ///
+    /// NOTE: the emitted mesh is still a zero-thickness ribbon with placeholder
+    /// normals - see TODO.md. This function's contract fixed here is *coverage*:
+    /// it previously iterated only `spirograph_layers`, so a flinqué- or
+    /// diamant-only pattern silently produced an empty (but valid) STL.
     pub fn export_combined_stl(
         &self,
         filename: &str,
@@ -746,14 +887,13 @@ impl GuillochePattern {
         let mut all_triangles = Vec::new();
         let depth = config.depth;
 
-        for layer in &self.spirograph_layers {
-            let points = layer.points_2d();
-            if points.is_empty() {
-                continue;
+        let mut extrude = |points: &[Point2D], closed: bool| {
+            if points.len() < 2 {
+                return;
             }
-
             let num_points = points.len();
-            for i in 0..num_points {
+            let segments = if closed { num_points } else { num_points - 1 };
+            for i in 0..segments {
                 let p1 = points[i];
                 let p2 = points[(i + 1) % num_points];
 
@@ -773,6 +913,21 @@ impl GuillochePattern {
                     vertices: [v2_top, v2_bottom, v1_bottom],
                 });
             }
+        };
+
+        // Clipping splits a stroke wherever it leaves the dial, so every piece
+        // is an open run - closing any of them would bridge the gap with a
+        // chord straight across the face.
+        for path in self.clipped_paths() {
+            extrude(&path, false);
+        }
+
+        if all_triangles.is_empty() {
+            return Err(SpirographError::ExportError(
+                "No geometry to export. Ensure the pattern was generated and \
+                 contains at least one path of two or more points."
+                    .to_string(),
+            ));
         }
 
         let mut file = std::fs::File::create(filename)
@@ -787,38 +942,17 @@ impl GuillochePattern {
         filename: &str,
         _config: &ExportConfig,
     ) -> Result<(), SpirographError> {
-        let mut content = String::new();
+        let paths: Vec<Vec<Point3D>> = self
+            .clipped_paths()
+            .into_iter()
+            .map(|path| {
+                path.into_iter()
+                    .map(|p| Point3D::new(p.x, p.y, 0.0))
+                    .collect()
+            })
+            .collect();
 
-        let timestamp = chrono::Utc::now().format("%Y-%m-%dT%H:%M:%S").to_string();
-
-        content.push_str("ISO-10303-21;\n");
-        content.push_str("HEADER;\n");
-        content.push_str("FILE_DESCRIPTION(('Guilloche Pattern - Multiple Layers'),'2;1');\n");
-        content.push_str(&format!(
-            "FILE_NAME('guilloche.stp','{}',(''),(''),'','','');\n",
-            timestamp
-        ));
-        content.push_str("FILE_SCHEMA(('AUTOMOTIVE_DESIGN'));\n");
-        content.push_str("ENDSEC;\n");
-        content.push_str("DATA;\n");
-
-        let mut point_id = 1;
-        for layer in &self.spirograph_layers {
-            let points = layer.points_2d();
-            for point in points {
-                content.push_str(&format!(
-                    "#{}=CARTESIAN_POINT('',({}.,{}.,0.));\n",
-                    point_id, point.x, point.y
-                ));
-                point_id += 1;
-            }
-        }
-
-        content.push_str("ENDSEC;\n");
-        content.push_str("END-ISO-10303-21;\n");
-
-        std::fs::write(filename, content)
-            .map_err(|e| SpirographError::ExportError(format!("Failed to write STEP file: {}", e)))
+        crate::step::write_step_polylines(filename, "Guilloche Pattern - Multiple Layers", &paths)
     }
 }
 

@@ -1,3 +1,4 @@
+use crate::common::{validate_finite, validate_non_negative, validate_positive, SpirographError};
 use crate::rose_engine::rosette::RosettePattern;
 
 /// Configuration for the rose engine lathe
@@ -44,6 +45,37 @@ pub struct RoseEngineConfig {
 }
 
 impl RoseEngineConfig {
+    /// Validate the configuration.
+    ///
+    /// Shared by every entry point that turns a config into geometry so the
+    /// checks cannot drift apart: `RoseEngineLatheRun` previously validated
+    /// only `base_radius`, accepting a `resolution` of 0 (division by zero in
+    /// the angle step) or a NaN amplitude that silently poisons every point.
+    /// Note that ordered comparisons against NaN are always false, so the
+    /// finiteness checks must come first.
+    pub fn validate(&self) -> Result<(), SpirographError> {
+        validate_finite("base_radius", self.base_radius)?;
+        validate_finite("amplitude", self.amplitude)?;
+        validate_finite("phase", self.phase)?;
+        validate_finite("start_angle", self.start_angle)?;
+        validate_finite("end_angle", self.end_angle)?;
+        validate_finite("secondary_amplitude", self.secondary_amplitude)?;
+        validate_finite("secondary_phase", self.secondary_phase)?;
+
+        validate_positive("base_radius", self.base_radius)?;
+        validate_non_negative("amplitude", self.amplitude)?;
+        validate_non_negative("secondary_amplitude", self.secondary_amplitude)?;
+
+        if self.resolution < 10 {
+            return Err(SpirographError::InvalidParameter(format!(
+                "resolution must be at least 10, got {}",
+                self.resolution
+            )));
+        }
+
+        Ok(())
+    }
+
     /// Create a new configuration with sensible defaults
     ///
     /// # Arguments
@@ -276,8 +308,8 @@ mod tests {
         let r_half = config.radius_at_angle(PI);
 
         // Should be within reasonable range
-        assert!(r0 >= 18.0 && r0 <= 22.0);
-        assert!(r_half >= 18.0 && r_half <= 22.0);
+        assert!((18.0..=22.0).contains(&r0));
+        assert!((18.0..=22.0).contains(&r_half));
     }
 
     #[test]

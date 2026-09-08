@@ -21,7 +21,7 @@ from turtles import HuitEightLayer, RoseEngineLatheRun, WatchFace
 
 def huiteight_mathematical():
     """Generate a huit-eight pattern using the direct mathematical model."""
-    layer = HuitEightLayer(num_curves=72, scale=20.0, resolution=360)
+    layer = HuitEightLayer(num_curves=36, scale=20.0, resolution=360)
     layer.generate()
     layer.to_svg("examples/svg/huiteight_math.svg")
 
@@ -29,7 +29,7 @@ def huiteight_mathematical():
 def huiteight_rose_engine():
     """Generate a huit-eight pattern via the rose engine mechanism."""
     run = RoseEngineLatheRun.huiteight(
-        num_curves=72,
+        num_curves=36,
         scale=20.0,
         resolution=360,
     )
@@ -43,7 +43,7 @@ def huiteight_watchface():
     wf.add_inner()
     wf.add_outer()
     wf.add_center_hole()
-    wf.add_huiteight(num_curves=36, scale=38.0, resolution=360)
+    wf.add_huiteight(num_curves=18, scale=38.0, resolution=360)
     wf.generate()
     wf.to_svg("examples/svg/huiteight_watchface.svg")
 
@@ -60,7 +60,7 @@ def huiteight_clustered_mathematical():
     seen on real engine-turned watch dials.
     """
     layer = HuitEightLayer(
-        num_curves=72,
+        num_curves=36,
         scale=20.0,
         resolution=360,
         num_clusters=8,
@@ -73,7 +73,7 @@ def huiteight_clustered_mathematical():
 def huiteight_clustered_rose_engine():
     """Generate a clustered huit-eight pattern via the rose engine."""
     run = RoseEngineLatheRun.huiteight(
-        num_curves=72,
+        num_curves=36,
         scale=20.0,
         resolution=360,
         num_clusters=8,
@@ -94,7 +94,7 @@ def huiteight_clustered_watchface():
     wf.add_outer()
     wf.add_center_hole()
     wf.add_huiteight(
-        num_curves=72,
+        num_curves=36,
         scale=38.0,
         resolution=360,
         num_clusters=8,
@@ -107,7 +107,7 @@ def huiteight_clustered_watchface():
 def huiteight_tight_clusters():
     """Tighter clustering: 12 clusters with a narrow spread."""
     layer = HuitEightLayer(
-        num_curves=72,
+        num_curves=36,
         scale=20.0,
         resolution=360,
         num_clusters=12,
@@ -120,7 +120,7 @@ def huiteight_tight_clusters():
 def huiteight_wide_clusters():
     """Wide clustering: 6 clusters with a wider spread – bold lobes."""
     layer = HuitEightLayer(
-        num_curves=72,
+        num_curves=36,
         scale=20.0,
         resolution=360,
         num_clusters=6,
@@ -133,7 +133,7 @@ def huiteight_wide_clusters():
 def huiteight_auto_spread():
     """Use auto spread (cluster_spread=0) – spread is half the sector width."""
     layer = HuitEightLayer(
-        num_curves=72,
+        num_curves=36,
         scale=20.0,
         resolution=360,
         num_clusters=8,

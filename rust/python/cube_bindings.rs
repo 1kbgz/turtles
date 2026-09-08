@@ -45,7 +45,7 @@ impl CubeLayer {
         };
         BaseCubeLayer::new(config)
             .map(|inner| CubeLayer { inner })
-            .map_err(|e| pyo3::exceptions::PyValueError::new_err(e.to_string()))
+            .map_err(crate::errors::to_py_err)
     }
 
     /// Create a cube layer with a custom center point
@@ -75,7 +75,7 @@ impl CubeLayer {
         };
         BaseCubeLayer::new_with_center(config, center_x, center_y)
             .map(|inner| CubeLayer { inner })
-            .map_err(|e| pyo3::exceptions::PyValueError::new_err(e.to_string()))
+            .map_err(crate::errors::to_py_err)
     }
 
     /// Create a cube layer positioned at a given angle and distance from origin
@@ -105,7 +105,7 @@ impl CubeLayer {
         };
         BaseCubeLayer::new_at_polar(config, angle, distance)
             .map(|inner| CubeLayer { inner })
-            .map_err(|e| pyo3::exceptions::PyValueError::new_err(e.to_string()))
+            .map_err(crate::errors::to_py_err)
     }
 
     /// Create a cube layer positioned at a clock position (like hour hand)
@@ -141,7 +141,7 @@ impl CubeLayer {
         };
         BaseCubeLayer::new_at_clock(config, hour, minute, distance)
             .map(|inner| CubeLayer { inner })
-            .map_err(|e| pyo3::exceptions::PyValueError::new_err(e.to_string()))
+            .map_err(crate::errors::to_py_err)
     }
 
     /// Generate the cube pattern
@@ -153,7 +153,7 @@ impl CubeLayer {
     fn to_svg(&self, filename: &str) -> PyResult<()> {
         self.inner
             .to_svg(filename)
-            .map_err(|e| pyo3::exceptions::PyIOError::new_err(e.to_string()))
+            .map_err(crate::errors::to_py_err)
     }
 
     /// Get all generated lines as list of list of (x, y) tuples

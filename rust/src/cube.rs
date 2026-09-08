@@ -1,4 +1,7 @@
-use crate::common::{clock_to_cartesian, polar_to_cartesian, Point2D, SpirographError};
+use crate::common::{
+    checked_element_count, clock_to_cartesian, polar_to_cartesian, validate_finite,
+    validate_non_negative, validate_positive, Point2D, SpirographError,
+};
 
 /// Configuration for the Cube (tumbling blocks) guilloché pattern
 ///
@@ -159,16 +162,13 @@ impl CubeLayer {
         center_x: f64,
         center_y: f64,
     ) -> Result<Self, SpirographError> {
-        if config.spacing <= 0.0 {
-            return Err(SpirographError::InvalidParameter(
-                "spacing must be positive".to_string(),
-            ));
-        }
-        if config.radius <= 0.0 {
-            return Err(SpirographError::InvalidParameter(
-                "radius must be positive".to_string(),
-            ));
-        }
+        validate_positive("spacing", config.spacing)?;
+        validate_positive("radius", config.radius)?;
+        validate_non_negative("amplitude", config.amplitude)?;
+        validate_finite("angle", config.angle)?;
+        validate_finite("leg_angle", config.leg_angle)?;
+        validate_finite("center_x", center_x)?;
+        validate_finite("center_y", center_y)?;
         if config.resolution < 2 {
             return Err(SpirographError::InvalidParameter(
                 "resolution must be at least 2".to_string(),
@@ -189,11 +189,14 @@ impl CubeLayer {
                 "leg_angle must be between 0 and 90 degrees (exclusive)".to_string(),
             ));
         }
-        if config.amplitude < 0.0 {
-            return Err(SpirographError::InvalidParameter(
-                "amplitude must be non-negative (0 = auto)".to_string(),
-            ));
-        }
+
+        // Bound the derived group count. `generate()` computes
+        // `(radius / group_cycle).ceil() as i32`; the cast saturates on
+        // overflow, so an unchecked tiny spacing yields a runaway loop.
+        let group_cycle = (config.cuts_per_group + config.gap_per_group) as f64 * config.spacing;
+        validate_positive("cuts_per_group + gap_per_group times spacing", group_cycle)?;
+        checked_element_count("radius / group cycle", (config.radius / group_cycle).ceil())?;
+
         Ok(CubeLayer {
             config,
             center_x,

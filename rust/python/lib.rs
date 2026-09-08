@@ -1,5 +1,6 @@
 use pyo3::prelude::*;
 
+mod errors;
 mod diamant_bindings;
 mod draperie_bindings;
 mod clous_de_paris_bindings;
@@ -27,46 +28,46 @@ pub use watch_face_bindings::WatchFace;
 #[pymodule]
 fn turtles(_py: Python, m: &Bound<PyModule>) -> PyResult<()> {
     // Spirograph classes
-    m.add_class::<HorizontalSpirograph>().unwrap();
-    m.add_class::<VerticalSpirograph>().unwrap();
-    m.add_class::<SphericalSpirograph>().unwrap();
+    m.add_class::<HorizontalSpirograph>()?;
+    m.add_class::<VerticalSpirograph>()?;
+    m.add_class::<SphericalSpirograph>()?;
 
     // Guilloche pattern
-    m.add_class::<GuillochePattern>().unwrap();
+    m.add_class::<GuillochePattern>()?;
 
     // Flinqué (engine-turned) layer
-    m.add_class::<FlinqueLayer>().unwrap();
+    m.add_class::<FlinqueLayer>()?;
 
     // Diamant (diamond) pattern layer
-    m.add_class::<DiamantLayer>().unwrap();
+    m.add_class::<DiamantLayer>()?;
 
     // Huit-Eight (figure-eight) pattern layer
-    m.add_class::<HuitEightLayer>().unwrap();
+    m.add_class::<HuitEightLayer>()?;
 
     // Draperie (drapery) pattern layer
-    m.add_class::<DraperieLayer>().unwrap();
+    m.add_class::<DraperieLayer>()?;
 
     // Paon (peacock) pattern layer
-    m.add_class::<PaonLayer>().unwrap();
+    m.add_class::<PaonLayer>()?;
 
     // Clous de Paris (hobnail) pattern layer
-    m.add_class::<ClousDeParisLayer>().unwrap();
+    m.add_class::<ClousDeParisLayer>()?;
 
     // Cube (tumbling blocks) pattern layer
-    m.add_class::<CubeLayer>().unwrap();
+    m.add_class::<CubeLayer>()?;
 
     // Limaçon pattern layer
-    m.add_class::<LimaconLayer>().unwrap();
+    m.add_class::<LimaconLayer>()?;
 
     // Watch face
-    m.add_class::<WatchFace>().unwrap();
+    m.add_class::<WatchFace>()?;
 
     // Rose engine classes
-    m.add_class::<RoseEngineLathe>().unwrap();
-    m.add_class::<RoseEngineLatheRun>().unwrap();
-    m.add_class::<RoseEngineConfig>().unwrap();
-    m.add_class::<CuttingBit>().unwrap();
-    m.add_class::<RosettePattern>().unwrap();
+    m.add_class::<RoseEngineLathe>()?;
+    m.add_class::<RoseEngineLatheRun>()?;
+    m.add_class::<RoseEngineConfig>()?;
+    m.add_class::<CuttingBit>()?;
+    m.add_class::<RosettePattern>()?;
 
     Ok(())
 }

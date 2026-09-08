@@ -50,7 +50,7 @@ impl PaonLayer {
         };
         BasePaonLayer::new(config)
             .map(|inner| PaonLayer { inner })
-            .map_err(|e| pyo3::exceptions::PyValueError::new_err(e.to_string()))
+            .map_err(crate::errors::to_py_err)
     }
 
     /// Create a paon layer with a custom center point
@@ -82,7 +82,7 @@ impl PaonLayer {
         };
         BasePaonLayer::new_with_center(config, center_x, center_y)
             .map(|inner| PaonLayer { inner })
-            .map_err(|e| pyo3::exceptions::PyValueError::new_err(e.to_string()))
+            .map_err(crate::errors::to_py_err)
     }
 
     /// Create a paon layer positioned at a given angle and distance from origin
@@ -114,7 +114,7 @@ impl PaonLayer {
         };
         BasePaonLayer::new_at_polar(config, angle, distance)
             .map(|inner| PaonLayer { inner })
-            .map_err(|e| pyo3::exceptions::PyValueError::new_err(e.to_string()))
+            .map_err(crate::errors::to_py_err)
     }
 
     /// Create a paon layer positioned at a clock position (like hour hand)
@@ -152,7 +152,7 @@ impl PaonLayer {
         };
         BasePaonLayer::new_at_clock(config, hour, minute, distance)
             .map(|inner| PaonLayer { inner })
-            .map_err(|e| pyo3::exceptions::PyValueError::new_err(e.to_string()))
+            .map_err(crate::errors::to_py_err)
     }
 
     /// Generate the paon pattern
@@ -164,7 +164,7 @@ impl PaonLayer {
     fn to_svg(&self, filename: &str) -> PyResult<()> {
         self.inner
             .to_svg(filename)
-            .map_err(|e| pyo3::exceptions::PyIOError::new_err(e.to_string()))
+            .map_err(crate::errors::to_py_err)
     }
 
     /// Get all generated lines as list of list of (x, y) tuples
