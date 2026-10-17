@@ -42,6 +42,7 @@ develop = [
     "hatch-rs",
     "hatchling",
     "mdformat",
+    "mdformat-myst>=0.3.0",
     "mdformat-tables>=1",
     "pytest",
     "pytest-cov",
@@ -50,6 +51,13 @@ develop = [
     "ty",
     "uv",
     "wheel",
+]
+docs = [
+    "codespell",
+    "mdformat",
+    "mdformat-myst>=0.3.0",
+    "mdformat-tables>=1",
+    "yardang[themes]>=0.10.3",
 ]
 
 [project.scripts]
@@ -198,3 +206,19 @@ section-order = [
     "F401",
     "F403",
 ]
+
+[tool.yardang]
+title = "turtles"
+module = "turtles"
+description = "Spirograph and guilloché pattern generation in Python and Rust"
+root = "docs/home.md"
+theme = "furo"
+docs-host = "https://1kbgz.github.io/turtles/"
+pages = [
+    "docs/tutorials/index",
+    "docs/how-to/index",
+    "docs/reference/index",
+    "docs/explanation/index",
+]
+use-autoapi = false
+exclude-patterns = ["docs/home.md", "TODO.md", "examples/README.md"]

@@ -75,6 +75,12 @@ jobs:
         run: make lint
         if: matrix.target == 'native'
 
+      - name: Check documentation
+        run: |
+          uv pip install -r pyproject.toml --extra docs
+          make docs
+        if: matrix.name == 'ubuntu-24.04'
+
       - name: Checks
         run: make checks
         if: matrix.name == 'ubuntu-24.04'

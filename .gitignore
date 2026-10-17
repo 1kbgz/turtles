@@ -117,7 +117,7 @@ dmypy.json
 
 # Documentation
 /site
-index.md
+/index.md
 docs/_build/
 docs/api
 docs/html
@@ -125,7 +125,7 @@ docs/index.md
 docs/jupyter_execute
 docs/src/_build/
 docs/superpowers
-index.md
+/index.md
 
 # JS
 js/coverage
