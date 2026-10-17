@@ -1,0 +1,666 @@
+<!doctype html>
+<html class="no-js" lang="en" data-content_root="../../">
+  <head><meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="index" title="Index" href="../../genindex.html"><link rel="search" title="Search" href="../../search.html"><link rel="next" title="Pattern gallery" href="gallery.html"><link rel="prev" title="Exports" href="exports.html">
+
+    <!-- Generated with Sphinx 8.2.3 and Furo 2025.12.19 -->
+        <title>Errors and validation - turtles v0.1.0</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="../../_static/styles/furo.css?v=7bdb33bb" />
+    <link rel="stylesheet" type="text/css" href="../../_static/mystnb.11b39860a7a0cbfd473a3ad8a317855267ff0bd372690045ca344a6b62be495e.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../../_static/graphviz.css?v=4ae1632d" />
+    <link rel="stylesheet" type="text/css" href="../../_static/autodoc_pydantic.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sphinx-design.min.css?v=95c83b7e" />
+    <link rel="stylesheet" type="text/css" href="../../_static/searchlite.css?v=4235115c" />
+    <link rel="stylesheet" type="text/css" href="../../_static/styles/furo-extensions.css?v=8dab3a3b" />
+    <link rel="stylesheet" type="text/css" href="../../_static/styles/custom.css?v=890fd012" />
+    
+    
+
+
+<style>
+  body {
+    --color-code-background: #eeffcc;
+  --color-code-foreground: black;
+  
+  }
+  @media not print {
+    body[data-theme="dark"] {
+      --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  
+    }
+    @media (prefers-color-scheme: dark) {
+      body:not([data-theme="light"]) {
+        --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  
+      }
+    }
+  }
+</style></head>
+  <body>
+    
+    <script>
+      document.body.dataset.theme = localStorage.getItem("theme") || "auto";
+    </script>
+    
+
+<svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
+  <symbol id="svg-toc" viewBox="0 0 24 24">
+    <title>Contents</title>
+    <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 1024 1024">
+      <path d="M408 442h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8zm-8 204c0 4.4 3.6 8 8 8h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56zm504-486H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zm0 632H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zM115.4 518.9L271.7 642c5.8 4.6 14.4.5 14.4-6.9V388.9c0-7.4-8.5-11.5-14.4-6.9L115.4 505.1a8.74 8.74 0 0 0 0 13.8z"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-menu" viewBox="0 0 24 24">
+    <title>Menu</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-menu">
+      <line x1="3" y1="12" x2="21" y2="12"></line>
+      <line x1="3" y1="6" x2="21" y2="6"></line>
+      <line x1="3" y1="18" x2="21" y2="18"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-arrow-right" viewBox="0 0 24 24">
+    <title>Expand</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-chevron-right">
+      <polyline points="9 18 15 12 9 6"></polyline>
+    </svg>
+  </symbol>
+  <symbol id="svg-sun" viewBox="0 0 24 24">
+    <title>Light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="feather-sun">
+      <circle cx="12" cy="12" r="5"></circle>
+      <line x1="12" y1="1" x2="12" y2="3"></line>
+      <line x1="12" y1="21" x2="12" y2="23"></line>
+      <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+      <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+      <line x1="1" y1="12" x2="3" y2="12"></line>
+      <line x1="21" y1="12" x2="23" y2="12"></line>
+      <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+      <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon" viewBox="0 0 24 24">
+    <title>Dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-moon">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M12 3c.132 0 .263 0 .393 0a7.5 7.5 0 0 0 7.92 12.446a9 9 0 1 1 -8.313 -12.454z" />
+    </svg>
+  </symbol>
+  <symbol id="svg-sun-with-moon" viewBox="0 0 24 24">
+    <title>Auto light/dark, in light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round"
+      class="icon-custom-derived-from-feather-sun-and-tabler-moon">
+      <path style="opacity: 50%" d="M 5.411 14.504 C 5.471 14.504 5.532 14.504 5.591 14.504 C 3.639 16.319 4.383 19.569 6.931 20.352 C 7.693 20.586 8.512 20.551 9.25 20.252 C 8.023 23.207 4.056 23.725 2.11 21.184 C 0.166 18.642 1.702 14.949 4.874 14.536 C 5.051 14.512 5.231 14.5 5.411 14.5 L 5.411 14.504 Z"/>
+      <line x1="14.5" y1="3.25" x2="14.5" y2="1.25"/>
+      <line x1="14.5" y1="15.85" x2="14.5" y2="17.85"/>
+      <line x1="10.044" y1="5.094" x2="8.63" y2="3.68"/>
+      <line x1="19" y1="14.05" x2="20.414" y2="15.464"/>
+      <line x1="8.2" y1="9.55" x2="6.2" y2="9.55"/>
+      <line x1="20.8" y1="9.55" x2="22.8" y2="9.55"/>
+      <line x1="10.044" y1="14.006" x2="8.63" y2="15.42"/>
+      <line x1="19" y1="5.05" x2="20.414" y2="3.636"/>
+      <circle cx="14.5" cy="9.55" r="3.6"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon-with-sun" viewBox="0 0 24 24">
+    <title>Auto light/dark, in dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round"
+      class="icon-custom-derived-from-feather-sun-and-tabler-moon">
+      <path d="M 8.282 7.007 C 8.385 7.007 8.494 7.007 8.595 7.007 C 5.18 10.184 6.481 15.869 10.942 17.24 C 12.275 17.648 13.706 17.589 15 17.066 C 12.851 22.236 5.91 23.143 2.505 18.696 C -0.897 14.249 1.791 7.786 7.342 7.063 C 7.652 7.021 7.965 7 8.282 7 L 8.282 7.007 Z"/>
+      <line style="opacity: 50%" x1="18" y1="3.705" x2="18" y2="2.5"/>
+      <line style="opacity: 50%" x1="18" y1="11.295" x2="18" y2="12.5"/>
+      <line style="opacity: 50%" x1="15.316" y1="4.816" x2="14.464" y2="3.964"/>
+      <line style="opacity: 50%" x1="20.711" y1="10.212" x2="21.563" y2="11.063"/>
+      <line style="opacity: 50%" x1="14.205" y1="7.5" x2="13.001" y2="7.5"/>
+      <line style="opacity: 50%" x1="21.795" y1="7.5" x2="23" y2="7.5"/>
+      <line style="opacity: 50%" x1="15.316" y1="10.184" x2="14.464" y2="11.036"/>
+      <line style="opacity: 50%" x1="20.711" y1="4.789" x2="21.563" y2="3.937"/>
+      <circle style="opacity: 50%" cx="18" cy="7.5" r="2.169"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-pencil" viewBox="0 0 24 24">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-pencil-code">
+      <path d="M4 20h4l10.5 -10.5a2.828 2.828 0 1 0 -4 -4l-10.5 10.5v4" />
+      <path d="M13.5 6.5l4 4" />
+      <path d="M20 21l2 -2l-2 -2" />
+      <path d="M17 17l-2 2l2 2" />
+    </svg>
+  </symbol>
+  <symbol id="svg-eye" viewBox="0 0 24 24">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-eye-code">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M10 12a2 2 0 1 0 4 0a2 2 0 0 0 -4 0" />
+      <path
+        d="M11.11 17.958c-3.209 -.307 -5.91 -2.293 -8.11 -5.958c2.4 -4 5.4 -6 9 -6c3.6 0 6.6 2 9 6c-.21 .352 -.427 .688 -.647 1.008" />
+      <path d="M20 21l2 -2l-2 -2" />
+      <path d="M17 17l-2 2l2 2" />
+    </svg>
+  </symbol>
+</svg>
+
+<input type="checkbox" class="sidebar-toggle" name="__navigation" id="__navigation" aria-label="Toggle site navigation sidebar">
+<input type="checkbox" class="sidebar-toggle" name="__toc" id="__toc" aria-label="Toggle table of contents sidebar">
+<label class="overlay sidebar-overlay" for="__navigation"></label>
+<label class="overlay toc-overlay" for="__toc"></label>
+
+<a class="skip-to-content muted-link" href="#furo-main-content">Skip to content</a>
+
+
+
+<div class="page">
+  <header class="mobile-header">
+    <div class="header-left">
+      <label class="nav-overlay-icon" for="__navigation">
+        <span class="icon"><svg><use href="#svg-menu"></use></svg></span>
+      </label>
+    </div>
+    <div class="header-center">
+      <a href="../../index.html"><div class="brand">turtles <code style='font-size: var(--font-size--small--4);color: var(--sd-color-primary);'>v0.1.0</code></div></a>
+    </div>
+    <div class="header-right">
+      <div class="theme-toggle-container theme-toggle-header">
+        <button class="theme-toggle" aria-label="Toggle Light / Dark / Auto color theme">
+          <svg class="theme-icon-when-auto-light"><use href="#svg-sun-with-moon"></use></svg>
+          <svg class="theme-icon-when-auto-dark"><use href="#svg-moon-with-sun"></use></svg>
+          <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+          <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+        </button>
+      </div>
+      <label class="toc-overlay-icon toc-header-icon" for="__toc">
+        <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
+      </label>
+    </div>
+  </header>
+  <aside class="sidebar-drawer">
+    <div class="sidebar-container">
+      
+      <div class="sidebar-sticky"><a class="sidebar-brand" href="../../index.html">
+  
+  <span class="sidebar-brand-text">turtles <code style='font-size: var(--font-size--small--4);color: var(--sd-color-primary);'>v0.1.0</code></span>
+  
+</a><form class="sidebar-search-container" method="get" action="../../search.html" role="search">
+  <input class="sidebar-search" placeholder="Search" name="q" aria-label="Search">
+  <input type="hidden" name="check_keywords" value="yes">
+  <input type="hidden" name="area" value="default">
+</form>
+<div id="searchbox"></div><div class="sidebar-scroll"><div class="sidebar-tree">
+  <ul class="current">
+<li class="toctree-l1 has-children"><a class="reference internal" href="../tutorials/index.html">Tutorials</a><input aria-label="Toggle navigation of Tutorials" class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../tutorials/first-pattern.html">Your first pattern</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../tutorials/watch-dial.html">A patterned watch dial</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../tutorials/rose-engine.html">A rose-engine pattern</a></li>
+</ul>
+</li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../how-to/index.html">How-to guides</a><input aria-label="Toggle navigation of How-to guides" class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" role="switch" type="checkbox"/><label for="toctree-checkbox-2"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../how-to/install.html">How to install Turtles</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../how-to/position-and-compose.html">How to position and compose patterns</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../how-to/export.html">How to export patterns</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../how-to/develop.html">How to develop and check changes</a></li>
+</ul>
+</li>
+<li class="toctree-l1 current has-children"><a class="reference internal" href="index.html">Reference</a><input aria-label="Toggle navigation of Reference" checked="" class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" role="switch" type="checkbox"/><label for="toctree-checkbox-3"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="patterns.html">Pattern layers and spirographs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="composition.html">Composition</a></li>
+<li class="toctree-l2"><a class="reference internal" href="rose-engine.html">Rose engine Python API</a></li>
+<li class="toctree-l2"><a class="reference internal" href="exports.html">Exports</a></li>
+<li class="toctree-l2 current current-page"><a class="current reference internal" href="#">Errors and validation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="gallery.html">Pattern gallery</a></li>
+<li class="toctree-l2"><a class="reference internal" href="rust.html">Rust API</a></li>
+</ul>
+</li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../explanation/index.html">Explanation</a><input aria-label="Toggle navigation of Explanation" class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" role="switch" type="checkbox"/><label for="toctree-checkbox-4"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../explanation/pattern-models.html">Pattern models</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../explanation/coordinates.html">Coordinates and boundaries</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../explanation/geometry-and-exports.html">Geometry and exports</a></li>
+</ul>
+</li>
+</ul>
+
+</div>
+</div>
+
+      </div>
+      
+    </div>
+  </aside>
+  <div class="main">
+    <div class="content">
+      <div class="article-container">
+        <a href="#" class="back-to-top muted-link">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+            <path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12z"></path>
+          </svg>
+          <span>Back to top</span>
+        </a>
+        <div class="content-icon-container">
+          <div class="view-this-page">
+  <a class="muted-link" href="../../_sources/docs/reference/errors.md.txt" title="View this page">
+    <svg><use href="#svg-eye"></use></svg>
+    <span class="visually-hidden">View this page</span>
+  </a>
+</div>
+<div class="theme-toggle-container theme-toggle-content">
+            <button class="theme-toggle" aria-label="Toggle Light / Dark / Auto color theme">
+              <svg class="theme-icon-when-auto-light"><use href="#svg-sun-with-moon"></use></svg>
+              <svg class="theme-icon-when-auto-dark"><use href="#svg-moon-with-sun"></use></svg>
+              <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+              <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+            </button>
+          </div>
+          <label class="toc-overlay-icon toc-content-icon" for="__toc">
+            <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
+          </label>
+        </div>
+        <article role="main" id="furo-main-content">
+          <section class="tex2jax_ignore mathjax_ignore" id="errors-and-validation">
+<h1>Errors and validation<a class="headerlink" href="#errors-and-validation" title="Link to this heading">¶</a></h1>
+<p>This page records Python exception types, constructor checks, and known gaps.
+Parameter meanings and signatures are listed in <a class="reference internal" href="patterns.html"><span class="std std-doc">Patterns</span></a>,
+<a class="reference internal" href="composition.html"><span class="std std-doc">Composition</span></a>, and <a class="reference internal" href="rose-engine.html"><span class="std std-doc">Rose engine</span></a>.
+<a class="reference internal" href="exports.html"><span class="std std-doc">Exports</span></a> describes file contents and export preconditions;
+<a class="reference internal" href="rust.html"><span class="std std-doc">Rust API</span></a> describes native error handling.</p>
+<section id="python-exception-mapping">
+<h2>Python exception mapping<a class="headerlink" href="#python-exception-mapping" title="Link to this heading">¶</a></h2>
+<p>The bindings convert <code class="docutils literal notranslate"><span class="pre">SpirographError</span></code> variants through one shared mapping.
+Python argument conversion happens before those Rust checks.</p>
+<div class="table-wrapper colwidths-auto docutils container">
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Python exception</p></th>
+<th class="head"><p>Source or condition</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">ValueError</span></code></p></td>
+<td><p>Rust <code class="docutils literal notranslate"><span class="pre">InvalidRadius</span></code> or <code class="docutils literal notranslate"><span class="pre">InvalidParameter</span></code>. Also an unrecognized <code class="docutils literal notranslate"><span class="pre">spiro_type</span></code> in positioned spirograph composition methods.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">OSError</span></code></p></td>
+<td><p>Rust <code class="docutils literal notranslate"><span class="pre">ExportError</span></code>: missing generated geometry, rejected SVG bounds or STEP coordinates, no drawable paths after clipping, file creation/write failures, or unimplemented single-lathe STEP export. <code class="docutils literal notranslate"><span class="pre">PyIOError</span></code> is Python’s <code class="docutils literal notranslate"><span class="pre">OSError</span></code> alias.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">TypeError</span></code></p></td>
+<td><p>Incompatible binding argument types, missing/extra arguments, unexpected keywords, or unsupported objects passed to a compositor’s spirograph adder. Filename parameters require strings, not <code class="docutils literal notranslate"><span class="pre">pathlib.Path</span></code> objects.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">OverflowError</span></code></p></td>
+<td><p>A negative Python integer or an integer outside the target Rust unsigned range supplied to a <code class="docutils literal notranslate"><span class="pre">usize</span></code> or <code class="docutils literal notranslate"><span class="pre">u32</span></code> parameter. This occurs before constructor value validation.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">NotImplementedError</span></code></p></td>
+<td><p>Public Python <code class="docutils literal notranslate"><span class="pre">WatchFace.add_subdial()</span></code> and <code class="docutils literal notranslate"><span class="pre">WatchFace.add_window()</span></code> always raise this without rendering or validating the intended geometry.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>Rust error messages retain the <code class="docutils literal notranslate"><span class="pre">Display</span></code> prefix: <code class="docutils literal notranslate"><span class="pre">Invalid</span> <span class="pre">radius:</span></code>,
+<code class="docutils literal notranslate"><span class="pre">Invalid</span> <span class="pre">parameter:</span></code>, or <code class="docutils literal notranslate"><span class="pre">Export</span> <span class="pre">error:</span></code>. For example, a finite dial radius
+outside 26–44 mm produces <code class="docutils literal notranslate"><span class="pre">InvalidRadius</span></code>; a non-finite dial radius is rejected
+by <code class="docutils literal notranslate"><span class="pre">validate_finite()</span></code> as <code class="docutils literal notranslate"><span class="pre">InvalidParameter</span></code>. Both become <code class="docutils literal notranslate"><span class="pre">ValueError</span></code>.</p>
+<p><code class="docutils literal notranslate"><span class="pre">GuillochePattern.add_layer()</span></code> and the binding behind <code class="docutils literal notranslate"><span class="pre">WatchFace.add()</span></code> accept
+only the three spirograph classes when handling spirographs. The public
+<code class="docutils literal notranslate"><span class="pre">WatchFace.add()</span></code> dispatches the eight decorative classes before that call;
+other object types raise <code class="docutils literal notranslate"><span class="pre">TypeError</span></code>. Family-specific adders require their
+matching layer class. Existing layer bindings reconstruct and validate a fresh
+internal object rather than copying its generated geometry.</p>
+<p>Positioned <code class="docutils literal notranslate"><span class="pre">GuillochePattern</span></code> spirograph adders lowercase <code class="docutils literal notranslate"><span class="pre">spiro_type</span></code> and accept
+only <code class="docutils literal notranslate"><span class="pre">horizontal</span></code>, <code class="docutils literal notranslate"><span class="pre">vertical</span></code>, or <code class="docutils literal notranslate"><span class="pre">spherical</span></code>; whitespace is not stripped.
+Unused variant options still undergo binding type conversion, but do not
+receive another variant’s numeric checks.</p>
+<p>Missing methods, such as <code class="docutils literal notranslate"><span class="pre">RoseEngineLatheRun.to_stl()</span></code> or a direct layer’s
+<code class="docutils literal notranslate"><span class="pre">to_step()</span></code>, are absent APIs and normally cause <code class="docutils literal notranslate"><span class="pre">AttributeError</span></code> on lookup.
+They are not <code class="docutils literal notranslate"><span class="pre">NotImplementedError</span></code> stubs. Conversely,
+<code class="docutils literal notranslate"><span class="pre">RoseEngineLathe.to_step()</span></code> exists and reports its unimplemented state as
+<code class="docutils literal notranslate"><span class="pre">OSError</span></code>, not <code class="docutils literal notranslate"><span class="pre">NotImplementedError</span></code>, for type-correct arguments.</p>
+</section>
+<section id="constructor-checks">
+<h2>Constructor checks<a class="headerlink" href="#constructor-checks" title="Link to this heading">¶</a></h2>
+<p>In the tables below, <strong>positive</strong> means finite and strictly greater than zero;
+<strong>nonnegative</strong> means finite and greater than or equal to zero. “Finite” rejects
+NaN and both infinities. Counts bind to <code class="docutils literal notranslate"><span class="pre">usize</span></code> unless stated otherwise;
+clock hours/minutes and draperie/rose-engine phase and wave exponents bind to
+<code class="docutils literal notranslate"><span class="pre">u32</span></code>. Unsigned conversion is separate from these value checks.</p>
+<p>The checks apply to construction, including the corresponding centered,
+polar, and clock factories where exposed. They are not universal rules for
+every API with a similarly named parameter.</p>
+<section id="compositors-and-spirographs">
+<h3>Compositors and spirographs<a class="headerlink" href="#compositors-and-spirographs" title="Link to this heading">¶</a></h3>
+<div class="table-wrapper colwidths-auto docutils container">
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>API</p></th>
+<th class="head"><p>Checks</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">WatchFace</span></code>, <code class="docutils literal notranslate"><span class="pre">GuillochePattern</span></code></p></td>
+<td><p>Finite <code class="docutils literal notranslate"><span class="pre">radius</span></code> in <code class="docutils literal notranslate"><span class="pre">[26,</span> <span class="pre">44]</span></code> mm inclusive. This is a radius, not a diameter, and does not restrict standalone layer sizes.</p></td>
+</tr>
+<tr class="row-odd"><td><p>All three spirographs</p></td>
+<td><p>Positive <code class="docutils literal notranslate"><span class="pre">outer_radius</span></code>; finite <code class="docutils literal notranslate"><span class="pre">radius_ratio</span></code> strictly between 0 and 1; nonnegative <code class="docutils literal notranslate"><span class="pre">point_distance</span></code>; finite center coordinates; <code class="docutils literal notranslate"><span class="pre">rotations</span> <span class="pre">&gt;=</span> <span class="pre">1</span></code>; <code class="docutils literal notranslate"><span class="pre">resolution</span> <span class="pre">&gt;=</span> <span class="pre">1</span></code>; checked product <code class="docutils literal notranslate"><span class="pre">rotations</span> <span class="pre">*</span> <span class="pre">resolution</span> <span class="pre">&lt;=</span> <span class="pre">1_000_000</span></code>, with integer overflow rejected.</p></td>
+</tr>
+<tr class="row-even"><td><p>Vertical spirograph, additionally</p></td>
+<td><p>Nonnegative <code class="docutils literal notranslate"><span class="pre">wave_amplitude</span></code>; finite <code class="docutils literal notranslate"><span class="pre">wave_frequency</span></code>.</p></td>
+</tr>
+<tr class="row-odd"><td><p>Spherical spirograph, additionally</p></td>
+<td><p>Positive <code class="docutils literal notranslate"><span class="pre">dome_height</span></code>.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">point_distance</span> <span class="pre">&gt;</span> <span class="pre">1</span></code> is accepted. Zero and negative vertical wave frequencies
+are accepted. In Python, standalone spirographs have no positioning factories;
+positioned internal instances are available through <code class="docutils literal notranslate"><span class="pre">GuillochePattern</span></code>.</p>
+</section>
+<section id="eight-decorative-layers">
+<h3>Eight decorative layers<a class="headerlink" href="#eight-decorative-layers" title="Link to this heading">¶</a></h3>
+<p>All eight validate finite <code class="docutils literal notranslate"><span class="pre">center_x</span></code> and <code class="docutils literal notranslate"><span class="pre">center_y</span></code>. The remaining checks are:</p>
+<div class="table-wrapper colwidths-auto docutils container">
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Layer</p></th>
+<th class="head"><p>Checks</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">FlinqueLayer</span></code></p></td>
+<td><p>Positive <code class="docutils literal notranslate"><span class="pre">radius</span></code>; nonnegative <code class="docutils literal notranslate"><span class="pre">wave_amplitude</span></code>; finite <code class="docutils literal notranslate"><span class="pre">wave_frequency</span></code>; <code class="docutils literal notranslate"><span class="pre">num_petals</span> <span class="pre">&gt;=</span> <span class="pre">1</span></code>; <code class="docutils literal notranslate"><span class="pre">num_waves</span> <span class="pre">&gt;=</span> <span class="pre">1</span></code>; <code class="docutils literal notranslate"><span class="pre">inner_radius_ratio</span></code> in <code class="docutils literal notranslate"><span class="pre">[0,</span> <span class="pre">1]</span></code> inclusive, rejecting non-finite values.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">DiamantLayer</span></code></p></td>
+<td><p>Positive <code class="docutils literal notranslate"><span class="pre">circle_radius</span></code>; <code class="docutils literal notranslate"><span class="pre">num_circles</span> <span class="pre">&gt;=</span> <span class="pre">1</span></code>; <code class="docutils literal notranslate"><span class="pre">resolution</span> <span class="pre">&gt;=</span> <span class="pre">10</span></code>.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">LimaconLayer</span></code></p></td>
+<td><p>Positive <code class="docutils literal notranslate"><span class="pre">base_radius</span></code>; finite <code class="docutils literal notranslate"><span class="pre">amplitude</span></code>; <code class="docutils literal notranslate"><span class="pre">num_curves</span> <span class="pre">&gt;=</span> <span class="pre">1</span></code>; <code class="docutils literal notranslate"><span class="pre">resolution</span> <span class="pre">&gt;=</span> <span class="pre">10</span></code>. Negative amplitude is accepted.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">DraperieLayer</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">num_rings</span> <span class="pre">&gt;=</span> <span class="pre">1</span></code>; positive <code class="docutils literal notranslate"><span class="pre">radius_step</span></code> and <code class="docutils literal notranslate"><span class="pre">base_radius</span></code>; finite <code class="docutils literal notranslate"><span class="pre">wave_frequency</span></code>, resolved <code class="docutils literal notranslate"><span class="pre">phase_shift</span></code>, and <code class="docutils literal notranslate"><span class="pre">phase_oscillations</span></code>; nonnegative <code class="docutils literal notranslate"><span class="pre">circular_phase</span></code>; <code class="docutils literal notranslate"><span class="pre">resolution</span> <span class="pre">&gt;=</span> <span class="pre">10</span></code>. Rust’s optional explicit <code class="docutils literal notranslate"><span class="pre">amplitude</span></code>, when present, must be nonnegative; Python always uses automatic amplitude.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">PaonLayer</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">num_lines</span> <span class="pre">&gt;=</span> <span class="pre">1</span></code>; positive <code class="docutils literal notranslate"><span class="pre">radius</span></code>, <code class="docutils literal notranslate"><span class="pre">fan_angle</span></code>, and <code class="docutils literal notranslate"><span class="pre">vanishing_point</span></code>; nonnegative <code class="docutils literal notranslate"><span class="pre">amplitude</span></code>; finite <code class="docutils literal notranslate"><span class="pre">wave_frequency</span></code> and <code class="docutils literal notranslate"><span class="pre">phase_rate</span></code>; <code class="docutils literal notranslate"><span class="pre">resolution</span> <span class="pre">&gt;=</span> <span class="pre">10</span></code>.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">HuitEightLayer</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">num_curves</span> <span class="pre">&gt;=</span> <span class="pre">1</span></code>; positive <code class="docutils literal notranslate"><span class="pre">scale</span></code>; nonnegative <code class="docutils literal notranslate"><span class="pre">cluster_spread</span></code>; <code class="docutils literal notranslate"><span class="pre">resolution</span> <span class="pre">&gt;=</span> <span class="pre">10</span></code>.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">ClousDeParisLayer</span></code></p></td>
+<td><p>Positive <code class="docutils literal notranslate"><span class="pre">spacing</span></code> and <code class="docutils literal notranslate"><span class="pre">radius</span></code>; finite grid <code class="docutils literal notranslate"><span class="pre">angle</span></code>; <code class="docutils literal notranslate"><span class="pre">resolution</span> <span class="pre">&gt;=</span> <span class="pre">2</span></code>; finite <code class="docutils literal notranslate"><span class="pre">ceil(radius</span> <span class="pre">/</span> <span class="pre">spacing)</span> <span class="pre">&lt;=</span> <span class="pre">1_000_000</span></code>.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">CubeLayer</span></code></p></td>
+<td><p>Positive <code class="docutils literal notranslate"><span class="pre">spacing</span></code> and <code class="docutils literal notranslate"><span class="pre">radius</span></code>; nonnegative <code class="docutils literal notranslate"><span class="pre">amplitude</span></code>; finite grid <code class="docutils literal notranslate"><span class="pre">angle</span></code> and <code class="docutils literal notranslate"><span class="pre">leg_angle</span></code>; <code class="docutils literal notranslate"><span class="pre">resolution</span> <span class="pre">&gt;=</span> <span class="pre">2</span></code>; positive integer <code class="docutils literal notranslate"><span class="pre">cuts_per_group</span></code> and <code class="docutils literal notranslate"><span class="pre">gap_per_group</span></code>; <code class="docutils literal notranslate"><span class="pre">0</span> <span class="pre">&lt;</span> <span class="pre">leg_angle</span> <span class="pre">&lt;</span> <span class="pre">90</span></code> degrees; finite positive group cycle <code class="docutils literal notranslate"><span class="pre">(cuts_per_group</span> <span class="pre">+</span> <span class="pre">gap_per_group)</span> <span class="pre">*</span> <span class="pre">spacing</span></code>; finite <code class="docutils literal notranslate"><span class="pre">ceil(radius</span> <span class="pre">/</span> <span class="pre">group_cycle)</span> <span class="pre">&lt;=</span> <span class="pre">1_000_000</span></code>.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>There is no further positive-frequency requirement, upper curve/ring count,
+positive draperie-exponent check, or maximum harmonic count in these
+constructors. Huit-eight cluster count need not divide the curve count or be
+smaller than it; inactive clustering selects uniform rotation. Cube validates
+<code class="docutils literal notranslate"><span class="pre">resolution</span></code> even though its zigzag generation does not use that sample count.</p>
+</section>
+<section id="rose-engine-config-single-lathe-and-general-run">
+<h3>Rose-engine config, single lathe, and general run<a class="headerlink" href="#rose-engine-config-single-lathe-and-general-run" title="Link to this heading">¶</a></h3>
+<p><code class="docutils literal notranslate"><span class="pre">RoseEngineConfig</span></code> construction, its factories, and its Python mutation methods
+store values without validating them. <code class="docutils literal notranslate"><span class="pre">RoseEngineLathe</span></code> and the general run
+constructors validate the copied config:</p>
+<ul class="simple">
+<li><p>Positive <code class="docutils literal notranslate"><span class="pre">base_radius</span></code>.</p></li>
+<li><p>Nonnegative primary <code class="docutils literal notranslate"><span class="pre">amplitude</span></code> and <code class="docutils literal notranslate"><span class="pre">secondary_amplitude</span></code>.</p></li>
+<li><p>Finite primary <code class="docutils literal notranslate"><span class="pre">phase</span></code>, <code class="docutils literal notranslate"><span class="pre">secondary_phase</span></code>, <code class="docutils literal notranslate"><span class="pre">start_angle</span></code>, and <code class="docutils literal notranslate"><span class="pre">end_angle</span></code>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">resolution</span> <span class="pre">&gt;=</span> <span class="pre">10</span></code>.</p></li>
+<li><p>Finite generator center coordinates.</p></li>
+</ul>
+<p>General runs also require <code class="docutils literal notranslate"><span class="pre">num_passes</span> <span class="pre">&gt;=</span> <span class="pre">1</span></code> and <code class="docutils literal notranslate"><span class="pre">segments_per_pass</span> <span class="pre">&gt;=</span> <span class="pre">1</span></code>.
+The Python run constructor assigns <code class="docutils literal notranslate"><span class="pre">radius_step</span></code>, <code class="docutils literal notranslate"><span class="pre">phase_shift</span></code>,
+<code class="docutils literal notranslate"><span class="pre">phase_oscillations</span></code>, <code class="docutils literal notranslate"><span class="pre">circular_phase</span></code>, and <code class="docutils literal notranslate"><span class="pre">phase_exponent</span></code> after those checks,
+without further numeric validation. Python exposes no config <code class="docutils literal notranslate"><span class="pre">validate()</span></code>
+method; Rust exposes <code class="docutils literal notranslate"><span class="pre">RoseEngineConfig::validate()</span></code>.</p>
+<p>These config checks do not inspect rosette parameters, cutting-bit dimensions,
+depth-modulation controls, angular ordering, or the minimum radius reached by
+the curve. Bit factories do not reject invalid dimensions or aspect ratios.
+<code class="docutils literal notranslate"><span class="pre">CuttingBit.v_shaped()</span></code> clamps the angle to 1–179 degrees, but does not validate
+width; this is not a general bit-validation pass. Rosette factories do not
+require positive counts or finite floating-point parameters. Elliptical and
+rice-grain displacement have specific zero-displacement fallbacks described in
+<a class="reference internal" href="rose-engine.html"><span class="std std-doc">Rose engine</span></a>.</p>
+</section>
+<section id="run-presets-have-different-validation-coverage">
+<h3>Run presets have different validation coverage<a class="headerlink" href="#run-presets-have-different-validation-coverage" title="Link to this heading">¶</a></h3>
+<p>Each preset constructs an internal radial config and calls the run constructor;
+it does <strong>not</strong> construct the matching standalone decorative layer. All presets
+check finite centers and a positive nominal radius or scale. Additional checks
+and omissions are:</p>
+<div class="table-wrapper colwidths-auto docutils container">
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Run preset</p></th>
+<th class="head"><p>Checks and omissions</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">draperie()</span></code></p></td>
+<td><p>Positive ring count, requested <code class="docutils literal notranslate"><span class="pre">resolution</span> <span class="pre">&gt;=</span> <span class="pre">10</span></code>, valid derived config amplitude and phase. Zero frequency produces a non-finite derived phase and is rejected. Spacing and envelope arguments are not each validated as in <code class="docutils literal notranslate"><span class="pre">DraperieLayer</span></code>.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">paon()</span></code></p></td>
+<td><p>Positive line count and nonnegative amplitude. Requested specialized resolution, frequencies, phase controls, <code class="docutils literal notranslate"><span class="pre">fan_angle</span></code>, and <code class="docutils literal notranslate"><span class="pre">vanishing_point</span></code> do not receive <code class="docutils literal notranslate"><span class="pre">PaonLayer</span></code> checks.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">diamant()</span></code></p></td>
+<td><p>Positive circle count. Requested specialized resolution is not checked against the minimum of 10.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">limacon()</span></code></p></td>
+<td><p>Positive curve count, nonnegative amplitude, requested <code class="docutils literal notranslate"><span class="pre">resolution</span> <span class="pre">&gt;=</span> <span class="pre">10</span></code>. Unlike <code class="docutils literal notranslate"><span class="pre">LimaconLayer</span></code>, negative amplitude is rejected.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">flinque()</span></code></p></td>
+<td><p>Positive ring count and nonnegative half-amplitude (<code class="docutils literal notranslate"><span class="pre">wave_amplitude</span> <span class="pre">/</span> <span class="pre">2</span></code>). Petal count, wave frequency, and inner-radius ratio do not receive <code class="docutils literal notranslate"><span class="pre">FlinqueLayer</span></code> checks.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">huiteight()</span></code></p></td>
+<td><p>Positive curve count. Requested specialized resolution and cluster spread do not receive <code class="docutils literal notranslate"><span class="pre">HuitEightLayer</span></code> checks.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">clous_de_paris()</span></code></p></td>
+<td><p>Internal pass count is one. Spacing, grid angle, requested resolution, and derived line count do not receive <code class="docutils literal notranslate"><span class="pre">ClousDeParisLayer</span></code> checks.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">cube()</span></code></p></td>
+<td><p>Internal pass count is one. Spacing, group counts, amplitude, rotation, leg angle, and derived group count do not receive <code class="docutils literal notranslate"><span class="pre">CubeLayer</span></code> checks.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>In presets that store a specialized resolution separately, the internal radial
+config retains its valid default resolution; validating that config does not
+validate the requested specialized resolution. Zero or extremely small spacing
+in the run grid presets can cause excessive iteration rather than an early
+<code class="docutils literal notranslate"><span class="pre">ValueError</span></code>.</p>
+</section>
+</section>
+<section id="count-limits-and-arithmetic-gaps">
+<h2>Count limits and arithmetic gaps<a class="headerlink" href="#count-limits-and-arithmetic-gaps" title="Link to this heading">¶</a></h2>
+<p>Rust defines <code class="docutils literal notranslate"><span class="pre">MAX_ELEMENTS</span> <span class="pre">=</span> <span class="pre">1_000_000</span></code>, but this is <strong>not a universal geometry
+or memory limit</strong>. Its enforced uses are the spirograph sample product and the
+two direct-layer derived counts above. <code class="docutils literal notranslate"><span class="pre">checked_element_count()</span></code> rejects
+non-finite, negative, or greater-than-limit floating-point counts and converts
+accepted values to <code class="docutils literal notranslate"><span class="pre">usize</span></code>; the layer callers supply a ceiling.</p>
+<p>The Clous de Paris limit applies to one half-extent count, not all grooves in
+both directions or their sample count. Cube checks a group count, not the
+number of cuts or zigzag vertices; generation also pads that count by two
+groups on each side. Neither check bounds every allocation. Other layer and
+run counts do not acquire this limit.</p>
+<p>Not every integer operation uses checked arithmetic. For example, Cube’s
+constructor adds the two <code class="docutils literal notranslate"><span class="pre">usize</span></code> group counts before conversion to <code class="docutils literal notranslate"><span class="pre">f64</span></code>, and
+flinqué generation multiplies petal count by 80. Extremely large accepted
+integers can therefore overflow internal arithmetic or exhaust resources;
+they are not guaranteed to become a documented <code class="docutils literal notranslate"><span class="pre">ValueError</span></code> or Python
+<code class="docutils literal notranslate"><span class="pre">OverflowError</span></code>. Binding <code class="docutils literal notranslate"><span class="pre">OverflowError</span></code> describes conversion failure, not
+arbitrary Rust arithmetic failure.</p>
+</section>
+<section id="generation-and-export-failures">
+<h2>Generation and export failures<a class="headerlink" href="#generation-and-export-failures" title="Link to this heading">¶</a></h2>
+<p>Python <code class="docutils literal notranslate"><span class="pre">generate()</span></code> methods return <code class="docutils literal notranslate"><span class="pre">None</span></code>, not a validation report. General
+rose-engine run generation skips passes whose derived configs fail validation,
+such as concentric rings with nonpositive base radius. Rust records messages in
+<code class="docutils literal notranslate"><span class="pre">generation_errors()</span></code>; Python does not expose those messages. Segmentation,
+local clipping, and skipped rings can also reduce or empty line output without
+a Python exception. A configured pass count is not a generated-line count.</p>
+<div class="table-wrapper colwidths-auto docutils container">
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Export check</p></th>
+<th class="head"><p>Scope</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>Missing generation/empty stored collections</p></td>
+<td><p>Standalone layer and spirograph exporters; lathe and run exporters also check their generated flag.</p></td>
+</tr>
+<tr class="row-odd"><td><p>No drawable geometry after dial clipping</p></td>
+<td><p>Combined STL and STEP. A path needs at least two points; identical points are not rejected as degenerate.</p></td>
+</tr>
+<tr class="row-even"><td><p>No layers in batch</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">GuillochePattern.export_all()</span></code> rejects this before writing. With layers present, it writes SVG, STL, then STEP and can leave partial output.</p></td>
+</tr>
+<tr class="row-odd"><td><p>Empty or non-finite SVG bounds</p></td>
+<td><p>Shared <code class="docutils literal notranslate"><span class="pre">compute_bounds()</span></code> used by standalone spirographs, standalone flinqué, single lathe, and multi-pass run. Other decorative SVG exporters use local bounds calculations without this shared rejection.</p></td>
+</tr>
+<tr class="row-even"><td><p>Non-finite STEP coordinates</p></td>
+<td><p>Shared STEP writer checks coordinates of retained paths with at least two points. Shorter paths are skipped before coordinate serialization.</p></td>
+</tr>
+<tr class="row-odd"><td><p>Unimplemented STEP</p></td>
+<td><p>Single lathe always fails for valid arguments: missing-generation error first, unimplemented-export error after generation.</p></td>
+</tr>
+<tr class="row-even"><td><p>Filesystem failure</p></td>
+<td><p>Exporters convert file creation or write errors into <code class="docutils literal notranslate"><span class="pre">ExportError</span></code>, hence <code class="docutils literal notranslate"><span class="pre">OSError</span></code>. A preceding geometry check can fail before any filesystem access.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>Combined SVG does not require generated paths and does not use the shared
+bounds check. It can write decorations alone. STL exporters do not provide a
+general finite-coordinate, positive-depth, or watertight-mesh check. Export
+<code class="docutils literal notranslate"><span class="pre">depth</span></code>, <code class="docutils literal notranslate"><span class="pre">base_thickness</span></code>, and Rust <code class="docutils literal notranslate"><span class="pre">tool_radius</span></code> have no numeric validation;
+unused options can accept non-finite values without changing output.</p>
+</section>
+<section id="other-validation-gaps">
+<h2>Other validation gaps<a class="headerlink" href="#other-validation-gaps" title="Link to this heading">¶</a></h2>
+<ul class="simple">
+<li><p>Clock positions use <code class="docutils literal notranslate"><span class="pre">hour</span> <span class="pre">%</span> <span class="pre">12</span></code> and include the minute contribution. The
+conventional hour 1–12 and minute 0–59 ranges are not enforced beyond <code class="docutils literal notranslate"><span class="pre">u32</span></code>
+conversion. Placement distance need not be nonnegative or within a dial;
+layer constructors check the resulting center coordinates for finiteness.</p></li>
+<li><p>Watch-face hole addition does not validate finite/positive hole radius,
+finite distance, or containment. Hole circles are SVG decorations, not
+physical cuts in STL or STEP.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">DraperieLayer</span></code> accepts zero frequency, but generation divides by frequency
+when computing phase and can produce non-finite coordinates. It also does
+not require positive innermost ring radius.</p></li>
+<li><p>Finite input checks do not guarantee finite derived arithmetic for extreme
+values, nonintersecting curves, valid stock, or tool clearance. SVG masks and
+geometric dial clipping are not manufacturing validation.</p></li>
+</ul>
+<p>For call sequences and output checks, see <a class="reference internal" href="../how-to/export.html"><span class="std std-doc">How to export patterns</span></a>
+and <a class="reference internal" href="../how-to/position-and-compose.html"><span class="std std-doc">How to position and compose patterns</span></a>.
+The <a class="reference internal" href="../explanation/coordinates.html"><span class="std std-doc">coordinate model</span></a> and
+<a class="reference internal" href="../explanation/geometry-and-exports.html"><span class="std std-doc">geometry model</span></a> describe boundary and
+representation differences.</p>
+<p>Implementation sources: <a class="reference external" href="https://github.com/1kbgz/turtles/blob/main/rust/src/common.rs">shared checks and errors</a>,
+<a class="reference external" href="https://github.com/1kbgz/turtles/blob/main/rust/python/errors.rs">exception mapping</a>,
+<a class="reference external" href="https://github.com/1kbgz/turtles/blob/main/rust/src/rose_engine/lathe_run.rs">run constructors and generation</a>,
+and <a class="reference external" href="https://github.com/1kbgz/turtles/blob/main/turtles/__init__.py">public Python wrapper</a>.</p>
+</section>
+</section>
+
+        </article>
+      </div>
+      <footer>
+        
+        <div class="related-pages">
+          <a class="next-page" href="gallery.html">
+              <div class="page-info">
+                <div class="context">
+                  <span>Next</span>
+                </div>
+                <div class="title">Pattern gallery</div>
+              </div>
+              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
+            </a>
+          <a class="prev-page" href="exports.html">
+              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
+              <div class="page-info">
+                <div class="context">
+                  <span>Previous</span>
+                </div>
+                
+                <div class="title">Exports</div>
+                
+              </div>
+            </a>
+        </div>
+        <div class="bottom-of-page">
+          <div class="left-details">
+            <div class="copyright">
+                Copyright &#169; the turtles authors
+            </div>
+            Made with <a href="https://www.sphinx-doc.org/">Sphinx</a> and <a class="muted-link" href="https://pradyunsg.me">@pradyunsg</a>'s
+            
+            <a href="https://github.com/pradyunsg/furo">Furo</a>
+            
+          </div>
+          <div class="right-details">
+            
+          </div>
+        </div>
+        
+      </footer>
+    </div>
+    <aside class="toc-drawer">
+      
+      
+      <div class="toc-sticky toc-scroll">
+        <div class="toc-title-container">
+          <span class="toc-title">
+            On this page
+          </span>
+        </div>
+        <div class="toc-tree-container">
+          <div class="toc-tree">
+            <ul>
+<li><a class="reference internal" href="#">Errors and validation</a><ul>
+<li><a class="reference internal" href="#python-exception-mapping">Python exception mapping</a></li>
+<li><a class="reference internal" href="#constructor-checks">Constructor checks</a><ul>
+<li><a class="reference internal" href="#compositors-and-spirographs">Compositors and spirographs</a></li>
+<li><a class="reference internal" href="#eight-decorative-layers">Eight decorative layers</a></li>
+<li><a class="reference internal" href="#rose-engine-config-single-lathe-and-general-run">Rose-engine config, single lathe, and general run</a></li>
+<li><a class="reference internal" href="#run-presets-have-different-validation-coverage">Run presets have different validation coverage</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#count-limits-and-arithmetic-gaps">Count limits and arithmetic gaps</a></li>
+<li><a class="reference internal" href="#generation-and-export-failures">Generation and export failures</a></li>
+<li><a class="reference internal" href="#other-validation-gaps">Other validation gaps</a></li>
+</ul>
+</li>
+</ul>
+
+          </div>
+        </div>
+      </div>
+      
+      
+    </aside>
+  </div>
+</div><script src="../../_static/documentation_options.js?v=01f34227"></script>
+    <script src="../../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/scripts/furo.js?v=46bd48cc"></script>
+    <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../../_static/copybutton.js?v=f281be69"></script>
+    <script src="../../_static/design-tabs.js?v=f930bc37"></script>
+    <script data-searchlite-index="searchlite-index.json" defer="defer" src="../../_static/searchlite.js?v=a5320898"></script>
+    <script data-searchlite-adopt="true" defer="defer" src="../../_static/searchlite-ui.js?v=4e4bdd69"></script>
+    <script src="../../_static/js/custom.js?v=956e5d78"></script>
+    </body>
+</html>

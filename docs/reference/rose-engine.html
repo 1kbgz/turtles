@@ -1,0 +1,978 @@
+<!doctype html>
+<html class="no-js" lang="en" data-content_root="../../">
+  <head><meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="index" title="Index" href="../../genindex.html"><link rel="search" title="Search" href="../../search.html"><link rel="next" title="Exports" href="exports.html"><link rel="prev" title="Composition" href="composition.html">
+
+    <!-- Generated with Sphinx 8.2.3 and Furo 2025.12.19 -->
+        <title>Rose engine Python API - turtles v0.1.0</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="../../_static/styles/furo.css?v=7bdb33bb" />
+    <link rel="stylesheet" type="text/css" href="../../_static/mystnb.11b39860a7a0cbfd473a3ad8a317855267ff0bd372690045ca344a6b62be495e.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../../_static/graphviz.css?v=4ae1632d" />
+    <link rel="stylesheet" type="text/css" href="../../_static/autodoc_pydantic.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sphinx-design.min.css?v=95c83b7e" />
+    <link rel="stylesheet" type="text/css" href="../../_static/searchlite.css?v=4235115c" />
+    <link rel="stylesheet" type="text/css" href="../../_static/styles/furo-extensions.css?v=8dab3a3b" />
+    <link rel="stylesheet" type="text/css" href="../../_static/styles/custom.css?v=890fd012" />
+    
+    
+
+
+<style>
+  body {
+    --color-code-background: #eeffcc;
+  --color-code-foreground: black;
+  
+  }
+  @media not print {
+    body[data-theme="dark"] {
+      --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  
+    }
+    @media (prefers-color-scheme: dark) {
+      body:not([data-theme="light"]) {
+        --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  
+      }
+    }
+  }
+</style></head>
+  <body>
+    
+    <script>
+      document.body.dataset.theme = localStorage.getItem("theme") || "auto";
+    </script>
+    
+
+<svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
+  <symbol id="svg-toc" viewBox="0 0 24 24">
+    <title>Contents</title>
+    <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 1024 1024">
+      <path d="M408 442h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8zm-8 204c0 4.4 3.6 8 8 8h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56zm504-486H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zm0 632H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zM115.4 518.9L271.7 642c5.8 4.6 14.4.5 14.4-6.9V388.9c0-7.4-8.5-11.5-14.4-6.9L115.4 505.1a8.74 8.74 0 0 0 0 13.8z"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-menu" viewBox="0 0 24 24">
+    <title>Menu</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-menu">
+      <line x1="3" y1="12" x2="21" y2="12"></line>
+      <line x1="3" y1="6" x2="21" y2="6"></line>
+      <line x1="3" y1="18" x2="21" y2="18"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-arrow-right" viewBox="0 0 24 24">
+    <title>Expand</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-chevron-right">
+      <polyline points="9 18 15 12 9 6"></polyline>
+    </svg>
+  </symbol>
+  <symbol id="svg-sun" viewBox="0 0 24 24">
+    <title>Light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="feather-sun">
+      <circle cx="12" cy="12" r="5"></circle>
+      <line x1="12" y1="1" x2="12" y2="3"></line>
+      <line x1="12" y1="21" x2="12" y2="23"></line>
+      <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+      <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+      <line x1="1" y1="12" x2="3" y2="12"></line>
+      <line x1="21" y1="12" x2="23" y2="12"></line>
+      <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+      <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon" viewBox="0 0 24 24">
+    <title>Dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-moon">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M12 3c.132 0 .263 0 .393 0a7.5 7.5 0 0 0 7.92 12.446a9 9 0 1 1 -8.313 -12.454z" />
+    </svg>
+  </symbol>
+  <symbol id="svg-sun-with-moon" viewBox="0 0 24 24">
+    <title>Auto light/dark, in light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round"
+      class="icon-custom-derived-from-feather-sun-and-tabler-moon">
+      <path style="opacity: 50%" d="M 5.411 14.504 C 5.471 14.504 5.532 14.504 5.591 14.504 C 3.639 16.319 4.383 19.569 6.931 20.352 C 7.693 20.586 8.512 20.551 9.25 20.252 C 8.023 23.207 4.056 23.725 2.11 21.184 C 0.166 18.642 1.702 14.949 4.874 14.536 C 5.051 14.512 5.231 14.5 5.411 14.5 L 5.411 14.504 Z"/>
+      <line x1="14.5" y1="3.25" x2="14.5" y2="1.25"/>
+      <line x1="14.5" y1="15.85" x2="14.5" y2="17.85"/>
+      <line x1="10.044" y1="5.094" x2="8.63" y2="3.68"/>
+      <line x1="19" y1="14.05" x2="20.414" y2="15.464"/>
+      <line x1="8.2" y1="9.55" x2="6.2" y2="9.55"/>
+      <line x1="20.8" y1="9.55" x2="22.8" y2="9.55"/>
+      <line x1="10.044" y1="14.006" x2="8.63" y2="15.42"/>
+      <line x1="19" y1="5.05" x2="20.414" y2="3.636"/>
+      <circle cx="14.5" cy="9.55" r="3.6"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon-with-sun" viewBox="0 0 24 24">
+    <title>Auto light/dark, in dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round"
+      class="icon-custom-derived-from-feather-sun-and-tabler-moon">
+      <path d="M 8.282 7.007 C 8.385 7.007 8.494 7.007 8.595 7.007 C 5.18 10.184 6.481 15.869 10.942 17.24 C 12.275 17.648 13.706 17.589 15 17.066 C 12.851 22.236 5.91 23.143 2.505 18.696 C -0.897 14.249 1.791 7.786 7.342 7.063 C 7.652 7.021 7.965 7 8.282 7 L 8.282 7.007 Z"/>
+      <line style="opacity: 50%" x1="18" y1="3.705" x2="18" y2="2.5"/>
+      <line style="opacity: 50%" x1="18" y1="11.295" x2="18" y2="12.5"/>
+      <line style="opacity: 50%" x1="15.316" y1="4.816" x2="14.464" y2="3.964"/>
+      <line style="opacity: 50%" x1="20.711" y1="10.212" x2="21.563" y2="11.063"/>
+      <line style="opacity: 50%" x1="14.205" y1="7.5" x2="13.001" y2="7.5"/>
+      <line style="opacity: 50%" x1="21.795" y1="7.5" x2="23" y2="7.5"/>
+      <line style="opacity: 50%" x1="15.316" y1="10.184" x2="14.464" y2="11.036"/>
+      <line style="opacity: 50%" x1="20.711" y1="4.789" x2="21.563" y2="3.937"/>
+      <circle style="opacity: 50%" cx="18" cy="7.5" r="2.169"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-pencil" viewBox="0 0 24 24">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-pencil-code">
+      <path d="M4 20h4l10.5 -10.5a2.828 2.828 0 1 0 -4 -4l-10.5 10.5v4" />
+      <path d="M13.5 6.5l4 4" />
+      <path d="M20 21l2 -2l-2 -2" />
+      <path d="M17 17l-2 2l2 2" />
+    </svg>
+  </symbol>
+  <symbol id="svg-eye" viewBox="0 0 24 24">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-eye-code">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M10 12a2 2 0 1 0 4 0a2 2 0 0 0 -4 0" />
+      <path
+        d="M11.11 17.958c-3.209 -.307 -5.91 -2.293 -8.11 -5.958c2.4 -4 5.4 -6 9 -6c3.6 0 6.6 2 9 6c-.21 .352 -.427 .688 -.647 1.008" />
+      <path d="M20 21l2 -2l-2 -2" />
+      <path d="M17 17l-2 2l2 2" />
+    </svg>
+  </symbol>
+</svg>
+
+<input type="checkbox" class="sidebar-toggle" name="__navigation" id="__navigation" aria-label="Toggle site navigation sidebar">
+<input type="checkbox" class="sidebar-toggle" name="__toc" id="__toc" aria-label="Toggle table of contents sidebar">
+<label class="overlay sidebar-overlay" for="__navigation"></label>
+<label class="overlay toc-overlay" for="__toc"></label>
+
+<a class="skip-to-content muted-link" href="#furo-main-content">Skip to content</a>
+
+
+
+<div class="page">
+  <header class="mobile-header">
+    <div class="header-left">
+      <label class="nav-overlay-icon" for="__navigation">
+        <span class="icon"><svg><use href="#svg-menu"></use></svg></span>
+      </label>
+    </div>
+    <div class="header-center">
+      <a href="../../index.html"><div class="brand">turtles <code style='font-size: var(--font-size--small--4);color: var(--sd-color-primary);'>v0.1.0</code></div></a>
+    </div>
+    <div class="header-right">
+      <div class="theme-toggle-container theme-toggle-header">
+        <button class="theme-toggle" aria-label="Toggle Light / Dark / Auto color theme">
+          <svg class="theme-icon-when-auto-light"><use href="#svg-sun-with-moon"></use></svg>
+          <svg class="theme-icon-when-auto-dark"><use href="#svg-moon-with-sun"></use></svg>
+          <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+          <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+        </button>
+      </div>
+      <label class="toc-overlay-icon toc-header-icon" for="__toc">
+        <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
+      </label>
+    </div>
+  </header>
+  <aside class="sidebar-drawer">
+    <div class="sidebar-container">
+      
+      <div class="sidebar-sticky"><a class="sidebar-brand" href="../../index.html">
+  
+  <span class="sidebar-brand-text">turtles <code style='font-size: var(--font-size--small--4);color: var(--sd-color-primary);'>v0.1.0</code></span>
+  
+</a><form class="sidebar-search-container" method="get" action="../../search.html" role="search">
+  <input class="sidebar-search" placeholder="Search" name="q" aria-label="Search">
+  <input type="hidden" name="check_keywords" value="yes">
+  <input type="hidden" name="area" value="default">
+</form>
+<div id="searchbox"></div><div class="sidebar-scroll"><div class="sidebar-tree">
+  <ul class="current">
+<li class="toctree-l1 has-children"><a class="reference internal" href="../tutorials/index.html">Tutorials</a><input aria-label="Toggle navigation of Tutorials" class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../tutorials/first-pattern.html">Your first pattern</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../tutorials/watch-dial.html">A patterned watch dial</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../tutorials/rose-engine.html">A rose-engine pattern</a></li>
+</ul>
+</li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../how-to/index.html">How-to guides</a><input aria-label="Toggle navigation of How-to guides" class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" role="switch" type="checkbox"/><label for="toctree-checkbox-2"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../how-to/install.html">How to install Turtles</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../how-to/position-and-compose.html">How to position and compose patterns</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../how-to/export.html">How to export patterns</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../how-to/develop.html">How to develop and check changes</a></li>
+</ul>
+</li>
+<li class="toctree-l1 current has-children"><a class="reference internal" href="index.html">Reference</a><input aria-label="Toggle navigation of Reference" checked="" class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" role="switch" type="checkbox"/><label for="toctree-checkbox-3"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="patterns.html">Pattern layers and spirographs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="composition.html">Composition</a></li>
+<li class="toctree-l2 current current-page"><a class="current reference internal" href="#">Rose engine Python API</a></li>
+<li class="toctree-l2"><a class="reference internal" href="exports.html">Exports</a></li>
+<li class="toctree-l2"><a class="reference internal" href="errors.html">Errors and validation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="gallery.html">Pattern gallery</a></li>
+<li class="toctree-l2"><a class="reference internal" href="rust.html">Rust API</a></li>
+</ul>
+</li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../explanation/index.html">Explanation</a><input aria-label="Toggle navigation of Explanation" class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" role="switch" type="checkbox"/><label for="toctree-checkbox-4"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../explanation/pattern-models.html">Pattern models</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../explanation/coordinates.html">Coordinates and boundaries</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../explanation/geometry-and-exports.html">Geometry and exports</a></li>
+</ul>
+</li>
+</ul>
+
+</div>
+</div>
+
+      </div>
+      
+    </div>
+  </aside>
+  <div class="main">
+    <div class="content">
+      <div class="article-container">
+        <a href="#" class="back-to-top muted-link">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+            <path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12z"></path>
+          </svg>
+          <span>Back to top</span>
+        </a>
+        <div class="content-icon-container">
+          <div class="view-this-page">
+  <a class="muted-link" href="../../_sources/docs/reference/rose-engine.md.txt" title="View this page">
+    <svg><use href="#svg-eye"></use></svg>
+    <span class="visually-hidden">View this page</span>
+  </a>
+</div>
+<div class="theme-toggle-container theme-toggle-content">
+            <button class="theme-toggle" aria-label="Toggle Light / Dark / Auto color theme">
+              <svg class="theme-icon-when-auto-light"><use href="#svg-sun-with-moon"></use></svg>
+              <svg class="theme-icon-when-auto-dark"><use href="#svg-moon-with-sun"></use></svg>
+              <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+              <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+            </button>
+          </div>
+          <label class="toc-overlay-icon toc-content-icon" for="__toc">
+            <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
+          </label>
+        </div>
+        <article role="main" id="furo-main-content">
+          <section class="tex2jax_ignore mathjax_ignore" id="rose-engine-python-api">
+<h1>Rose engine Python API<a class="headerlink" href="#rose-engine-python-api" title="Link to this heading">¶</a></h1>
+<p>The <code class="docutils literal notranslate"><span class="pre">turtles</span></code> package exports <code class="docutils literal notranslate"><span class="pre">RosettePattern</span></code>, <code class="docutils literal notranslate"><span class="pre">CuttingBit</span></code>,
+<code class="docutils literal notranslate"><span class="pre">RoseEngineConfig</span></code>, <code class="docutils literal notranslate"><span class="pre">RoseEngineLathe</span></code>, and <code class="docutils literal notranslate"><span class="pre">RoseEngineLatheRun</span></code>.
+<code class="docutils literal notranslate"><span class="pre">RoseEngineLathe</span></code> generates a single radial path with width-offset edges;
+<code class="docutils literal notranslate"><span class="pre">RoseEngineLatheRun</span></code> generates multiple curves or line segments.</p>
+<p>Distances, coordinates, widths, and depths are in millimeters. Angles are in
+radians except <code class="docutils literal notranslate"><span class="pre">CuttingBit.v_shaped(angle,</span> <span class="pre">width)</span></code> and the <code class="docutils literal notranslate"><span class="pre">leg_angle</span></code> argument
+of <code class="docutils literal notranslate"><span class="pre">RoseEngineLatheRun.cube()</span></code>, which use degrees. Frequencies, ratios,
+exponents, and counts are dimensionless unless stated otherwise.</p>
+<p>The signatures below describe the Python bindings, not the additional Rust
+API. Arguments accept positional or keyword syntax. Count arguments are
+Python integers converted to Rust <code class="docutils literal notranslate"><span class="pre">usize</span></code>; <code class="docutils literal notranslate"><span class="pre">wave_exponent</span></code> and
+<code class="docutils literal notranslate"><span class="pre">phase_exponent</span></code> are converted to <code class="docutils literal notranslate"><span class="pre">u32</span></code>. Negative or out-of-range integers
+raise <code class="docutils literal notranslate"><span class="pre">OverflowError</span></code> during conversion, independently of parameter
+validation. Incompatible argument types raise <code class="docutils literal notranslate"><span class="pre">TypeError</span></code>.</p>
+<p>Related references: <a class="reference internal" href="exports.html"><span class="std std-doc">Exports</span></a>, <a class="reference internal" href="errors.html"><span class="std std-doc">Errors</span></a>, and
+<a class="reference internal" href="patterns.html"><span class="std std-doc">Pattern layers</span></a>.</p>
+<section id="rosettepattern">
+<h2><code class="docutils literal notranslate"><span class="pre">RosettePattern</span></code><a class="headerlink" href="#rosettepattern" title="Link to this heading">¶</a></h2>
+<p>Rosette factories return a new <code class="docutils literal notranslate"><span class="pre">RosettePattern</span></code>. There is no public Python
+constructor, property getter, or setter. Rosette parameters are selected at
+creation; a config’s primary pattern is replaced with <code class="docutils literal notranslate"><span class="pre">set_rosette()</span></code>.</p>
+<section id="rosette-factories">
+<h3>Rosette factories<a class="headerlink" href="#rosette-factories" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">RosettePattern.circular()</span></code>: zero radial displacement, independent of amplitude.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">RosettePattern.elliptical(eccentricity,</span> <span class="pre">rotation=0.0)</span></code>: normalized elliptical displacement. <code class="docutils literal notranslate"><span class="pre">eccentricity</span></code> is the major-to-minor axis ratio, not the geometric eccentricity of an ellipse; <code class="docutils literal notranslate"><span class="pre">rotation</span></code> is in radians. Displacement is normalized to approximately -1 to 1 when the ratio is greater than 1. Ratios at or below 1 produce zero displacement, as do non-finite ratios or rotations. The implementation also returns zero when the normalized axis difference is no greater than floating-point epsilon.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">RosettePattern.sinusoidal(frequency)</span></code>: <code class="docutils literal notranslate"><span class="pre">sin(angle</span> <span class="pre">*</span> <span class="pre">frequency)</span></code>; <code class="docutils literal notranslate"><span class="pre">frequency</span></code> is cycles per revolution.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">RosettePattern.multi_lobe(lobes)</span></code>: <code class="docutils literal notranslate"><span class="pre">2</span> <span class="pre">*</span> <span class="pre">abs(sin(angle</span> <span class="pre">*</span> <span class="pre">lobes</span> <span class="pre">/</span> <span class="pre">2))</span> <span class="pre">-</span> <span class="pre">1</span></code>; <code class="docutils literal notranslate"><span class="pre">lobes</span></code> is an integer lobe count.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">RosettePattern.epicycloid(petals)</span></code>: <code class="docutils literal notranslate"><span class="pre">cos(angle</span> <span class="pre">*</span> <span class="pre">petals)</span></code>; <code class="docutils literal notranslate"><span class="pre">petals</span></code> is the integer angular multiplier. A config adds this displacement to its base radius, so this does not by itself specify a standalone mathematical epicycloid.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">RosettePattern.huit_eight(lobes)</span></code>: <code class="docutils literal notranslate"><span class="pre">sin(angle</span> <span class="pre">*</span> <span class="pre">lobes)</span> <span class="pre">*</span> <span class="pre">cos(angle</span> <span class="pre">/</span> <span class="pre">2)</span></code>; radial modulation, not a Cartesian lemniscate.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">RosettePattern.grain_de_riz(grain_size,</span> <span class="pre">rows)</span></code>: <code class="docutils literal notranslate"><span class="pre">abs(sin(angle</span> <span class="pre">*</span> <span class="pre">rows))</span> <span class="pre">*</span> <span class="pre">sin(angle</span> <span class="pre">/</span> <span class="pre">grain_size)</span></code>. <code class="docutils literal notranslate"><span class="pre">grain_size</span></code> is an angular scale in radians, not a grain length in millimeters; <code class="docutils literal notranslate"><span class="pre">rows</span></code> is an integer multiplier. A zero or non-finite <code class="docutils literal notranslate"><span class="pre">grain_size</span></code> produces zero displacement.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">RosettePattern.draperie(frequency,</span> <span class="pre">wave_exponent=1)</span></code>: a sine wave with <code class="docutils literal notranslate"><span class="pre">frequency</span></code> cycles per revolution. For <code class="docutils literal notranslate"><span class="pre">wave_exponent</span> <span class="pre">&gt;</span> <span class="pre">1</span></code>, applies <code class="docutils literal notranslate"><span class="pre">abs(sin(angle</span> <span class="pre">*</span> <span class="pre">frequency))</span> <span class="pre">**</span> <span class="pre">wave_exponent</span></code> with the sine’s sign; exponents 0 and 1 both use the unmodified sine.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">RosettePattern.paon(frequency)</span></code>: <code class="docutils literal notranslate"><span class="pre">sin(angle</span> <span class="pre">*</span> <span class="pre">frequency)</span></code>. The fan geometry of the run preset requires <code class="docutils literal notranslate"><span class="pre">RoseEngineLatheRun.paon()</span></code>, not this rosette alone.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">RosettePattern.diamant(divisions)</span></code>: <code class="docutils literal notranslate"><span class="pre">abs(sin(angle</span> <span class="pre">*</span> <span class="pre">divisions))</span> <span class="pre">+</span> <span class="pre">abs(sin(angle</span> <span class="pre">*</span> <span class="pre">divisions</span> <span class="pre">+</span> <span class="pre">pi</span> <span class="pre">/</span> <span class="pre">4))</span> <span class="pre">-</span> <span class="pre">1</span></code>; <code class="docutils literal notranslate"><span class="pre">divisions</span></code> is an integer angular multiplier. This differs from the tangent-circle run preset.</p></li>
+</ul>
+<p>These factories do not validate floating-point parameters or require positive
+counts. The elliptical and rice-grain fallback behavior occurs when
+displacement is evaluated. Other invalid values can produce non-finite
+coordinates later; there is no general rosette-validation pass.</p>
+<p><code class="docutils literal notranslate"><span class="pre">repr(pattern)</span></code> identifies the factory and its parameters. Rust custom
+rosettes and displacement evaluation are not exposed as Python methods:
+there is no <code class="docutils literal notranslate"><span class="pre">custom()</span></code>, <code class="docutils literal notranslate"><span class="pre">from_function()</span></code>, or <code class="docutils literal notranslate"><span class="pre">displacement()</span></code> binding.</p>
+</section>
+</section>
+<section id="cuttingbit">
+<h2><code class="docutils literal notranslate"><span class="pre">CuttingBit</span></code><a class="headerlink" href="#cuttingbit" title="Link to this heading">¶</a></h2>
+<p>Bit factories return a new <code class="docutils literal notranslate"><span class="pre">CuttingBit</span></code>. There is no public Python
+constructor. All dimensions below are in millimeters.</p>
+<section id="bit-factories">
+<h3>Bit factories<a class="headerlink" href="#bit-factories" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">CuttingBit.v_shaped(angle,</span> <span class="pre">width)</span></code>: stores <code class="docutils literal notranslate"><span class="pre">width</span></code>. Clamps <code class="docutils literal notranslate"><span class="pre">angle</span></code> to 1–179 degrees, then computes <code class="docutils literal notranslate"><span class="pre">depth</span> <span class="pre">=</span> <span class="pre">width</span> <span class="pre">/</span> <span class="pre">(2</span> <span class="pre">*</span> <span class="pre">tan(angle_in_radians</span> <span class="pre">/</span> <span class="pre">2))</span></code>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">CuttingBit.flat(width,</span> <span class="pre">depth)</span></code>: stores the supplied width and depth.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">CuttingBit.round(diameter)</span></code>: <code class="docutils literal notranslate"><span class="pre">width</span> <span class="pre">=</span> <span class="pre">diameter</span></code>, <code class="docutils literal notranslate"><span class="pre">depth</span> <span class="pre">=</span> <span class="pre">diameter</span> <span class="pre">/</span> <span class="pre">2</span></code>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">CuttingBit.elliptical(width,</span> <span class="pre">aspect_ratio)</span></code>: stores <code class="docutils literal notranslate"><span class="pre">width</span></code>; <code class="docutils literal notranslate"><span class="pre">depth</span> <span class="pre">=</span> <span class="pre">width</span> <span class="pre">/</span> <span class="pre">(2</span> <span class="pre">*</span> <span class="pre">aspect_ratio)</span></code>. <code class="docutils literal notranslate"><span class="pre">aspect_ratio</span></code> is the major-to-minor axis ratio.</p></li>
+</ul>
+<p>Clamping the V angle does not constitute general validation: widths, depths,
+diameters, and aspect ratios are not checked for positivity or finiteness.
+A zero elliptical aspect ratio can produce an infinite depth rather than a
+Python division exception. Lathe construction does not add bit validation.</p>
+</section>
+<section id="properties">
+<h3>Properties<a class="headerlink" href="#properties" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">width</span></code>: read-only <code class="docutils literal notranslate"><span class="pre">float</span></code>; stored width or diameter in millimeters.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">depth</span></code>: read-only <code class="docutils literal notranslate"><span class="pre">float</span></code>; stored or derived depth in millimeters.</p></li>
+</ul>
+<p><code class="docutils literal notranslate"><span class="pre">repr(bit)</span></code> reports width and depth, not the bit shape. Shape access,
+custom profiles, cross sections, footprints, and Rust’s default bit are not
+exposed in Python.</p>
+</section>
+</section>
+<section id="roseengineconfig">
+<h2><code class="docutils literal notranslate"><span class="pre">RoseEngineConfig</span></code><a class="headerlink" href="#roseengineconfig" title="Link to this heading">¶</a></h2>
+<section id="constructor-and-defaults">
+<h3>Constructor and defaults<a class="headerlink" href="#constructor-and-defaults" title="Link to this heading">¶</a></h3>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">RoseEngineConfig</span><span class="p">(</span><span class="n">base_radius</span><span class="p">,</span> <span class="n">amplitude</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Both arguments are required floating-point values in millimeters. The
+constructor stores them without validation. It initializes the following
+state:</p>
+<ul class="simple">
+<li><p>Base radius: supplied <code class="docutils literal notranslate"><span class="pre">base_radius</span></code>; read-only <code class="docutils literal notranslate"><span class="pre">base_radius</span></code> property.</p></li>
+<li><p>Primary amplitude: supplied <code class="docutils literal notranslate"><span class="pre">amplitude</span></code>; read-only <code class="docutils literal notranslate"><span class="pre">amplitude</span></code> property.</p></li>
+<li><p>Primary rosette: <code class="docutils literal notranslate"><span class="pre">RosettePattern.multi_lobe(12)</span></code>; replaced with <code class="docutils literal notranslate"><span class="pre">set_rosette(pattern)</span></code>, with no getter.</p></li>
+<li><p>Resolution: <code class="docutils literal notranslate"><span class="pre">1000</span></code>; read-only <code class="docutils literal notranslate"><span class="pre">resolution</span></code> property, mutated with <code class="docutils literal notranslate"><span class="pre">set_resolution(resolution)</span></code>.</p></li>
+<li><p>Primary phase: <code class="docutils literal notranslate"><span class="pre">0.0</span></code> radians; not exposed.</p></li>
+<li><p>Start and end angles: <code class="docutils literal notranslate"><span class="pre">0.0</span></code> and <code class="docutils literal notranslate"><span class="pre">2</span> <span class="pre">*</span> <span class="pre">pi</span></code> radians; not exposed.</p></li>
+<li><p>Secondary rosette: absent; added with <code class="docutils literal notranslate"><span class="pre">with_secondary_rosette(rosette,</span> <span class="pre">amplitude)</span></code>, with no getter.</p></li>
+<li><p>Secondary amplitude and phase: <code class="docutils literal notranslate"><span class="pre">0.0</span></code> mm and <code class="docutils literal notranslate"><span class="pre">0.0</span></code> radians; no direct access.</p></li>
+<li><p>Depth modulation: disabled; enabled with <code class="docutils literal notranslate"><span class="pre">with_depth_modulation(amplitude,</span> <span class="pre">frequency)</span></code>.</p></li>
+<li><p>Depth-modulation amplitude and frequency: <code class="docutils literal notranslate"><span class="pre">0.0</span></code> and <code class="docutils literal notranslate"><span class="pre">1.0</span></code>; no direct access.</p></li>
+</ul>
+<p>The three properties have types <code class="docutils literal notranslate"><span class="pre">float</span></code>, <code class="docutils literal notranslate"><span class="pre">float</span></code>, and <code class="docutils literal notranslate"><span class="pre">int</span></code>, respectively.
+They have no assignment setters. There is no no-argument constructor or
+Python <code class="docutils literal notranslate"><span class="pre">default()</span></code> factory.</p>
+<p>For a standard radial path, the radius is the base radius plus primary
+amplitude times primary displacement, plus secondary amplitude times
+secondary displacement when present. The Python config API leaves both
+phase offsets at zero. It does not enforce that the resulting radius stays
+positive or that curves avoid intersections.</p>
+</section>
+<section id="mutation-methods">
+<h3>Mutation methods<a class="headerlink" href="#mutation-methods" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">set_rosette(pattern)</span> <span class="pre">-&gt;</span> <span class="pre">None</span></code>: replaces the primary rosette with a stored copy of <code class="docutils literal notranslate"><span class="pre">pattern</span></code>; leaves amplitude and resolution unchanged.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">set_resolution(resolution)</span> <span class="pre">-&gt;</span> <span class="pre">None</span></code>: stores an integer resolution. Standard radial generation uses <code class="docutils literal notranslate"><span class="pre">resolution</span> <span class="pre">+</span> <span class="pre">1</span></code> points, including both angular endpoints.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">with_secondary_rosette(rosette,</span> <span class="pre">amplitude)</span> <span class="pre">-&gt;</span> <span class="pre">None</span></code>: adds or replaces the secondary rosette and its amplitude in millimeters; leaves the secondary phase at zero.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">with_depth_modulation(amplitude,</span> <span class="pre">frequency)</span> <span class="pre">-&gt;</span> <span class="pre">None</span></code>: enables depth modulation and replaces its parameters. <code class="docutils literal notranslate"><span class="pre">amplitude</span></code> is a fraction of bit depth, conventionally 0–1; <code class="docutils literal notranslate"><span class="pre">frequency</span></code> is depth cycles per revolution.</p></li>
+</ul>
+<p>All four methods mutate the same config and perform no numeric validation
+beyond Python-to-Rust argument conversion. Despite their names, the
+<code class="docutils literal notranslate"><span class="pre">with_...</span></code> methods do not return the config and cannot be chained. There is
+no bound method to remove the secondary rosette or disable depth modulation.</p>
+<p>Depth modulation calculates bit depth times
+<code class="docutils literal notranslate"><span class="pre">max(0,</span> <span class="pre">1</span> <span class="pre">+</span> <span class="pre">amplitude</span> <span class="pre">*</span> <span class="pre">sin(angle</span> <span class="pre">*</span> <span class="pre">frequency))</span></code>. Neither the conventional
+0–1 amplitude range nor frequency finiteness is enforced. This affects
+internal single-pass depth and shading data; the bound exports do not use
+that depth map, and Python exposes no depth-map getter.</p>
+</section>
+<section id="configuration-factories">
+<h3>Configuration factories<a class="headerlink" href="#configuration-factories" title="Link to this heading">¶</a></h3>
+<p>Each static factory returns a new <code class="docutils literal notranslate"><span class="pre">RoseEngineConfig</span></code>. All arguments shown
+are required. Unlisted settings retain the constructor defaults; no factory
+validates its numeric parameters.</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">RoseEngineConfig.classic_multi_lobe(base_radius,</span> <span class="pre">lobes,</span> <span class="pre">amplitude)</span></code>: <code class="docutils literal notranslate"><span class="pre">multi_lobe(lobes)</span></code>; resolution <code class="docutils literal notranslate"><span class="pre">1000</span></code>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">RoseEngineConfig.sunburst(base_radius,</span> <span class="pre">rays,</span> <span class="pre">amplitude)</span></code>: <code class="docutils literal notranslate"><span class="pre">multi_lobe(rays)</span></code>; resolution <code class="docutils literal notranslate"><span class="pre">2000</span></code>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">RoseEngineConfig.wave(base_radius,</span> <span class="pre">frequency,</span> <span class="pre">amplitude)</span></code>: <code class="docutils literal notranslate"><span class="pre">sinusoidal(frequency)</span></code>; resolution <code class="docutils literal notranslate"><span class="pre">1000</span></code>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">RoseEngineConfig.rose_curve(base_radius,</span> <span class="pre">petals,</span> <span class="pre">amplitude)</span></code>: <code class="docutils literal notranslate"><span class="pre">epicycloid(petals)</span></code>; resolution <code class="docutils literal notranslate"><span class="pre">1000</span></code>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">RoseEngineConfig.compound(base_radius,</span> <span class="pre">primary_lobes,</span> <span class="pre">primary_amplitude,</span> <span class="pre">secondary_frequency,</span> <span class="pre">secondary_amplitude)</span></code>: <code class="docutils literal notranslate"><span class="pre">multi_lobe(primary_lobes)</span></code> with primary amplitude <code class="docutils literal notranslate"><span class="pre">primary_amplitude</span></code>; adds <code class="docutils literal notranslate"><span class="pre">sinusoidal(secondary_frequency)</span></code> at <code class="docutils literal notranslate"><span class="pre">secondary_amplitude</span></code>; resolution <code class="docutils literal notranslate"><span class="pre">1000</span></code>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">RoseEngineConfig.huit_eight(base_radius,</span> <span class="pre">amplitude)</span></code>: <code class="docutils literal notranslate"><span class="pre">huit_eight(8)</span></code>; resolution <code class="docutils literal notranslate"><span class="pre">1500</span></code>. This is radial modulation, not the <code class="docutils literal notranslate"><span class="pre">huiteight()</span></code> run preset’s lemniscate.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">RoseEngineConfig.grain_de_riz(base_radius,</span> <span class="pre">grain_size,</span> <span class="pre">amplitude)</span></code>: <code class="docutils literal notranslate"><span class="pre">grain_de_riz(grain_size,</span> <span class="pre">rows=12)</span></code>; resolution <code class="docutils literal notranslate"><span class="pre">2000</span></code>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">RoseEngineConfig.draperie(base_radius,</span> <span class="pre">wave_frequency,</span> <span class="pre">amplitude)</span></code>: <code class="docutils literal notranslate"><span class="pre">draperie(wave_frequency,</span> <span class="pre">wave_exponent=1)</span></code>; resolution <code class="docutils literal notranslate"><span class="pre">1500</span></code>. Does not configure multiple rings, phase oscillation, or automatic amplitude selection.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">RoseEngineConfig.diamant(base_radius,</span> <span class="pre">divisions,</span> <span class="pre">amplitude)</span></code>: <code class="docutils literal notranslate"><span class="pre">diamant(divisions)</span></code>; resolution <code class="docutils literal notranslate"><span class="pre">2000</span></code>. Does not configure tangent circles.</p></li>
+</ul>
+<p><code class="docutils literal notranslate"><span class="pre">repr(config)</span></code> reports base radius, amplitude, and resolution; it omits the
+rosette, secondary motion, and depth-modulation settings.</p>
+</section>
+<section id="validation-and-copying">
+<h3>Validation and copying<a class="headerlink" href="#validation-and-copying" title="Link to this heading">¶</a></h3>
+<p><code class="docutils literal notranslate"><span class="pre">RoseEngineLathe(config,</span> <span class="pre">bit)</span></code>, its <code class="docutils literal notranslate"><span class="pre">with_center()</span></code> factory, and the general
+<code class="docutils literal notranslate"><span class="pre">RoseEngineLatheRun</span></code> constructors validate the config when they copy it into
+a generator. They require:</p>
+<ul class="simple">
+<li><p>A finite, strictly positive <code class="docutils literal notranslate"><span class="pre">base_radius</span></code>.</p></li>
+<li><p>Finite, nonnegative primary and secondary amplitudes.</p></li>
+<li><p>Finite primary and secondary phases and start/end angles.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">resolution</span> <span class="pre">&gt;=</span> <span class="pre">10</span></code>.</p></li>
+</ul>
+<p>They also require finite center coordinates. Invalid values in these checks
+raise <code class="docutils literal notranslate"><span class="pre">ValueError</span></code>; constructing or mutating a config alone does not.
+There is no Python <code class="docutils literal notranslate"><span class="pre">validate()</span></code> method. These checks do not inspect rosette
+parameters, the bit, or depth-modulation parameters.</p>
+<p>Both config and bit are cloned during generator construction. Later config
+mutations do not update an existing lathe or run, even if it has not yet
+generated geometry. Creating a new generator is necessary to use the changed
+config. The run presets below construct their own configs and have different
+validation coverage.</p>
+</section>
+</section>
+<section id="roseenginelathe">
+<h2><code class="docutils literal notranslate"><span class="pre">RoseEngineLathe</span></code><a class="headerlink" href="#roseenginelathe" title="Link to this heading">¶</a></h2>
+<section id="construction">
+<h3>Construction<a class="headerlink" href="#construction" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">RoseEngineLathe(config,</span> <span class="pre">bit)</span></code>: returns a new <code class="docutils literal notranslate"><span class="pre">RoseEngineLathe</span></code> centered at <code class="docutils literal notranslate"><span class="pre">(0.0,</span> <span class="pre">0.0)</span></code>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">RoseEngineLathe.with_center(config,</span> <span class="pre">bit,</span> <span class="pre">center_x,</span> <span class="pre">center_y)</span></code>: returns a new <code class="docutils literal notranslate"><span class="pre">RoseEngineLathe</span></code> with the supplied center coordinates in millimeters; both coordinates are required.</p></li>
+</ul>
+<p><code class="docutils literal notranslate"><span class="pre">config</span></code> must be a <code class="docutils literal notranslate"><span class="pre">RoseEngineConfig</span></code> and <code class="docutils literal notranslate"><span class="pre">bit</span></code> a <code class="docutils literal notranslate"><span class="pre">CuttingBit</span></code>. Construction
+copies both objects and applies the checks above. It does not generate
+geometry. Python exposes no config, bit, center, path, or rendered-output
+properties on the lathe.</p>
+</section>
+<section id="generation-and-exports">
+<h3>Generation and exports<a class="headerlink" href="#generation-and-exports" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">generate()</span> <span class="pre">-&gt;</span> <span class="pre">None</span></code>: replaces previously generated geometry with the radial centerline and two perpendicular offset edges at half the bit width. Generates internal depth/shading arrays if depth modulation is enabled.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">to_svg(filename)</span> <span class="pre">-&gt;</span> <span class="pre">None</span></code>: writes the centerline with stroke width <code class="docutils literal notranslate"><span class="pre">0.1</span></code> and the two offset edges with stroke width <code class="docutils literal notranslate"><span class="pre">0.05</span></code>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">to_stl(filename,</span> <span class="pre">depth=0.1,</span> <span class="pre">base_thickness=2.0)</span> <span class="pre">-&gt;</span> <span class="pre">None</span></code>: writes two triangles per centerline segment, spanning from <code class="docutils literal notranslate"><span class="pre">z=0</span></code> to <code class="docutils literal notranslate"><span class="pre">z=-depth</span></code>. <code class="docutils literal notranslate"><span class="pre">depth</span></code> is in millimeters; <code class="docutils literal notranslate"><span class="pre">base_thickness</span></code> is accepted but unused.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">to_step(filename,</span> <span class="pre">depth=0.1)</span></code>: never succeeds. Before generation, raises <code class="docutils literal notranslate"><span class="pre">OSError</span></code> for missing geometry. After generation, raises <code class="docutils literal notranslate"><span class="pre">OSError</span></code> containing <code class="docutils literal notranslate"><span class="pre">STEP</span> <span class="pre">export</span> <span class="pre">not</span> <span class="pre">yet</span> <span class="pre">implemented</span></code>.</p></li>
+</ul>
+<p>Every export requires an earlier <code class="docutils literal notranslate"><span class="pre">generate()</span></code> call; export methods do not
+generate automatically. <code class="docutils literal notranslate"><span class="pre">filename</span></code> is a string path. SVG dimensions are in
+millimeters, with a 5 mm margin around the generated bounds. Missing
+generation, invalid SVG bounds, and file-write failures raise <code class="docutils literal notranslate"><span class="pre">OSError</span></code>.
+The STL method does not perform the SVG bounds checks or validate its export
+parameters.</p>
+<p>The STL output is an open strip of vertical triangles along the centerline,
+not a closed solid or a bit-profile groove. It does not apply bit width,
+bit shape, bit depth, or depth modulation, and it does not add a base plate.
+These methods do not produce machine instructions or establish machining
+suitability. See <a class="reference internal" href="exports.html"><span class="std std-doc">Exports</span></a> for format limitations.</p>
+<p><code class="docutils literal notranslate"><span class="pre">repr(lathe)</span></code> reports center coordinates and base radius. There is no
+single-pass Python <code class="docutils literal notranslate"><span class="pre">get_lines()</span></code> method.</p>
+</section>
+</section>
+<section id="roseenginelatherun">
+<h2><code class="docutils literal notranslate"><span class="pre">RoseEngineLatheRun</span></code><a class="headerlink" href="#roseenginelatherun" title="Link to this heading">¶</a></h2>
+<section id="constructor">
+<h3>Constructor<a class="headerlink" href="#constructor" title="Link to this heading">¶</a></h3>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">RoseEngineLatheRun</span><span class="p">(</span>
+    <span class="n">config</span><span class="p">,</span>
+    <span class="n">bit</span><span class="p">,</span>
+    <span class="n">num_passes</span><span class="p">,</span>
+    <span class="n">segments_per_pass</span><span class="o">=</span><span class="mi">24</span><span class="p">,</span>
+    <span class="n">radius_step</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span>
+    <span class="n">phase_shift</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span>
+    <span class="n">phase_oscillations</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span>
+    <span class="n">circular_phase</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span>
+    <span class="n">phase_exponent</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+<p>Copies <code class="docutils literal notranslate"><span class="pre">config</span></code> and <code class="docutils literal notranslate"><span class="pre">bit</span></code>, centers the pattern at <code class="docutils literal notranslate"><span class="pre">(0.0,</span> <span class="pre">0.0)</span></code>, and starts
+with no generated lines. The arguments have these effects:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">config</span></code>: base <code class="docutils literal notranslate"><span class="pre">RoseEngineConfig</span></code> copied for each standard radial pass.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">bit</span></code>: <code class="docutils literal notranslate"><span class="pre">CuttingBit</span></code> copied into the run. Exported run lines are centerlines, not width-offset cut edges.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">num_passes</span></code>: integer requested pass count; must be at least 1.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">segments_per_pass</span></code>: integer segmentation count; must be at least 1. A value of 1 retains each whole path. Larger values draw approximately 70% of each sample-index cycle and omit 30% as a gap.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">radius_step</span></code>: change in base radius per pass in millimeters. Any nonzero value selects concentric-ring mode, including a negative value. Zero selects phase-rotation mode.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">phase_shift</span></code>: phase-envelope amplitude in radians, used only in concentric-ring mode.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">phase_oscillations</span></code>: number of phase-envelope cycles across the ring stack, used only in concentric-ring mode.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">circular_phase</span></code>: dimensionless dome exponent. Positive values select the dome envelope; values at or below zero select the sine-power envelope.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">phase_exponent</span></code>: integer exponent for the sine-power phase envelope; ignored when <code class="docutils literal notranslate"><span class="pre">circular_phase</span> <span class="pre">&gt;</span> <span class="pre">0</span></code>.</p></li>
+</ul>
+<p>In phase-rotation mode, pass <code class="docutils literal notranslate"><span class="pre">i</span></code> adds <code class="docutils literal notranslate"><span class="pre">2</span> <span class="pre">*</span> <span class="pre">pi</span> <span class="pre">*</span> <span class="pre">i</span> <span class="pre">/</span> <span class="pre">num_passes</span></code> to the primary
+rosette phase, not to the coordinate angle or secondary phase. The phase
+envelope arguments have no effect in this mode. This is not a guarantee that
+every pass produces a geometrically distinct curve.</p>
+<p>In concentric-ring mode, pass <code class="docutils literal notranslate"><span class="pre">i</span></code> has base radius
+<code class="docutils literal notranslate"><span class="pre">base_radius</span> <span class="pre">+</span> <span class="pre">(i</span> <span class="pre">-</span> <span class="pre">(num_passes</span> <span class="pre">-</span> <span class="pre">1)</span> <span class="pre">/</span> <span class="pre">2)</span> <span class="pre">*</span> <span class="pre">radius_step</span></code>. Its primary phase
+adds <code class="docutils literal notranslate"><span class="pre">phase_shift</span> <span class="pre">*</span> <span class="pre">envelope(t)</span></code>, where
+<code class="docutils literal notranslate"><span class="pre">t</span> <span class="pre">=</span> <span class="pre">2</span> <span class="pre">*</span> <span class="pre">pi</span> <span class="pre">*</span> <span class="pre">phase_oscillations</span> <span class="pre">*</span> <span class="pre">i</span> <span class="pre">/</span> <span class="pre">num_passes</span></code>. For positive
+<code class="docutils literal notranslate"><span class="pre">circular_phase</span></code>, the envelope is
+<code class="docutils literal notranslate"><span class="pre">sign(sin(t))</span> <span class="pre">*</span> <span class="pre">(1</span> <span class="pre">-</span> <span class="pre">(1</span> <span class="pre">-</span> <span class="pre">abs(sin(t)))</span> <span class="pre">**</span> <span class="pre">circular_phase)</span></code>; otherwise it is
+<code class="docutils literal notranslate"><span class="pre">sign(sin(t))</span> <span class="pre">*</span> <span class="pre">abs(sin(t))</span> <span class="pre">**</span> <span class="pre">phase_exponent</span></code>.</p>
+<p>Construction checks pass and segment counts, the copied config, and center
+coordinates. The binding then assigns <code class="docutils literal notranslate"><span class="pre">radius_step</span></code>, <code class="docutils literal notranslate"><span class="pre">phase_shift</span></code>,
+<code class="docutils literal notranslate"><span class="pre">phase_oscillations</span></code>, <code class="docutils literal notranslate"><span class="pre">circular_phase</span></code>, and <code class="docutils literal notranslate"><span class="pre">phase_exponent</span></code> without additional
+numeric validation. There are no Python getters or setters for these run
+settings.</p>
+<p>Segmentation divides <code class="docutils literal notranslate"><span class="pre">resolution</span> <span class="pre">+</span> <span class="pre">1</span></code> samples using integer arithmetic;
+line lengths and counts can be reduced by rounding. If there are too few
+samples per requested segment, generation can produce no lines. A concentric
+pass whose derived config is invalid, such as a nonpositive base radius, is
+skipped during <code class="docutils literal notranslate"><span class="pre">generate()</span></code> rather than raised as a Python exception. Rust
+records these failures, but Python does not expose <code class="docutils literal notranslate"><span class="pre">generation_errors()</span></code>.</p>
+</section>
+<section id="centered-factory">
+<h3>Centered factory<a class="headerlink" href="#centered-factory" title="Link to this heading">¶</a></h3>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">RoseEngineLatheRun</span><span class="o">.</span><span class="n">with_center</span><span class="p">(</span>
+    <span class="n">config</span><span class="p">,</span>
+    <span class="n">bit</span><span class="p">,</span>
+    <span class="n">num_passes</span><span class="p">,</span>
+    <span class="n">segments_per_pass</span><span class="o">=</span><span class="mi">24</span><span class="p">,</span>
+    <span class="n">center_x</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span>
+    <span class="n">center_y</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+<p>Returns a new run with copied config and bit, validated finite center
+coordinates, and the same pass/segment/config checks as the constructor.
+Unlike the constructor, this factory accepts no ring or phase-envelope
+arguments: <code class="docutils literal notranslate"><span class="pre">radius_step=0.0</span></code>, <code class="docutils literal notranslate"><span class="pre">phase_shift=0.0</span></code>,
+<code class="docutils literal notranslate"><span class="pre">phase_oscillations=1.0</span></code>, <code class="docutils literal notranslate"><span class="pre">circular_phase=0.0</span></code>, and <code class="docutils literal notranslate"><span class="pre">phase_exponent=1</span></code> remain
+internal defaults. It does not generate geometry.</p>
+</section>
+<section id="generation-data-and-export">
+<h3>Generation, data, and export<a class="headerlink" href="#generation-data-and-export" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">generate()</span> <span class="pre">-&gt;</span> <span class="pre">None</span></code>: clears previous passes, lines, and internal generation errors, then regenerates the run. It does not export.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">num_passes</span></code>: read-only <code class="docutils literal notranslate"><span class="pre">int</span></code> property. Returns the configured pass count before or after generation, not the number of generated polylines. Access is <code class="docutils literal notranslate"><span class="pre">run.num_passes</span></code>, not <code class="docutils literal notranslate"><span class="pre">run.num_passes()</span></code>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">get_lines()</span> <span class="pre">-&gt;</span> <span class="pre">list[list[tuple[float,</span> <span class="pre">float]]]</span></code>: returns a fresh copy of the generated polylines. Each outer item is a line; each line contains <code class="docutils literal notranslate"><span class="pre">(x,</span> <span class="pre">y)</span></code> tuples in millimeters. Returns <code class="docutils literal notranslate"><span class="pre">[]</span></code> before generation.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">to_svg(filename)</span> <span class="pre">-&gt;</span> <span class="pre">None</span></code>: writes the generated lines with stroke width <code class="docutils literal notranslate"><span class="pre">0.05</span></code>, millimeter document dimensions, and a 5 mm bounds margin. <code class="docutils literal notranslate"><span class="pre">filename</span></code> is a string path.</p></li>
+</ul>
+<p>Changing the list returned by <code class="docutils literal notranslate"><span class="pre">get_lines()</span></code> does not change the run or later
+exports. Saved lists also remain unchanged when the run is regenerated.
+Segments are separate lines; the outer list is not a list of pass objects.
+Clipping, segmentation, skipped rings, and specialized presets can make its
+length differ from <code class="docutils literal notranslate"><span class="pre">num_passes</span></code>.</p>
+<p><code class="docutils literal notranslate"><span class="pre">to_svg()</span></code> requires a prior <code class="docutils literal notranslate"><span class="pre">generate()</span></code> call and raises <code class="docutils literal notranslate"><span class="pre">OSError</span></code> if the
+pattern is ungenerated, has no points, contains non-finite coordinates, or
+cannot be written. <code class="docutils literal notranslate"><span class="pre">get_lines()</span></code> does not perform these export checks.
+There are no Python <code class="docutils literal notranslate"><span class="pre">to_stl()</span></code> or <code class="docutils literal notranslate"><span class="pre">to_step()</span></code> methods on a run, including
+runs returned by presets. See <a class="reference internal" href="exports.html"><span class="std std-doc">Exports</span></a> and <a class="reference internal" href="errors.html"><span class="std std-doc">Errors</span></a>.</p>
+<p><code class="docutils literal notranslate"><span class="pre">repr(run)</span></code> reports its center and configured pass count. Individual pass
+objects and their width-offset edges are not exposed in Python.</p>
+</section>
+<section id="run-presets">
+<h3>Run presets<a class="headerlink" href="#run-presets" title="Link to this heading">¶</a></h3>
+<p>The following eight static factories return new, ungenerated
+<code class="docutils literal notranslate"><span class="pre">RoseEngineLatheRun</span></code> objects. They create their own config and a
+<code class="docutils literal notranslate"><span class="pre">CuttingBit.v_shaped(30.0,</span> <span class="pre">0.02)</span></code>; they do not accept a config or bit argument.
+All use one unsegmented path per standard pass, or specialized line
+generation. They share the run’s SVG-only export interface.</p>
+<p>These factories do not call the corresponding pattern-layer constructors,
+so they do not inherit all of those layers’ validation. The checks below
+describe the run bindings specifically; see <a class="reference internal" href="patterns.html"><span class="std std-doc">Pattern layers</span></a>
+for the separate layer API.</p>
+<section id="draperie">
+<h4><code class="docutils literal notranslate"><span class="pre">draperie()</span></code><a class="headerlink" href="#draperie" title="Link to this heading">¶</a></h4>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">RoseEngineLatheRun</span><span class="o">.</span><span class="n">draperie</span><span class="p">(</span>
+    <span class="n">num_rings</span><span class="o">=</span><span class="mi">96</span><span class="p">,</span>
+    <span class="n">base_radius</span><span class="o">=</span><span class="mf">22.0</span><span class="p">,</span>
+    <span class="n">radius_step</span><span class="o">=</span><span class="mf">0.44</span><span class="p">,</span>
+    <span class="n">wave_frequency</span><span class="o">=</span><span class="mf">12.0</span><span class="p">,</span>
+    <span class="n">phase_shift</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">phase_oscillations</span><span class="o">=</span><span class="mf">2.5</span><span class="p">,</span>
+    <span class="n">resolution</span><span class="o">=</span><span class="mi">1500</span><span class="p">,</span>
+    <span class="n">phase_exponent</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span>
+    <span class="n">wave_exponent</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+    <span class="n">circular_phase</span><span class="o">=</span><span class="mf">2.0</span><span class="p">,</span>
+    <span class="n">center_x</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span>
+    <span class="n">center_y</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+<p>Creates concentric wavy rings centered as a band around <code class="docutils literal notranslate"><span class="pre">base_radius</span></code>, with
+<code class="docutils literal notranslate"><span class="pre">num_passes</span> <span class="pre">==</span> <span class="pre">num_rings</span></code>. Radii and spacing are in millimeters;
+<code class="docutils literal notranslate"><span class="pre">wave_frequency</span></code> is undulations per revolution. <code class="docutils literal notranslate"><span class="pre">phase_shift=None</span></code> resolves
+to <code class="docutils literal notranslate"><span class="pre">pi</span> <span class="pre">/</span> <span class="pre">12</span></code> radians, not zero. The initial primary phase is
+<code class="docutils literal notranslate"><span class="pre">pi</span> <span class="pre">/</span> <span class="pre">2</span> <span class="pre">+</span> <span class="pre">pi</span> <span class="pre">/</span> <span class="pre">(2</span> <span class="pre">*</span> <span class="pre">wave_frequency)</span></code> for peak alignment at SVG 12 o’clock.
+Phase-envelope arguments have the meanings defined for the general run;
+<code class="docutils literal notranslate"><span class="pre">wave_exponent</span></code> shapes each ring’s wave independently. Each successful ring
+has <code class="docutils literal notranslate"><span class="pre">resolution</span> <span class="pre">+</span> <span class="pre">1</span></code> samples.</p>
+<p>There is no amplitude argument. The factory uses <code class="docutils literal notranslate"><span class="pre">DraperieConfig</span></code>’s
+automatic amplitude calculation: 60% of the smaller of the sampled
+adjacent-ring phase limit and an innermost-radius limit of 90% of that
+radius (zero if the innermost radius is nonpositive). This is the
+implementation’s amplitude-selection rule, not a guarantee for arbitrary
+unchecked parameters.</p>
+<p>Construction checks positive ring count, finite positive base radius,
+<code class="docutils literal notranslate"><span class="pre">resolution</span> <span class="pre">&gt;=</span> <span class="pre">10</span></code>, finite centers, and the derived config amplitude and
+phase. It does not separately validate every spacing or envelope argument.
+Zero <code class="docutils literal notranslate"><span class="pre">wave_frequency</span></code> makes the derived phase non-finite and is rejected.
+Nonpositive inner-ring radii can still cause passes to be skipped during
+generation. With <code class="docutils literal notranslate"><span class="pre">radius_step=0</span></code>, the run uses phase-rotation mode rather
+than concentric-ring mode.</p>
+</section>
+<section id="paon">
+<h4><code class="docutils literal notranslate"><span class="pre">paon()</span></code><a class="headerlink" href="#paon" title="Link to this heading">¶</a></h4>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">RoseEngineLatheRun</span><span class="o">.</span><span class="n">paon</span><span class="p">(</span>
+    <span class="n">num_lines</span><span class="o">=</span><span class="mi">500</span><span class="p">,</span>
+    <span class="n">radius</span><span class="o">=</span><span class="mf">22.0</span><span class="p">,</span>
+    <span class="n">amplitude</span><span class="o">=</span><span class="mf">0.035</span><span class="p">,</span>
+    <span class="n">wave_frequency</span><span class="o">=</span><span class="mf">10.0</span><span class="p">,</span>
+    <span class="n">phase_rate</span><span class="o">=</span><span class="mf">9.0</span><span class="p">,</span>
+    <span class="n">resolution</span><span class="o">=</span><span class="mi">800</span><span class="p">,</span>
+    <span class="n">n_harmonics</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span>
+    <span class="n">fan_angle</span><span class="o">=</span><span class="mf">4.0</span><span class="p">,</span>
+    <span class="n">vanishing_point</span><span class="o">=</span><span class="mf">0.3</span><span class="p">,</span>
+    <span class="n">center_x</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span>
+    <span class="n">center_y</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+<p>Generates fan lines sampled from SVG top to bottom, with horizontal
+oscillation, retaining samples inside a circle of <code class="docutils literal notranslate"><span class="pre">radius</span></code>.
+<code class="docutils literal notranslate"><span class="pre">num_passes</span> <span class="pre">==</span> <span class="pre">num_lines</span></code>, but lines with fewer than two retained samples
+are omitted. Each candidate line has <code class="docutils literal notranslate"><span class="pre">resolution</span> <span class="pre">+</span> <span class="pre">1</span></code> samples before
+clipping.</p>
+<p><code class="docutils literal notranslate"><span class="pre">amplitude</span></code> is in millimeters. <code class="docutils literal notranslate"><span class="pre">wave_frequency</span></code> multiplies a logarithmic
+distance coordinate from the vanishing point; it is not a fixed number of
+cycles along every clipped line. <code class="docutils literal notranslate"><span class="pre">phase_rate</span></code> controls the absolute-sine
+phase envelope across the fan. Despite its name, <code class="docutils literal notranslate"><span class="pre">fan_angle</span></code> is phase
+amplitude in full wave cycles, not an angle in radians: the per-line phase
+is <code class="docutils literal notranslate"><span class="pre">-2</span> <span class="pre">*</span> <span class="pre">pi</span> <span class="pre">*</span> <span class="pre">fan_angle</span> <span class="pre">*</span> <span class="pre">abs(sin(pi</span> <span class="pre">*</span> <span class="pre">phase_rate</span> <span class="pre">*</span> <span class="pre">fraction))</span></code>.
+<code class="docutils literal notranslate"><span class="pre">vanishing_point</span></code> is distance beyond the SVG bottom edge as a fraction of
+the diameter; the actual fan spread is computed from this point and the
+circle. A finite positive value avoids the logarithm’s zero or negative
+reference distance.</p>
+<p><code class="docutils literal notranslate"><span class="pre">n_harmonics=0</span></code> selects a sine wave. Positive values use a normalized
+triangle-wave Fourier approximation with <code class="docutils literal notranslate"><span class="pre">n_harmonics</span> <span class="pre">+</span> <span class="pre">1</span></code> odd-harmonic
+terms. <code class="docutils literal notranslate"><span class="pre">n_harmonics</span></code> is an integer.</p>
+<p>Construction checks positive line count, finite positive radius, finite
+nonnegative amplitude, and finite centers. The requested <code class="docutils literal notranslate"><span class="pre">resolution</span></code>,
+wave/phase controls, <code class="docutils literal notranslate"><span class="pre">fan_angle</span></code>, and <code class="docutils literal notranslate"><span class="pre">vanishing_point</span></code> are stored without
+the separate <code class="docutils literal notranslate"><span class="pre">PaonLayer</span></code> checks; in particular, zero resolution or a
+nonpositive vanishing point is not rejected here. The internal radial
+config retains resolution <code class="docutils literal notranslate"><span class="pre">1000</span></code>, which does not validate the specialized
+line resolution.</p>
+</section>
+<section id="diamant">
+<h4><code class="docutils literal notranslate"><span class="pre">diamant()</span></code><a class="headerlink" href="#diamant" title="Link to this heading">¶</a></h4>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">RoseEngineLatheRun</span><span class="o">.</span><span class="n">diamant</span><span class="p">(</span>
+    <span class="n">num_circles</span><span class="o">=</span><span class="mi">72</span><span class="p">,</span>
+    <span class="n">circle_radius</span><span class="o">=</span><span class="mf">20.0</span><span class="p">,</span>
+    <span class="n">resolution</span><span class="o">=</span><span class="mi">360</span><span class="p">,</span>
+    <span class="n">center_x</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span>
+    <span class="n">center_y</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+<p>Generates <code class="docutils literal notranslate"><span class="pre">num_circles</span></code> circles, each of radius <code class="docutils literal notranslate"><span class="pre">circle_radius</span></code> and passing
+through the pattern center. Circle centers are at distance <code class="docutils literal notranslate"><span class="pre">circle_radius</span></code>
+from that center, evenly distributed over a full turn. The overall extent
+can reach twice <code class="docutils literal notranslate"><span class="pre">circle_radius</span></code>; this is not a clipping radius.
+<code class="docutils literal notranslate"><span class="pre">num_passes</span> <span class="pre">==</span> <span class="pre">num_circles</span></code> and each circle has <code class="docutils literal notranslate"><span class="pre">resolution</span> <span class="pre">+</span> <span class="pre">1</span></code> samples.</p>
+<p>The preset uses Cartesian circle sampling, not
+<code class="docutils literal notranslate"><span class="pre">RosettePattern.diamant()</span></code> or <code class="docutils literal notranslate"><span class="pre">RoseEngineConfig.diamant()</span></code>. Construction
+checks positive circle count, finite positive circle radius, and finite
+centers. The requested resolution is stored separately and is not checked
+against the config’s minimum of 10.</p>
+</section>
+<section id="limacon">
+<h4><code class="docutils literal notranslate"><span class="pre">limacon()</span></code><a class="headerlink" href="#limacon" title="Link to this heading">¶</a></h4>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">RoseEngineLatheRun</span><span class="o">.</span><span class="n">limacon</span><span class="p">(</span>
+    <span class="n">num_curves</span><span class="o">=</span><span class="mi">72</span><span class="p">,</span>
+    <span class="n">base_radius</span><span class="o">=</span><span class="mf">20.0</span><span class="p">,</span>
+    <span class="n">amplitude</span><span class="o">=</span><span class="mf">20.0</span><span class="p">,</span>
+    <span class="n">resolution</span><span class="o">=</span><span class="mi">360</span><span class="p">,</span>
+    <span class="n">center_x</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span>
+    <span class="n">center_y</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+<p>Uses the standard phase-rotation mode with a frequency-1 sinusoidal rosette
+and no segmentation. Curve <code class="docutils literal notranslate"><span class="pre">i</span></code> follows
+<code class="docutils literal notranslate"><span class="pre">r</span> <span class="pre">=</span> <span class="pre">base_radius</span> <span class="pre">+</span> <span class="pre">amplitude</span> <span class="pre">*</span> <span class="pre">sin(angle</span> <span class="pre">+</span> <span class="pre">2</span> <span class="pre">*</span> <span class="pre">pi</span> <span class="pre">*</span> <span class="pre">i</span> <span class="pre">/</span> <span class="pre">num_curves)</span></code>.
+<code class="docutils literal notranslate"><span class="pre">num_passes</span> <span class="pre">==</span> <span class="pre">num_curves</span></code>; each curve has <code class="docutils literal notranslate"><span class="pre">resolution</span> <span class="pre">+</span> <span class="pre">1</span></code> samples.
+Base radius and amplitude are in millimeters. Amplitude may equal or exceed
+base radius; zero or negative instantaneous radii are not clamped.</p>
+<p>Construction checks positive curve count, finite positive base radius,
+finite nonnegative amplitude, <code class="docutils literal notranslate"><span class="pre">resolution</span> <span class="pre">&gt;=</span> <span class="pre">10</span></code>, and finite centers. Unlike
+the Cartesian diamant and huit-eight presets, this preset assigns the
+requested resolution to the config that is validated.</p>
+</section>
+<section id="flinque">
+<h4><code class="docutils literal notranslate"><span class="pre">flinque()</span></code><a class="headerlink" href="#flinque" title="Link to this heading">¶</a></h4>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">RoseEngineLatheRun</span><span class="o">.</span><span class="n">flinque</span><span class="p">(</span>
+    <span class="n">radius</span><span class="o">=</span><span class="mf">10.0</span><span class="p">,</span>
+    <span class="n">num_petals</span><span class="o">=</span><span class="mi">12</span><span class="p">,</span>
+    <span class="n">num_waves</span><span class="o">=</span><span class="mi">60</span><span class="p">,</span>
+    <span class="n">wave_amplitude</span><span class="o">=</span><span class="mf">0.8</span><span class="p">,</span>
+    <span class="n">wave_frequency</span><span class="o">=</span><span class="mf">20.0</span><span class="p">,</span>
+    <span class="n">inner_radius_ratio</span><span class="o">=</span><span class="mf">0.05</span><span class="p">,</span>
+    <span class="n">center_x</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span>
+    <span class="n">center_y</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+<p>Generates concentric chevron rings with fine radial ripple.
+<code class="docutils literal notranslate"><span class="pre">num_passes</span> <span class="pre">==</span> <span class="pre">num_waves</span></code>. Base ring radii use half-step positions uniformly
+between <code class="docutils literal notranslate"><span class="pre">radius</span> <span class="pre">*</span> <span class="pre">inner_radius_ratio</span></code> and <code class="docutils literal notranslate"><span class="pre">radius</span></code>. A ring is skipped when
+its base radius is less than <code class="docutils literal notranslate"><span class="pre">0.1</span> <span class="pre">*</span> <span class="pre">wave_amplitude</span></code>.</p>
+<p><code class="docutils literal notranslate"><span class="pre">num_petals</span></code> is the chevron lobe count. Each retained ring has
+<code class="docutils literal notranslate"><span class="pre">num_petals</span> <span class="pre">*</span> <span class="pre">80</span> <span class="pre">+</span> <span class="pre">1</span></code> samples; there is no resolution argument.
+<code class="docutils literal notranslate"><span class="pre">wave_amplitude</span></code> is in millimeters. The radial addition is
+<code class="docutils literal notranslate"><span class="pre">wave_amplitude</span> <span class="pre">*</span> <span class="pre">abs(sin(petal_phase))</span></code> plus a ripple of amplitude
+<code class="docutils literal notranslate"><span class="pre">0.05</span> <span class="pre">*</span> <span class="pre">wave_amplitude</span></code> and phase <code class="docutils literal notranslate"><span class="pre">petal_phase</span> <span class="pre">*</span> <span class="pre">wave_frequency</span></code>, where
+<code class="docutils literal notranslate"><span class="pre">petal_phase</span> <span class="pre">=</span> <span class="pre">angle</span> <span class="pre">*</span> <span class="pre">num_petals</span> <span class="pre">/</span> <span class="pre">2</span></code>. Thus <code class="docutils literal notranslate"><span class="pre">wave_frequency</span></code> is a multiplier,
+and <code class="docutils literal notranslate"><span class="pre">radius</span></code> controls the base ring range rather than clipping the peaks.</p>
+<p>Construction checks positive ring count, finite positive radius, finite
+nonnegative half-amplitude, and finite centers. It does not check positive
+<code class="docutils literal notranslate"><span class="pre">num_petals</span></code>, the range of <code class="docutils literal notranslate"><span class="pre">inner_radius_ratio</span></code>, or finite <code class="docutils literal notranslate"><span class="pre">wave_frequency</span></code>.
+Zero petals can produce non-finite coordinates during generation.</p>
+</section>
+<section id="huiteight">
+<h4><code class="docutils literal notranslate"><span class="pre">huiteight()</span></code><a class="headerlink" href="#huiteight" title="Link to this heading">¶</a></h4>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">RoseEngineLatheRun</span><span class="o">.</span><span class="n">huiteight</span><span class="p">(</span>
+    <span class="n">num_curves</span><span class="o">=</span><span class="mi">72</span><span class="p">,</span>
+    <span class="n">scale</span><span class="o">=</span><span class="mf">20.0</span><span class="p">,</span>
+    <span class="n">resolution</span><span class="o">=</span><span class="mi">360</span><span class="p">,</span>
+    <span class="n">center_x</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span>
+    <span class="n">center_y</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span>
+    <span class="n">num_clusters</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+    <span class="n">cluster_spread</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+<p>Generates Cartesian lemniscates of Bernoulli through the pattern center.
+<code class="docutils literal notranslate"><span class="pre">scale</span></code> is the half-width in millimeters. <code class="docutils literal notranslate"><span class="pre">num_passes</span> <span class="pre">==</span> <span class="pre">num_curves</span></code>, and
+each curve has <code class="docutils literal notranslate"><span class="pre">resolution</span> <span class="pre">+</span> <span class="pre">1</span></code> samples. The spelling is <code class="docutils literal notranslate"><span class="pre">huiteight()</span></code>,
+unlike the rosette and config factories named <code class="docutils literal notranslate"><span class="pre">huit_eight()</span></code>; those radial
+factories do not generate this lemniscate.</p>
+<p>Uniform orientations span a half-turn, <code class="docutils literal notranslate"><span class="pre">pi</span> <span class="pre">*</span> <span class="pre">i</span> <span class="pre">/</span> <span class="pre">num_curves</span></code>, because a
+lemniscate has 180-degree rotational symmetry. Clustering is active only
+when <code class="docutils literal notranslate"><span class="pre">0</span> <span class="pre">&lt;</span> <span class="pre">num_clusters</span> <span class="pre">&lt;</span> <span class="pre">num_curves</span></code>. Curves are distributed evenly among
+clusters, with any remainder assigned to the earliest clusters. Cluster
+centers are separated by <code class="docutils literal notranslate"><span class="pre">pi</span> <span class="pre">/</span> <span class="pre">num_clusters</span></code> radians. A positive
+<code class="docutils literal notranslate"><span class="pre">cluster_spread</span></code> is the full angular span of each cluster; otherwise the
+span is automatically <code class="docutils literal notranslate"><span class="pre">pi</span> <span class="pre">/</span> <span class="pre">(2</span> <span class="pre">*</span> <span class="pre">num_clusters)</span></code>. Zero clusters, or a cluster
+count at least as large as the curve count, selects uniform orientations.</p>
+<p>Construction checks positive curve count, finite positive scale, and finite
+centers. It does not validate the separately stored resolution or cluster
+spread. The Python run preset defaults to 72 curves; the Rust
+<code class="docutils literal notranslate"><span class="pre">HuitEightConfig</span></code> default is not this factory’s default.</p>
+</section>
+<section id="clous-de-paris">
+<h4><code class="docutils literal notranslate"><span class="pre">clous_de_paris()</span></code><a class="headerlink" href="#clous-de-paris" title="Link to this heading">¶</a></h4>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">RoseEngineLatheRun</span><span class="o">.</span><span class="n">clous_de_paris</span><span class="p">(</span>
+    <span class="n">spacing</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span>
+    <span class="n">radius</span><span class="o">=</span><span class="mf">22.0</span><span class="p">,</span>
+    <span class="n">angle</span><span class="o">=</span><span class="mf">0.7853981633974483</span><span class="p">,</span>
+    <span class="n">resolution</span><span class="o">=</span><span class="mi">200</span><span class="p">,</span>
+    <span class="n">center_x</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span>
+    <span class="n">center_y</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+<p>Generates two perpendicular sets of parallel straight lines clipped to a
+circle. <code class="docutils literal notranslate"><span class="pre">spacing</span></code> is perpendicular line spacing in millimeters; <code class="docutils literal notranslate"><span class="pre">radius</span></code>
+is the clipping radius in millimeters. <code class="docutils literal notranslate"><span class="pre">angle</span></code> rotates the grid in radians;
+its default is <code class="docutils literal notranslate"><span class="pre">pi</span> <span class="pre">/</span> <span class="pre">4</span></code> (45 degrees). Each line has <code class="docutils literal notranslate"><span class="pre">resolution</span> <span class="pre">+</span> <span class="pre">1</span></code> samples,
+including its circle-boundary endpoints. Tangent lines may contain
+coincident points.</p>
+<p><code class="docutils literal notranslate"><span class="pre">num_passes</span></code> is always <code class="docutils literal notranslate"><span class="pre">1</span></code> for this preset, not the grid’s line count.
+Construction checks finite positive radius and finite centers. It does not
+validate <code class="docutils literal notranslate"><span class="pre">spacing</span></code>, <code class="docutils literal notranslate"><span class="pre">angle</span></code>, the requested resolution, or the derived line
+count. Finite positive spacing and a nonzero resolution are required for
+the generation formulas; zero or extremely small spacing can cause
+excessive iteration rather than an early <code class="docutils literal notranslate"><span class="pre">ValueError</span></code>.</p>
+</section>
+<section id="cube">
+<h4><code class="docutils literal notranslate"><span class="pre">cube()</span></code><a class="headerlink" href="#cube" title="Link to this heading">¶</a></h4>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">RoseEngineLatheRun</span><span class="o">.</span><span class="n">cube</span><span class="p">(</span>
+    <span class="n">spacing</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span>
+    <span class="n">radius</span><span class="o">=</span><span class="mf">22.0</span><span class="p">,</span>
+    <span class="n">angle</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span>
+    <span class="n">resolution</span><span class="o">=</span><span class="mi">200</span><span class="p">,</span>
+    <span class="n">cuts_per_group</span><span class="o">=</span><span class="mi">8</span><span class="p">,</span>
+    <span class="n">gap_per_group</span><span class="o">=</span><span class="mi">8</span><span class="p">,</span>
+    <span class="n">amplitude</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span>
+    <span class="n">leg_angle</span><span class="o">=</span><span class="mf">30.0</span><span class="p">,</span>
+    <span class="n">center_x</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span>
+    <span class="n">center_y</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+<p>Generates parallel zigzag lines grouped in sets of <code class="docutils literal notranslate"><span class="pre">cuts_per_group</span></code>, with
+<code class="docutils literal notranslate"><span class="pre">gap_per_group</span></code> line spacings between groups. Alternating groups shift by
+half a zigzag period. Lines are clipped geometrically to the circle of
+<code class="docutils literal notranslate"><span class="pre">radius</span></code>, then rotated by <code class="docutils literal notranslate"><span class="pre">angle</span></code> radians and translated to the supplied
+center. The implementation does not generate three independent line
+families or a 3D cube mesh.</p>
+<p><code class="docutils literal notranslate"><span class="pre">spacing</span></code>, <code class="docutils literal notranslate"><span class="pre">radius</span></code>, and <code class="docutils literal notranslate"><span class="pre">amplitude</span></code> are in millimeters. <code class="docutils literal notranslate"><span class="pre">amplitude</span></code> is half
+the peak-to-trough zigzag height. Positive amplitude is used directly;
+nonpositive amplitude selects <code class="docutils literal notranslate"><span class="pre">(gap_per_group</span> <span class="pre">+</span> <span class="pre">1)</span> <span class="pre">*</span> <span class="pre">spacing</span> <span class="pre">/</span> <span class="pre">2</span></code>.
+<code class="docutils literal notranslate"><span class="pre">leg_angle</span></code> is in degrees, with period
+<code class="docutils literal notranslate"><span class="pre">4</span> <span class="pre">*</span> <span class="pre">effective_amplitude</span> <span class="pre">/</span> <span class="pre">tan(leg_angle_in_radians)</span></code>.
+<code class="docutils literal notranslate"><span class="pre">resolution</span></code> is retained for API compatibility but does not control the
+zigzag vertices or clipping. <code class="docutils literal notranslate"><span class="pre">cuts_per_group</span></code> and <code class="docutils literal notranslate"><span class="pre">gap_per_group</span></code> are
+integer counts.</p>
+<p><code class="docutils literal notranslate"><span class="pre">num_passes</span></code> is always <code class="docutils literal notranslate"><span class="pre">1</span></code>, not the number of clipped polylines.
+Construction checks finite positive radius and finite centers. It does not
+perform <code class="docutils literal notranslate"><span class="pre">CubeLayer</span></code>’s checks on spacing, group counts, amplitude, rotation,
+leg angle, or derived group count. Finite positive spacing, positive group
+counts, and a finite leg angle strictly between 0 and 90 degrees describe
+the intended nondegenerate geometry, not enforced run-constructor checks.
+Invalid or very small spacing can cause excessive iteration during
+generation.</p>
+</section>
+</section>
+<section id="call-sequence-examples">
+<h3>Call sequence examples<a class="headerlink" href="#call-sequence-examples" title="Link to this heading">¶</a></h3>
+<p>Config mutation and generation are separate calls. Export follows
+generation:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">turtles</span><span class="w"> </span><span class="kn">import</span> <span class="n">CuttingBit</span><span class="p">,</span> <span class="n">RoseEngineConfig</span><span class="p">,</span> <span class="n">RoseEngineLathe</span><span class="p">,</span> <span class="n">RosettePattern</span>
+
+<span class="n">config</span> <span class="o">=</span> <span class="n">RoseEngineConfig</span><span class="p">(</span><span class="n">base_radius</span><span class="o">=</span><span class="mf">20.0</span><span class="p">,</span> <span class="n">amplitude</span><span class="o">=</span><span class="mf">0.5</span><span class="p">)</span>
+<span class="n">config</span><span class="o">.</span><span class="n">set_rosette</span><span class="p">(</span><span class="n">RosettePattern</span><span class="o">.</span><span class="n">multi_lobe</span><span class="p">(</span><span class="n">lobes</span><span class="o">=</span><span class="mi">12</span><span class="p">))</span>
+<span class="n">config</span><span class="o">.</span><span class="n">set_resolution</span><span class="p">(</span><span class="mi">1500</span><span class="p">)</span>
+<span class="n">config</span><span class="o">.</span><span class="n">with_secondary_rosette</span><span class="p">(</span><span class="n">RosettePattern</span><span class="o">.</span><span class="n">sinusoidal</span><span class="p">(</span><span class="mf">3.0</span><span class="p">),</span> <span class="n">amplitude</span><span class="o">=</span><span class="mf">0.1</span><span class="p">)</span>
+<span class="n">config</span><span class="o">.</span><span class="n">with_depth_modulation</span><span class="p">(</span><span class="n">amplitude</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">frequency</span><span class="o">=</span><span class="mf">2.0</span><span class="p">)</span>
+<span class="n">bit</span> <span class="o">=</span> <span class="n">CuttingBit</span><span class="o">.</span><span class="n">v_shaped</span><span class="p">(</span><span class="n">angle</span><span class="o">=</span><span class="mf">30.0</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="mf">0.5</span><span class="p">)</span>
+
+<span class="n">lathe</span> <span class="o">=</span> <span class="n">RoseEngineLathe</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">bit</span><span class="p">)</span>
+<span class="n">lathe</span><span class="o">.</span><span class="n">generate</span><span class="p">()</span>
+<span class="n">lathe</span><span class="o">.</span><span class="n">to_svg</span><span class="p">(</span><span class="s2">"rose.svg"</span><span class="p">)</span>
+<span class="n">lathe</span><span class="o">.</span><span class="n">to_stl</span><span class="p">(</span><span class="s2">"rose.stl"</span><span class="p">,</span> <span class="n">depth</span><span class="o">=</span><span class="mf">0.1</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Run data access returns polylines; the pass count is a property:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">turtles</span><span class="w"> </span><span class="kn">import</span> <span class="n">RoseEngineLatheRun</span>
+
+<span class="n">run</span> <span class="o">=</span> <span class="n">RoseEngineLatheRun</span><span class="o">.</span><span class="n">huiteight</span><span class="p">(</span><span class="n">num_curves</span><span class="o">=</span><span class="mi">36</span><span class="p">,</span> <span class="n">scale</span><span class="o">=</span><span class="mf">10.0</span><span class="p">)</span>
+<span class="k">assert</span> <span class="n">run</span><span class="o">.</span><span class="n">num_passes</span> <span class="o">==</span> <span class="mi">36</span>
+<span class="k">assert</span> <span class="n">run</span><span class="o">.</span><span class="n">get_lines</span><span class="p">()</span> <span class="o">==</span> <span class="p">[]</span>
+<span class="n">run</span><span class="o">.</span><span class="n">generate</span><span class="p">()</span>
+<span class="n">lines</span> <span class="o">=</span> <span class="n">run</span><span class="o">.</span><span class="n">get_lines</span><span class="p">()</span>
+<span class="n">x</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="n">lines</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+<span class="n">run</span><span class="o">.</span><span class="n">to_svg</span><span class="p">(</span><span class="s2">"huit-eight.svg"</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+</section>
+</section>
+
+        </article>
+      </div>
+      <footer>
+        
+        <div class="related-pages">
+          <a class="next-page" href="exports.html">
+              <div class="page-info">
+                <div class="context">
+                  <span>Next</span>
+                </div>
+                <div class="title">Exports</div>
+              </div>
+              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
+            </a>
+          <a class="prev-page" href="composition.html">
+              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
+              <div class="page-info">
+                <div class="context">
+                  <span>Previous</span>
+                </div>
+                
+                <div class="title">Composition</div>
+                
+              </div>
+            </a>
+        </div>
+        <div class="bottom-of-page">
+          <div class="left-details">
+            <div class="copyright">
+                Copyright &#169; the turtles authors
+            </div>
+            Made with <a href="https://www.sphinx-doc.org/">Sphinx</a> and <a class="muted-link" href="https://pradyunsg.me">@pradyunsg</a>'s
+            
+            <a href="https://github.com/pradyunsg/furo">Furo</a>
+            
+          </div>
+          <div class="right-details">
+            
+          </div>
+        </div>
+        
+      </footer>
+    </div>
+    <aside class="toc-drawer">
+      
+      
+      <div class="toc-sticky toc-scroll">
+        <div class="toc-title-container">
+          <span class="toc-title">
+            On this page
+          </span>
+        </div>
+        <div class="toc-tree-container">
+          <div class="toc-tree">
+            <ul>
+<li><a class="reference internal" href="#">Rose engine Python API</a><ul>
+<li><a class="reference internal" href="#rosettepattern"><code class="docutils literal notranslate"><span class="pre">RosettePattern</span></code></a><ul>
+<li><a class="reference internal" href="#rosette-factories">Rosette factories</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#cuttingbit"><code class="docutils literal notranslate"><span class="pre">CuttingBit</span></code></a><ul>
+<li><a class="reference internal" href="#bit-factories">Bit factories</a></li>
+<li><a class="reference internal" href="#properties">Properties</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#roseengineconfig"><code class="docutils literal notranslate"><span class="pre">RoseEngineConfig</span></code></a><ul>
+<li><a class="reference internal" href="#constructor-and-defaults">Constructor and defaults</a></li>
+<li><a class="reference internal" href="#mutation-methods">Mutation methods</a></li>
+<li><a class="reference internal" href="#configuration-factories">Configuration factories</a></li>
+<li><a class="reference internal" href="#validation-and-copying">Validation and copying</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#roseenginelathe"><code class="docutils literal notranslate"><span class="pre">RoseEngineLathe</span></code></a><ul>
+<li><a class="reference internal" href="#construction">Construction</a></li>
+<li><a class="reference internal" href="#generation-and-exports">Generation and exports</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#roseenginelatherun"><code class="docutils literal notranslate"><span class="pre">RoseEngineLatheRun</span></code></a><ul>
+<li><a class="reference internal" href="#constructor">Constructor</a></li>
+<li><a class="reference internal" href="#centered-factory">Centered factory</a></li>
+<li><a class="reference internal" href="#generation-data-and-export">Generation, data, and export</a></li>
+<li><a class="reference internal" href="#run-presets">Run presets</a><ul>
+<li><a class="reference internal" href="#draperie"><code class="docutils literal notranslate"><span class="pre">draperie()</span></code></a></li>
+<li><a class="reference internal" href="#paon"><code class="docutils literal notranslate"><span class="pre">paon()</span></code></a></li>
+<li><a class="reference internal" href="#diamant"><code class="docutils literal notranslate"><span class="pre">diamant()</span></code></a></li>
+<li><a class="reference internal" href="#limacon"><code class="docutils literal notranslate"><span class="pre">limacon()</span></code></a></li>
+<li><a class="reference internal" href="#flinque"><code class="docutils literal notranslate"><span class="pre">flinque()</span></code></a></li>
+<li><a class="reference internal" href="#huiteight"><code class="docutils literal notranslate"><span class="pre">huiteight()</span></code></a></li>
+<li><a class="reference internal" href="#clous-de-paris"><code class="docutils literal notranslate"><span class="pre">clous_de_paris()</span></code></a></li>
+<li><a class="reference internal" href="#cube"><code class="docutils literal notranslate"><span class="pre">cube()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#call-sequence-examples">Call sequence examples</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+          </div>
+        </div>
+      </div>
+      
+      
+    </aside>
+  </div>
+</div><script src="../../_static/documentation_options.js?v=01f34227"></script>
+    <script src="../../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/scripts/furo.js?v=46bd48cc"></script>
+    <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../../_static/copybutton.js?v=f281be69"></script>
+    <script src="../../_static/design-tabs.js?v=f930bc37"></script>
+    <script data-searchlite-index="searchlite-index.json" defer="defer" src="../../_static/searchlite.js?v=a5320898"></script>
+    <script data-searchlite-adopt="true" defer="defer" src="../../_static/searchlite-ui.js?v=4e4bdd69"></script>
+    <script src="../../_static/js/custom.js?v=956e5d78"></script>
+    </body>
+</html>

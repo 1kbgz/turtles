@@ -1,0 +1,899 @@
+<!doctype html>
+<html class="no-js" lang="en" data-content_root="../../">
+  <head><meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="index" title="Index" href="../../genindex.html"><link rel="search" title="Search" href="../../search.html"><link rel="next" title="Rose engine Python API" href="rose-engine.html"><link rel="prev" title="Pattern layers and spirographs" href="patterns.html">
+
+    <!-- Generated with Sphinx 8.2.3 and Furo 2025.12.19 -->
+        <title>Composition - turtles v0.1.0</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="../../_static/styles/furo.css?v=7bdb33bb" />
+    <link rel="stylesheet" type="text/css" href="../../_static/mystnb.11b39860a7a0cbfd473a3ad8a317855267ff0bd372690045ca344a6b62be495e.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../../_static/graphviz.css?v=4ae1632d" />
+    <link rel="stylesheet" type="text/css" href="../../_static/autodoc_pydantic.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sphinx-design.min.css?v=95c83b7e" />
+    <link rel="stylesheet" type="text/css" href="../../_static/searchlite.css?v=4235115c" />
+    <link rel="stylesheet" type="text/css" href="../../_static/styles/furo-extensions.css?v=8dab3a3b" />
+    <link rel="stylesheet" type="text/css" href="../../_static/styles/custom.css?v=890fd012" />
+    
+    
+
+
+<style>
+  body {
+    --color-code-background: #eeffcc;
+  --color-code-foreground: black;
+  
+  }
+  @media not print {
+    body[data-theme="dark"] {
+      --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  
+    }
+    @media (prefers-color-scheme: dark) {
+      body:not([data-theme="light"]) {
+        --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  
+      }
+    }
+  }
+</style></head>
+  <body>
+    
+    <script>
+      document.body.dataset.theme = localStorage.getItem("theme") || "auto";
+    </script>
+    
+
+<svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
+  <symbol id="svg-toc" viewBox="0 0 24 24">
+    <title>Contents</title>
+    <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 1024 1024">
+      <path d="M408 442h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8zm-8 204c0 4.4 3.6 8 8 8h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56zm504-486H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zm0 632H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zM115.4 518.9L271.7 642c5.8 4.6 14.4.5 14.4-6.9V388.9c0-7.4-8.5-11.5-14.4-6.9L115.4 505.1a8.74 8.74 0 0 0 0 13.8z"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-menu" viewBox="0 0 24 24">
+    <title>Menu</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-menu">
+      <line x1="3" y1="12" x2="21" y2="12"></line>
+      <line x1="3" y1="6" x2="21" y2="6"></line>
+      <line x1="3" y1="18" x2="21" y2="18"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-arrow-right" viewBox="0 0 24 24">
+    <title>Expand</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-chevron-right">
+      <polyline points="9 18 15 12 9 6"></polyline>
+    </svg>
+  </symbol>
+  <symbol id="svg-sun" viewBox="0 0 24 24">
+    <title>Light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="feather-sun">
+      <circle cx="12" cy="12" r="5"></circle>
+      <line x1="12" y1="1" x2="12" y2="3"></line>
+      <line x1="12" y1="21" x2="12" y2="23"></line>
+      <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+      <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+      <line x1="1" y1="12" x2="3" y2="12"></line>
+      <line x1="21" y1="12" x2="23" y2="12"></line>
+      <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+      <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon" viewBox="0 0 24 24">
+    <title>Dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-moon">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M12 3c.132 0 .263 0 .393 0a7.5 7.5 0 0 0 7.92 12.446a9 9 0 1 1 -8.313 -12.454z" />
+    </svg>
+  </symbol>
+  <symbol id="svg-sun-with-moon" viewBox="0 0 24 24">
+    <title>Auto light/dark, in light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round"
+      class="icon-custom-derived-from-feather-sun-and-tabler-moon">
+      <path style="opacity: 50%" d="M 5.411 14.504 C 5.471 14.504 5.532 14.504 5.591 14.504 C 3.639 16.319 4.383 19.569 6.931 20.352 C 7.693 20.586 8.512 20.551 9.25 20.252 C 8.023 23.207 4.056 23.725 2.11 21.184 C 0.166 18.642 1.702 14.949 4.874 14.536 C 5.051 14.512 5.231 14.5 5.411 14.5 L 5.411 14.504 Z"/>
+      <line x1="14.5" y1="3.25" x2="14.5" y2="1.25"/>
+      <line x1="14.5" y1="15.85" x2="14.5" y2="17.85"/>
+      <line x1="10.044" y1="5.094" x2="8.63" y2="3.68"/>
+      <line x1="19" y1="14.05" x2="20.414" y2="15.464"/>
+      <line x1="8.2" y1="9.55" x2="6.2" y2="9.55"/>
+      <line x1="20.8" y1="9.55" x2="22.8" y2="9.55"/>
+      <line x1="10.044" y1="14.006" x2="8.63" y2="15.42"/>
+      <line x1="19" y1="5.05" x2="20.414" y2="3.636"/>
+      <circle cx="14.5" cy="9.55" r="3.6"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon-with-sun" viewBox="0 0 24 24">
+    <title>Auto light/dark, in dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round"
+      class="icon-custom-derived-from-feather-sun-and-tabler-moon">
+      <path d="M 8.282 7.007 C 8.385 7.007 8.494 7.007 8.595 7.007 C 5.18 10.184 6.481 15.869 10.942 17.24 C 12.275 17.648 13.706 17.589 15 17.066 C 12.851 22.236 5.91 23.143 2.505 18.696 C -0.897 14.249 1.791 7.786 7.342 7.063 C 7.652 7.021 7.965 7 8.282 7 L 8.282 7.007 Z"/>
+      <line style="opacity: 50%" x1="18" y1="3.705" x2="18" y2="2.5"/>
+      <line style="opacity: 50%" x1="18" y1="11.295" x2="18" y2="12.5"/>
+      <line style="opacity: 50%" x1="15.316" y1="4.816" x2="14.464" y2="3.964"/>
+      <line style="opacity: 50%" x1="20.711" y1="10.212" x2="21.563" y2="11.063"/>
+      <line style="opacity: 50%" x1="14.205" y1="7.5" x2="13.001" y2="7.5"/>
+      <line style="opacity: 50%" x1="21.795" y1="7.5" x2="23" y2="7.5"/>
+      <line style="opacity: 50%" x1="15.316" y1="10.184" x2="14.464" y2="11.036"/>
+      <line style="opacity: 50%" x1="20.711" y1="4.789" x2="21.563" y2="3.937"/>
+      <circle style="opacity: 50%" cx="18" cy="7.5" r="2.169"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-pencil" viewBox="0 0 24 24">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-pencil-code">
+      <path d="M4 20h4l10.5 -10.5a2.828 2.828 0 1 0 -4 -4l-10.5 10.5v4" />
+      <path d="M13.5 6.5l4 4" />
+      <path d="M20 21l2 -2l-2 -2" />
+      <path d="M17 17l-2 2l2 2" />
+    </svg>
+  </symbol>
+  <symbol id="svg-eye" viewBox="0 0 24 24">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-eye-code">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M10 12a2 2 0 1 0 4 0a2 2 0 0 0 -4 0" />
+      <path
+        d="M11.11 17.958c-3.209 -.307 -5.91 -2.293 -8.11 -5.958c2.4 -4 5.4 -6 9 -6c3.6 0 6.6 2 9 6c-.21 .352 -.427 .688 -.647 1.008" />
+      <path d="M20 21l2 -2l-2 -2" />
+      <path d="M17 17l-2 2l2 2" />
+    </svg>
+  </symbol>
+</svg>
+
+<input type="checkbox" class="sidebar-toggle" name="__navigation" id="__navigation" aria-label="Toggle site navigation sidebar">
+<input type="checkbox" class="sidebar-toggle" name="__toc" id="__toc" aria-label="Toggle table of contents sidebar">
+<label class="overlay sidebar-overlay" for="__navigation"></label>
+<label class="overlay toc-overlay" for="__toc"></label>
+
+<a class="skip-to-content muted-link" href="#furo-main-content">Skip to content</a>
+
+
+
+<div class="page">
+  <header class="mobile-header">
+    <div class="header-left">
+      <label class="nav-overlay-icon" for="__navigation">
+        <span class="icon"><svg><use href="#svg-menu"></use></svg></span>
+      </label>
+    </div>
+    <div class="header-center">
+      <a href="../../index.html"><div class="brand">turtles <code style='font-size: var(--font-size--small--4);color: var(--sd-color-primary);'>v0.1.0</code></div></a>
+    </div>
+    <div class="header-right">
+      <div class="theme-toggle-container theme-toggle-header">
+        <button class="theme-toggle" aria-label="Toggle Light / Dark / Auto color theme">
+          <svg class="theme-icon-when-auto-light"><use href="#svg-sun-with-moon"></use></svg>
+          <svg class="theme-icon-when-auto-dark"><use href="#svg-moon-with-sun"></use></svg>
+          <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+          <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+        </button>
+      </div>
+      <label class="toc-overlay-icon toc-header-icon" for="__toc">
+        <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
+      </label>
+    </div>
+  </header>
+  <aside class="sidebar-drawer">
+    <div class="sidebar-container">
+      
+      <div class="sidebar-sticky"><a class="sidebar-brand" href="../../index.html">
+  
+  <span class="sidebar-brand-text">turtles <code style='font-size: var(--font-size--small--4);color: var(--sd-color-primary);'>v0.1.0</code></span>
+  
+</a><form class="sidebar-search-container" method="get" action="../../search.html" role="search">
+  <input class="sidebar-search" placeholder="Search" name="q" aria-label="Search">
+  <input type="hidden" name="check_keywords" value="yes">
+  <input type="hidden" name="area" value="default">
+</form>
+<div id="searchbox"></div><div class="sidebar-scroll"><div class="sidebar-tree">
+  <ul class="current">
+<li class="toctree-l1 has-children"><a class="reference internal" href="../tutorials/index.html">Tutorials</a><input aria-label="Toggle navigation of Tutorials" class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../tutorials/first-pattern.html">Your first pattern</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../tutorials/watch-dial.html">A patterned watch dial</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../tutorials/rose-engine.html">A rose-engine pattern</a></li>
+</ul>
+</li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../how-to/index.html">How-to guides</a><input aria-label="Toggle navigation of How-to guides" class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" role="switch" type="checkbox"/><label for="toctree-checkbox-2"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../how-to/install.html">How to install Turtles</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../how-to/position-and-compose.html">How to position and compose patterns</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../how-to/export.html">How to export patterns</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../how-to/develop.html">How to develop and check changes</a></li>
+</ul>
+</li>
+<li class="toctree-l1 current has-children"><a class="reference internal" href="index.html">Reference</a><input aria-label="Toggle navigation of Reference" checked="" class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" role="switch" type="checkbox"/><label for="toctree-checkbox-3"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="patterns.html">Pattern layers and spirographs</a></li>
+<li class="toctree-l2 current current-page"><a class="current reference internal" href="#">Composition</a></li>
+<li class="toctree-l2"><a class="reference internal" href="rose-engine.html">Rose engine Python API</a></li>
+<li class="toctree-l2"><a class="reference internal" href="exports.html">Exports</a></li>
+<li class="toctree-l2"><a class="reference internal" href="errors.html">Errors and validation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="gallery.html">Pattern gallery</a></li>
+<li class="toctree-l2"><a class="reference internal" href="rust.html">Rust API</a></li>
+</ul>
+</li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../explanation/index.html">Explanation</a><input aria-label="Toggle navigation of Explanation" class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" role="switch" type="checkbox"/><label for="toctree-checkbox-4"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../explanation/pattern-models.html">Pattern models</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../explanation/coordinates.html">Coordinates and boundaries</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../explanation/geometry-and-exports.html">Geometry and exports</a></li>
+</ul>
+</li>
+</ul>
+
+</div>
+</div>
+
+      </div>
+      
+    </div>
+  </aside>
+  <div class="main">
+    <div class="content">
+      <div class="article-container">
+        <a href="#" class="back-to-top muted-link">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+            <path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12z"></path>
+          </svg>
+          <span>Back to top</span>
+        </a>
+        <div class="content-icon-container">
+          <div class="view-this-page">
+  <a class="muted-link" href="../../_sources/docs/reference/composition.md.txt" title="View this page">
+    <svg><use href="#svg-eye"></use></svg>
+    <span class="visually-hidden">View this page</span>
+  </a>
+</div>
+<div class="theme-toggle-container theme-toggle-content">
+            <button class="theme-toggle" aria-label="Toggle Light / Dark / Auto color theme">
+              <svg class="theme-icon-when-auto-light"><use href="#svg-sun-with-moon"></use></svg>
+              <svg class="theme-icon-when-auto-dark"><use href="#svg-moon-with-sun"></use></svg>
+              <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+              <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+            </button>
+          </div>
+          <label class="toc-overlay-icon toc-content-icon" for="__toc">
+            <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
+          </label>
+        </div>
+        <article role="main" id="furo-main-content">
+          <section class="tex2jax_ignore mathjax_ignore" id="composition">
+<h1>Composition<a class="headerlink" href="#composition" title="Link to this heading">¶</a></h1>
+<p><code class="docutils literal notranslate"><span class="pre">turtles.WatchFace</span></code> is the public Python wrapper for assembling a dial from all
+eight standalone pattern-layer families and the three spirograph types.
+<code class="docutils literal notranslate"><span class="pre">turtles.GuillochePattern</span></code> is a separate extension class whose Python API exposes
+only spirographs, flinqué, diamant, limaçon, and paon. Rust methods do not
+automatically become methods of either Python class.</p>
+<p>Related reference: <a class="reference internal" href="patterns.html"><span class="std std-doc">Patterns</span></a>, <a class="reference internal" href="exports.html"><span class="std std-doc">Exports</span></a>,
+<a class="reference internal" href="errors.html"><span class="std std-doc">Errors</span></a>, <a class="reference internal" href="rose-engine.html"><span class="std std-doc">Rose engine</span></a>, and <a class="reference internal" href="rust.html"><span class="std std-doc">Rust API</span></a>.</p>
+<section id="shared-units-validation-and-lifecycle">
+<h2>Shared units, validation, and lifecycle<a class="headerlink" href="#shared-units-validation-and-lifecycle" title="Link to this heading">¶</a></h2>
+<p>Both constructors take a <strong>radius in millimeters</strong>, not a diameter. The radius
+must be finite and in <strong>[26, 44] mm inclusive</strong>. A radius of 38 mm produces a
+76 mm diameter dial. This restriction belongs to the compositor; smaller
+standalone layers and spirographs are valid.</p>
+<p>Cartesian positions, center distances, pattern lengths, and export depths are
+in millimeters. Polar positioning and pattern rotations use radians;
+<code class="docutils literal notranslate"><span class="pre">CubeLayer.leg_angle</span></code> uses degrees. Paon’s <code class="docutils literal notranslate"><span class="pre">fan_angle</span></code> is a phase amplitude in
+wave cycles, not a geometric angle. Clock placement uses the hour hand, including
+the minute contribution, with 12:00 upward (negative y) and 3:00 rightward.
+Hours are reduced modulo 12; the conventional hour 1–12 and minute 0–59 ranges
+are not explicitly enforced. See <a class="reference internal" href="patterns.html#units-and-positioning"><span class="std std-ref">Units and positioning</span></a>.</p>
+<p>Adding a layer does not generate its geometry. Binding methods accepting an
+existing layer reconstruct a fresh internal layer from its parameters; generated
+points are not copied and the original Python object is not attached by
+reference. Pattern-layer copies retain their configured centers. Spirograph
+copies added as objects are reconstructed at the origin.</p>
+<p><code class="docutils literal notranslate"><span class="pre">generate()</span></code> returns <code class="docutils literal notranslate"><span class="pre">None</span></code> and regenerates all internal layers, replacing their
+previous points. Generation of the compositor does not populate the original
+Python layer’s <code class="docutils literal notranslate"><span class="pre">get_lines()</span></code> result. After adding more layers, another
+<code class="docutils literal notranslate"><span class="pre">generate()</span></code> call generates those layers and regenerates the earlier ones.
+Exports do not generate automatically. Mutating methods and successful exports
+return <code class="docutils literal notranslate"><span class="pre">None</span></code>, so calls are not chainable.</p>
+<p>Layer validation follows the individual constructors in <a class="reference internal" href="patterns.html"><span class="std std-doc">Patterns</span></a>,
+not a universal frequency or resolution rule. Validation errors map to
+<code class="docutils literal notranslate"><span class="pre">ValueError</span></code>; export failures map to <code class="docutils literal notranslate"><span class="pre">OSError</span></code>. Python type and unsigned-integer
+conversion errors can occur before Rust validation. See <a class="reference internal" href="errors.html"><span class="std std-doc">Errors</span></a>.</p>
+</section>
+<section id="watchface">
+<h2><code class="docutils literal notranslate"><span class="pre">WatchFace</span></code><a class="headerlink" href="#watchface" title="Link to this heading">¶</a></h2>
+<section id="watchface-constructor-and-property">
+<h3><code class="docutils literal notranslate"><span class="pre">WatchFace</span></code> constructor and property<a class="headerlink" href="#watchface-constructor-and-property" title="Link to this heading">¶</a></h3>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">WatchFace</span><span class="p">(</span><span class="n">radius</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Creates an empty dial composition without an inner circle, bezel, center hole,
+or pattern layers. <code class="docutils literal notranslate"><span class="pre">radius</span></code> is the only public read-only property and returns the
+dial radius in mm. Its finite, inclusive 26–44 mm constraint is described above.</p>
+<p>The signatures below are bound-method calls: <code class="docutils literal notranslate"><span class="pre">face</span></code> denotes a <code class="docutils literal notranslate"><span class="pre">WatchFace</span></code>
+instance. They describe the public wrapper, not <code class="docutils literal notranslate"><span class="pre">turtles.RustWatchFace</span></code> or its
+internal <code class="docutils literal notranslate"><span class="pre">_watch_face</span></code> object.</p>
+</section>
+<section id="dial-elements">
+<h3>Dial elements<a class="headerlink" href="#dial-elements" title="Link to this heading">¶</a></h3>
+<div class="table-wrapper colwidths-auto docutils container">
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Signature</p></th>
+<th class="head"><p>Effect</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">face.add_inner()</span></code></p></td>
+<td><p>Enables the dial circle at <code class="docutils literal notranslate"><span class="pre">face.radius</span></code>, with fill <code class="docutils literal notranslate"><span class="pre">#fafaf5</span></code>, stroke <code class="docutils literal notranslate"><span class="pre">#2c2c2c</span></code>, and stroke width 0.3 mm.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">face.add_outer()</span></code></p></td>
+<td><p>Enables an unfilled bezel circle at <code class="docutils literal notranslate"><span class="pre">1.05</span> <span class="pre">*</span> <span class="pre">face.radius</span></code>, with stroke <code class="docutils literal notranslate"><span class="pre">#1a1a1a</span></code> and stroke width 0.8 mm.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">face.add_center_hole()</span></code></p></td>
+<td><p>Appends a filled <code class="docutils literal notranslate"><span class="pre">#1a1a1a</span></code> circle at the origin with radius 0.8 mm.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">face.add_hole(hour:</span> <span class="pre">int,</span> <span class="pre">minute:</span> <span class="pre">int,</span> <span class="pre">radius:</span> <span class="pre">float,</span> <span class="pre">hole_radius:</span> <span class="pre">float)</span></code></p></td>
+<td><p>Appends a filled <code class="docutils literal notranslate"><span class="pre">#1a1a1a</span></code> circle centered at the given clock position, <code class="docutils literal notranslate"><span class="pre">radius</span></code> mm from the dial center, with radius <code class="docutils literal notranslate"><span class="pre">hole_radius</span></code> mm.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>For <code class="docutils literal notranslate"><span class="pre">add_hole()</span></code>, <code class="docutils literal notranslate"><span class="pre">radius</span></code> means <strong>center distance</strong>, not hole size or dial size;
+<code class="docutils literal notranslate"><span class="pre">hole_radius</span></code> supplies the hole size. The implementation performs clock
+conversion but does not validate positive/finite hole size, positive/finite
+distance, or containment within the dial. Repeated <code class="docutils literal notranslate"><span class="pre">add_inner()</span></code> or
+<code class="docutils literal notranslate"><span class="pre">add_outer()</span></code> calls replace the corresponding configuration; repeated hole calls
+append more circles.</p>
+<p>These elements are SVG decorations. Combined STL and STEP delegate to the
+pattern compositor; they do not construct the inner disk, bezel solid, or
+physical hole cuts. The wrapper exposes no styling configuration arguments.</p>
+</section>
+<section id="unimplemented-elements">
+<h3>Unimplemented elements<a class="headerlink" href="#unimplemented-elements" title="Link to this heading">¶</a></h3>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">face</span><span class="o">.</span><span class="n">add_subdial</span><span class="p">(</span><span class="n">hour</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">minute</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">radius</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">subdial_radius</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span>
+<span class="n">face</span><span class="o">.</span><span class="n">add_window</span><span class="p">(</span><span class="n">hour</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">minute</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">width</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">height</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+                <span class="n">angle</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">add_subdial()</span></code> always raises
+<code class="docutils literal notranslate"><span class="pre">NotImplementedError(&quot;add_subdial</span> <span class="pre">is</span> <span class="pre">not</span> <span class="pre">implemented</span> <span class="pre">yet&quot;)</span></code>.
+<code class="docutils literal notranslate"><span class="pre">add_window()</span></code> always raises
+<code class="docutils literal notranslate"><span class="pre">NotImplementedError(&quot;add_window</span> <span class="pre">is</span> <span class="pre">not</span> <span class="pre">implemented</span> <span class="pre">yet&quot;)</span></code>.
+Neither renders, mutates the composition, nor validates its intended geometry.
+The intended window <code class="docutils literal notranslate"><span class="pre">angle</span></code> unit is degrees, but no rotation is implemented.
+Positioned texture layers do not implement these dial elements.</p>
+<p><code class="docutils literal notranslate"><span class="pre">add_hour_marks()</span></code> and <code class="docutils literal notranslate"><span class="pre">add_minute_marks()</span></code> are not exposed methods.</p>
+</section>
+<section id="adding-existing-layers">
+<h3>Adding existing layers<a class="headerlink" href="#adding-existing-layers" title="Link to this heading">¶</a></h3>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">face</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">layer</span><span class="p">)</span>
+<span class="n">face</span><span class="o">.</span><span class="n">add_flinque_layer</span><span class="p">(</span><span class="n">layer</span><span class="p">)</span>
+<span class="n">face</span><span class="o">.</span><span class="n">add_diamant_layer</span><span class="p">(</span><span class="n">layer</span><span class="p">)</span>
+<span class="n">face</span><span class="o">.</span><span class="n">add_limacon_layer</span><span class="p">(</span><span class="n">layer</span><span class="p">)</span>
+<span class="n">face</span><span class="o">.</span><span class="n">add_draperie_layer</span><span class="p">(</span><span class="n">layer</span><span class="p">)</span>
+<span class="n">face</span><span class="o">.</span><span class="n">add_paon_layer</span><span class="p">(</span><span class="n">layer</span><span class="p">)</span>
+<span class="n">face</span><span class="o">.</span><span class="n">add_huiteight_layer</span><span class="p">(</span><span class="n">layer</span><span class="p">)</span>
+<span class="n">face</span><span class="o">.</span><span class="n">add_clous_de_paris_layer</span><span class="p">(</span><span class="n">layer</span><span class="p">)</span>
+<span class="n">face</span><span class="o">.</span><span class="n">add_cube_layer</span><span class="p">(</span><span class="n">layer</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Each family-specific method accepts its matching standalone class, including
+<code class="docutils literal notranslate"><span class="pre">HuitEightLayer</span></code> for <code class="docutils literal notranslate"><span class="pre">add_huiteight_layer()</span></code> and <code class="docutils literal notranslate"><span class="pre">ClousDeParisLayer</span></code> for
+<code class="docutils literal notranslate"><span class="pre">add_clous_de_paris_layer()</span></code>. It copies configuration and center into a fresh,
+ungenerated internal layer.</p>
+<p><code class="docutils literal notranslate"><span class="pre">add(layer)</span></code> dispatches the eight standalone classes to those methods. Other
+objects are passed to the binding’s spirograph adder, which accepts only
+<code class="docutils literal notranslate"><span class="pre">HorizontalSpirograph</span></code>, <code class="docutils literal notranslate"><span class="pre">VerticalSpirograph</span></code>, or <code class="docutils literal notranslate"><span class="pre">SphericalSpirograph</span></code>; unsupported
+objects raise <code class="docutils literal notranslate"><span class="pre">TypeError</span></code>. <code class="docutils literal notranslate"><span class="pre">add()</span></code> does not accept a <code class="docutils literal notranslate"><span class="pre">GuillochePattern</span></code>,
+<code class="docutils literal notranslate"><span class="pre">RoseEngineLathe</span></code>, or <code class="docutils literal notranslate"><span class="pre">RoseEngineLatheRun</span></code>.</p>
+<p>The public wrapper has no <code class="docutils literal notranslate"><span class="pre">add_layer()</span></code>, <code class="docutils literal notranslate"><span class="pre">add_layer_at_clock()</span></code>,
+<code class="docutils literal notranslate"><span class="pre">add_layer_at_polar()</span></code>, or family-specific polar methods. Their presence in a
+Rust implementation or raw binding is not part of this wrapper’s API.</p>
+</section>
+<section id="pattern-convenience-methods">
+<h3>Pattern convenience methods<a class="headerlink" href="#pattern-convenience-methods" title="Link to this heading">¶</a></h3>
+<p>All methods below append one layer at the hour-hand center given by <code class="docutils literal notranslate"><span class="pre">hour</span></code>,
+<code class="docutils literal notranslate"><span class="pre">minute</span></code>, and <code class="docutils literal notranslate"><span class="pre">distance</span></code>. The default <code class="docutils literal notranslate"><span class="pre">distance=0.0</span></code> centers the layer regardless
+of the clock position. <code class="docutils literal notranslate"><span class="pre">None</span></code> size defaults are resolved from <code class="docutils literal notranslate"><span class="pre">face.radius</span></code>
+before construction; explicit values retain the standalone family’s validation.
+Parameter meanings and units not repeated here match <a class="reference internal" href="patterns.html"><span class="std std-doc">Patterns</span></a>.</p>
+<section id="flinque">
+<h4>Flinqué<a class="headerlink" href="#flinque" title="Link to this heading">¶</a></h4>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">face</span><span class="o">.</span><span class="n">add_flinque</span><span class="p">(</span><span class="n">radius</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">hour</span><span class="o">=</span><span class="mi">12</span><span class="p">,</span> <span class="n">minute</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">distance</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">num_petals</span><span class="o">=</span><span class="mi">12</span><span class="p">,</span>
+                 <span class="n">num_waves</span><span class="o">=</span><span class="mi">60</span><span class="p">,</span> <span class="n">wave_amplitude</span><span class="o">=</span><span class="mf">0.8</span><span class="p">,</span> <span class="n">wave_frequency</span><span class="o">=</span><span class="mf">20.0</span><span class="p">,</span>
+                 <span class="n">inner_radius_ratio</span><span class="o">=</span><span class="mf">0.05</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">radius=None</span></code> resolves to <code class="docutils literal notranslate"><span class="pre">face.radius</span></code>. This radius is nominal ring size, not a
+local clipping boundary; composed export applies the dial boundary separately.</p>
+</section>
+<section id="diamant">
+<h4>Diamant<a class="headerlink" href="#diamant" title="Link to this heading">¶</a></h4>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">face</span><span class="o">.</span><span class="n">add_diamant</span><span class="p">(</span><span class="n">num_circles</span><span class="o">=</span><span class="mi">72</span><span class="p">,</span> <span class="n">circle_radius</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">hour</span><span class="o">=</span><span class="mi">12</span><span class="p">,</span> <span class="n">minute</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+                 <span class="n">distance</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">resolution</span><span class="o">=</span><span class="mi">360</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">circle_radius=None</span></code> resolves to <code class="docutils literal notranslate"><span class="pre">face.radius</span></code>. Individual circles can reach
+twice <code class="docutils literal notranslate"><span class="pre">circle_radius</span></code> from the layer center before dial clipping.</p>
+</section>
+<section id="limacon">
+<h4>Limaçon<a class="headerlink" href="#limacon" title="Link to this heading">¶</a></h4>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">face</span><span class="o">.</span><span class="n">add_limacon</span><span class="p">(</span><span class="n">num_curves</span><span class="o">=</span><span class="mi">72</span><span class="p">,</span> <span class="n">base_radius</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">amplitude</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">hour</span><span class="o">=</span><span class="mi">12</span><span class="p">,</span>
+                 <span class="n">minute</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">distance</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">resolution</span><span class="o">=</span><span class="mi">360</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">base_radius=None</span></code> and <code class="docutils literal notranslate"><span class="pre">amplitude=None</span></code> each resolve independently to
+<code class="docutils literal notranslate"><span class="pre">face.radius</span></code>. Changing <code class="docutils literal notranslate"><span class="pre">base_radius</span></code> alone does not change the default
+<code class="docutils literal notranslate"><span class="pre">amplitude</span></code> to that value.</p>
+</section>
+<section id="draperie">
+<h4>Draperie<a class="headerlink" href="#draperie" title="Link to this heading">¶</a></h4>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">face</span><span class="o">.</span><span class="n">add_draperie</span><span class="p">(</span><span class="n">num_rings</span><span class="o">=</span><span class="mi">96</span><span class="p">,</span> <span class="n">base_radius</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">radius_step</span><span class="o">=</span><span class="mf">0.44</span><span class="p">,</span>
+                  <span class="n">wave_frequency</span><span class="o">=</span><span class="mf">12.0</span><span class="p">,</span> <span class="n">phase_shift</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                  <span class="n">phase_oscillations</span><span class="o">=</span><span class="mf">2.5</span><span class="p">,</span> <span class="n">hour</span><span class="o">=</span><span class="mi">12</span><span class="p">,</span> <span class="n">minute</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">distance</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span>
+                  <span class="n">resolution</span><span class="o">=</span><span class="mi">1500</span><span class="p">,</span> <span class="n">phase_exponent</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">wave_exponent</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+                  <span class="n">circular_phase</span><span class="o">=</span><span class="mf">2.0</span><span class="p">)</span>
+<span class="n">face</span><span class="o">.</span><span class="n">add_draperie_sharp</span><span class="p">(</span><span class="n">num_rings</span><span class="o">=</span><span class="mi">96</span><span class="p">,</span> <span class="n">base_radius</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">radius_step</span><span class="o">=</span><span class="mf">0.44</span><span class="p">,</span>
+                        <span class="n">wave_frequency</span><span class="o">=</span><span class="mf">12.0</span><span class="p">,</span> <span class="n">phase_shift</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                        <span class="n">phase_oscillations</span><span class="o">=</span><span class="mf">2.5</span><span class="p">,</span> <span class="n">hour</span><span class="o">=</span><span class="mi">12</span><span class="p">,</span> <span class="n">minute</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+                        <span class="n">distance</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">resolution</span><span class="o">=</span><span class="mi">1500</span><span class="p">,</span> <span class="n">wave_exponent</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">base_radius=None</span></code> resolves to <code class="docutils literal notranslate"><span class="pre">face.radius</span></code>; this is the middle of the ring
+band, not its outer boundary. <code class="docutils literal notranslate"><span class="pre">phase_shift=None</span></code> resolves to π/12 radians.
+Amplitude is automatic and has no Python argument.</p>
+<p><code class="docutils literal notranslate"><span class="pre">add_draperie_sharp()</span></code> calls <code class="docutils literal notranslate"><span class="pre">add_draperie()</span></code> with <code class="docutils literal notranslate"><span class="pre">phase_exponent=1</span></code> and
+<code class="docutils literal notranslate"><span class="pre">circular_phase=0.0</span></code>. Other arguments pass through unchanged. It is a preset,
+not a separate layer class.</p>
+</section>
+<section id="paon">
+<h4>Paon<a class="headerlink" href="#paon" title="Link to this heading">¶</a></h4>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">face</span><span class="o">.</span><span class="n">add_paon</span><span class="p">(</span><span class="n">num_lines</span><span class="o">=</span><span class="mi">500</span><span class="p">,</span> <span class="n">radius</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">amplitude</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span> <span class="n">wave_frequency</span><span class="o">=</span><span class="mf">15.0</span><span class="p">,</span>
+              <span class="n">phase_rate</span><span class="o">=</span><span class="mf">9.0</span><span class="p">,</span> <span class="n">hour</span><span class="o">=</span><span class="mi">12</span><span class="p">,</span> <span class="n">minute</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">distance</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">resolution</span><span class="o">=</span><span class="mi">800</span><span class="p">,</span>
+              <span class="n">n_harmonics</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">fan_angle</span><span class="o">=</span><span class="mf">3.0</span><span class="p">,</span> <span class="n">vanishing_point</span><span class="o">=</span><span class="mf">0.2</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">radius=None</span></code> resolves to <code class="docutils literal notranslate"><span class="pre">face.radius</span></code>, defining the layer’s local circle.
+The wrapper defaults differ from <code class="docutils literal notranslate"><span class="pre">PaonLayer</span></code>: amplitude 0.1 rather than 0.035 mm,
+wave frequency 15.0 rather than 10.0, five rather than three harmonics,
+<code class="docutils literal notranslate"><span class="pre">fan_angle=3.0</span></code> rather than 4.0, and <code class="docutils literal notranslate"><span class="pre">vanishing_point=0.2</span></code> rather than 0.3.
+<code class="docutils literal notranslate"><span class="pre">fan_angle</span></code> is a phase amplitude in cycles; <code class="docutils literal notranslate"><span class="pre">vanishing_point</span></code> is a fraction of
+the local diameter and must be strictly positive.</p>
+</section>
+<section id="huit-eight">
+<h4>Huit-eight<a class="headerlink" href="#huit-eight" title="Link to this heading">¶</a></h4>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">face</span><span class="o">.</span><span class="n">add_huiteight</span><span class="p">(</span><span class="n">num_curves</span><span class="o">=</span><span class="mi">36</span><span class="p">,</span> <span class="n">scale</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">hour</span><span class="o">=</span><span class="mi">12</span><span class="p">,</span> <span class="n">minute</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">distance</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span>
+                   <span class="n">resolution</span><span class="o">=</span><span class="mi">360</span><span class="p">,</span> <span class="n">num_clusters</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">cluster_spread</span><span class="o">=</span><span class="mf">0.0</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">scale=None</span></code> resolves to <code class="docutils literal notranslate"><span class="pre">face.radius</span></code>. <code class="docutils literal notranslate"><span class="pre">scale</span></code> is each figure-eight’s half-width
+in mm. Zero clusters select uniform rotations; automatic spread is used only
+when clustering is active. See <a class="reference internal" href="patterns.html#huiteightlayer"><span class="std std-ref">HuitEightLayer</span></a>.</p>
+</section>
+<section id="clous-de-paris">
+<h4>Clous de Paris<a class="headerlink" href="#clous-de-paris" title="Link to this heading">¶</a></h4>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">face</span><span class="o">.</span><span class="n">add_clous_de_paris</span><span class="p">(</span><span class="n">spacing</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">radius</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">angle</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">hour</span><span class="o">=</span><span class="mi">12</span><span class="p">,</span>
+                        <span class="n">minute</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">distance</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">resolution</span><span class="o">=</span><span class="mi">200</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">radius=None</span></code> resolves to <code class="docutils literal notranslate"><span class="pre">face.radius</span></code>; <code class="docutils literal notranslate"><span class="pre">angle=None</span></code> resolves to π/4 radians.
+<code class="docutils literal notranslate"><span class="pre">angle</span></code> rotates the grid, not the center position. <code class="docutils literal notranslate"><span class="pre">radius</span></code> defines the local
+clipping circle.</p>
+</section>
+<section id="cube">
+<span id="id1"></span><h4>Cube<a class="headerlink" href="#cube" title="Link to this heading">¶</a></h4>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">face</span><span class="o">.</span><span class="n">add_cube</span><span class="p">(</span><span class="n">spacing</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">radius</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">angle</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">hour</span><span class="o">=</span><span class="mi">12</span><span class="p">,</span> <span class="n">minute</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+               <span class="n">distance</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">resolution</span><span class="o">=</span><span class="mi">200</span><span class="p">,</span> <span class="n">cuts_per_group</span><span class="o">=</span><span class="mi">12</span><span class="p">,</span>
+               <span class="n">gap_per_group</span><span class="o">=</span><span class="mi">6</span><span class="p">,</span> <span class="n">amplitude</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">leg_angle</span><span class="o">=</span><span class="mf">30.0</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">radius=None</span></code> resolves to <code class="docutils literal notranslate"><span class="pre">face.radius</span></code>, defining the local clipping circle.
+<code class="docutils literal notranslate"><span class="pre">angle</span></code> rotates the pattern in radians; <code class="docutils literal notranslate"><span class="pre">leg_angle</span></code> is in degrees.
+<code class="docutils literal notranslate"><span class="pre">amplitude=0.0</span></code> selects automatic amplitude. <code class="docutils literal notranslate"><span class="pre">resolution</span></code> is validated but does
+not control zigzag-vertex generation.</p>
+<p>The public wrapper defaults to <strong>12 cuts and 6 gap spacings</strong>, whereas
+<code class="docutils literal notranslate"><span class="pre">CubeLayer</span></code> and the raw binding default to 8 and 8. An existing <code class="docutils literal notranslate"><span class="pre">CubeLayer</span></code>
+passed to <code class="docutils literal notranslate"><span class="pre">add_cube_layer()</span></code> or <code class="docutils literal notranslate"><span class="pre">add()</span></code> retains its own configuration.</p>
+</section>
+</section>
+<section id="watchface-generation-and-export">
+<h3><code class="docutils literal notranslate"><span class="pre">WatchFace</span></code> generation and export<a class="headerlink" href="#watchface-generation-and-export" title="Link to this heading">¶</a></h3>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">face</span><span class="o">.</span><span class="n">generate</span><span class="p">()</span>
+<span class="n">face</span><span class="o">.</span><span class="n">to_svg</span><span class="p">(</span><span class="n">filename</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span>
+<span class="n">face</span><span class="o">.</span><span class="n">to_stl</span><span class="p">(</span><span class="n">filename</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">depth</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.1</span><span class="p">,</span> <span class="n">base_thickness</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">2.0</span><span class="p">)</span>
+<span class="n">face</span><span class="o">.</span><span class="n">to_step</span><span class="p">(</span><span class="n">filename</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">depth</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.1</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">generate()</span></code> regenerates all stored pattern layers. <code class="docutils literal notranslate"><span class="pre">to_svg()</span></code> includes enabled
+dial elements and the generated patterns; it can write a decoration-only or
+empty SVG without generated pattern geometry. STL and STEP require drawable
+pattern geometry and raise <code class="docutils literal notranslate"><span class="pre">OSError</span></code> if clipping leaves no paths of at least two
+points. Their output contains all stored pattern families, not SVG decorations.
+See <a class="reference internal" href="#clipping-and-draw-order">Clipping and draw order</a> and
+<a class="reference internal" href="#export-limitations">Export limitations</a>.</p>
+<p>The wrapper exposes no <code class="docutils literal notranslate"><span class="pre">get_lines()</span></code>, <code class="docutils literal notranslate"><span class="pre">layer_count()</span></code>, or <code class="docutils literal notranslate"><span class="pre">export_all()</span></code> method.</p>
+</section>
+<section id="watchface-example">
+<h3><code class="docutils literal notranslate"><span class="pre">WatchFace</span></code> example<a class="headerlink" href="#watchface-example" title="Link to this heading">¶</a></h3>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">turtles</span><span class="w"> </span><span class="kn">import</span> <span class="n">FlinqueLayer</span><span class="p">,</span> <span class="n">WatchFace</span>
+
+<span class="n">face</span> <span class="o">=</span> <span class="n">WatchFace</span><span class="p">(</span><span class="n">radius</span><span class="o">=</span><span class="mf">38.0</span><span class="p">)</span>
+<span class="n">face</span><span class="o">.</span><span class="n">add_inner</span><span class="p">()</span>
+<span class="n">face</span><span class="o">.</span><span class="n">add_outer</span><span class="p">()</span>
+<span class="n">face</span><span class="o">.</span><span class="n">add_center_hole</span><span class="p">()</span>
+<span class="n">face</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">FlinqueLayer</span><span class="o">.</span><span class="n">at_clock</span><span class="p">(</span><span class="n">radius</span><span class="o">=</span><span class="mf">8.0</span><span class="p">,</span> <span class="n">hour</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">minute</span><span class="o">=</span><span class="mi">30</span><span class="p">,</span> <span class="n">distance</span><span class="o">=</span><span class="mf">15.0</span><span class="p">))</span>
+<span class="n">face</span><span class="o">.</span><span class="n">add_clous_de_paris</span><span class="p">(</span><span class="n">spacing</span><span class="o">=</span><span class="mf">1.2</span><span class="p">,</span> <span class="n">radius</span><span class="o">=</span><span class="mf">10.0</span><span class="p">,</span> <span class="n">hour</span><span class="o">=</span><span class="mi">9</span><span class="p">,</span> <span class="n">distance</span><span class="o">=</span><span class="mf">15.0</span><span class="p">)</span>
+<span class="n">face</span><span class="o">.</span><span class="n">generate</span><span class="p">()</span>
+<span class="n">face</span><span class="o">.</span><span class="n">to_svg</span><span class="p">(</span><span class="s2">"dial.svg"</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+</section>
+<section id="guillochepattern">
+<h2><code class="docutils literal notranslate"><span class="pre">GuillochePattern</span></code><a class="headerlink" href="#guillochepattern" title="Link to this heading">¶</a></h2>
+<section id="guillochepattern-constructor-and-property">
+<h3><code class="docutils literal notranslate"><span class="pre">GuillochePattern</span></code> constructor and property<a class="headerlink" href="#guillochepattern-constructor-and-property" title="Link to this heading">¶</a></h3>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">GuillochePattern</span><span class="p">(</span><span class="n">radius</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Creates an empty layer composition. <code class="docutils literal notranslate"><span class="pre">radius</span></code> is a read-only Python property in
+mm, with the same finite, inclusive 26–44 mm constraint as <code class="docutils literal notranslate"><span class="pre">WatchFace</span></code>.
+Combined SVG always adds the default dial circle, bezel, and 0.8 mm center-hole
+circle; this class has no Python methods to configure or disable them.</p>
+<p>The signatures below use <code class="docutils literal notranslate"><span class="pre">pattern</span></code> for a <code class="docutils literal notranslate"><span class="pre">GuillochePattern</span></code> instance. This
+section lists its exposed Python composition methods, not every public Rust
+method.</p>
+</section>
+<section id="adding-existing-objects">
+<h3>Adding existing objects<a class="headerlink" href="#adding-existing-objects" title="Link to this heading">¶</a></h3>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">pattern</span><span class="o">.</span><span class="n">add_layer</span><span class="p">(</span><span class="n">spiro</span><span class="p">)</span>
+<span class="n">pattern</span><span class="o">.</span><span class="n">add_flinque_layer</span><span class="p">(</span><span class="n">flinque</span><span class="p">)</span>
+<span class="n">pattern</span><span class="o">.</span><span class="n">add_diamant_layer</span><span class="p">(</span><span class="n">diamant</span><span class="p">)</span>
+<span class="n">pattern</span><span class="o">.</span><span class="n">add_limacon_layer</span><span class="p">(</span><span class="n">limacon</span><span class="p">)</span>
+<span class="n">pattern</span><span class="o">.</span><span class="n">add_paon_layer</span><span class="p">(</span><span class="n">paon</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">add_layer(spiro)</span></code> accepts only <code class="docutils literal notranslate"><span class="pre">HorizontalSpirograph</span></code>, <code class="docutils literal notranslate"><span class="pre">VerticalSpirograph</span></code>, or
+<code class="docutils literal notranslate"><span class="pre">SphericalSpirograph</span></code>. Other values raise <code class="docutils literal notranslate"><span class="pre">TypeError</span></code>. It reconstructs an
+origin-centered, ungenerated spirograph from its parameters.</p>
+<p>The other methods accept their corresponding standalone layer class and copy
+its configuration and center into a new, ungenerated internal layer. Their
+keyword parameter names are <code class="docutils literal notranslate"><span class="pre">flinque</span></code>, <code class="docutils literal notranslate"><span class="pre">diamant</span></code>, <code class="docutils literal notranslate"><span class="pre">limacon</span></code>, and <code class="docutils literal notranslate"><span class="pre">paon</span></code>, not
+<code class="docutils literal notranslate"><span class="pre">layer</span></code>.</p>
+<p>There is no generic <code class="docutils literal notranslate"><span class="pre">add()</span></code> method. Draperie, huit-eight, Clous de Paris, and
+Cube adders are <strong>not exposed</strong> on Python <code class="docutils literal notranslate"><span class="pre">GuillochePattern</span></code>, even though the
+Rust compositor supports them. <code class="docutils literal notranslate"><span class="pre">WatchFace</span></code> exposes those families.</p>
+</section>
+<section id="positioned-spirographs">
+<span id="id2"></span><h3>Positioned spirographs<a class="headerlink" href="#positioned-spirographs" title="Link to this heading">¶</a></h3>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">pattern</span><span class="o">.</span><span class="n">add_layer_at_polar</span><span class="p">(</span><span class="n">spiro_type</span><span class="p">,</span> <span class="n">outer_radius</span><span class="p">,</span> <span class="n">radius_ratio</span><span class="p">,</span> <span class="n">point_distance</span><span class="p">,</span>
+                           <span class="n">rotations</span><span class="p">,</span> <span class="n">resolution</span><span class="p">,</span> <span class="n">angle</span><span class="p">,</span> <span class="n">distance</span><span class="p">,</span>
+                           <span class="n">wave_amplitude</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">wave_frequency</span><span class="o">=</span><span class="mf">5.0</span><span class="p">,</span>
+                           <span class="n">dome_height</span><span class="o">=</span><span class="mf">5.0</span><span class="p">)</span>
+<span class="n">pattern</span><span class="o">.</span><span class="n">add_layer_at_clock</span><span class="p">(</span><span class="n">spiro_type</span><span class="p">,</span> <span class="n">outer_radius</span><span class="p">,</span> <span class="n">radius_ratio</span><span class="p">,</span> <span class="n">point_distance</span><span class="p">,</span>
+                           <span class="n">rotations</span><span class="p">,</span> <span class="n">resolution</span><span class="p">,</span> <span class="n">hour</span><span class="p">,</span> <span class="n">minute</span><span class="p">,</span> <span class="n">distance</span><span class="p">,</span>
+                           <span class="n">wave_amplitude</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">wave_frequency</span><span class="o">=</span><span class="mf">5.0</span><span class="p">,</span>
+                           <span class="n">dome_height</span><span class="o">=</span><span class="mf">5.0</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">spiro_type</span></code> is a case-insensitive string: <code class="docutils literal notranslate"><span class="pre">&quot;horizontal&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;vertical&quot;</span></code>, or
+<code class="docutils literal notranslate"><span class="pre">&quot;spherical&quot;</span></code>. Other strings raise <code class="docutils literal notranslate"><span class="pre">ValueError</span></code>. No whitespace stripping is
+performed. All base spirograph and positioning arguments are required.</p>
+<p><code class="docutils literal notranslate"><span class="pre">wave_amplitude</span></code> and <code class="docutils literal notranslate"><span class="pre">wave_frequency</span></code> are used only for the vertical variant;
+<code class="docutils literal notranslate"><span class="pre">dome_height</span></code> is used only for the spherical variant. Unused options do not
+undergo that variant’s constructor checks, though Python-to-Rust type
+conversion still applies. Base parameter validation matches the
+<a class="reference internal" href="patterns.html#shared-parameters-and-validation"><span class="std std-ref">standalone spirographs</span></a>.
+The resulting Cartesian center must be finite. There is no positive-distance
+or dial-containment check.</p>
+<p>These methods construct internal positioned spirographs directly; they do not
+return a standalone spirograph object.</p>
+</section>
+<section id="positioned-flinque">
+<h3>Positioned flinqué<a class="headerlink" href="#positioned-flinque" title="Link to this heading">¶</a></h3>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">pattern</span><span class="o">.</span><span class="n">add_flinque_at_polar</span><span class="p">(</span><span class="n">radius</span><span class="p">,</span> <span class="n">angle</span><span class="p">,</span> <span class="n">distance</span><span class="p">,</span> <span class="n">num_petals</span><span class="o">=</span><span class="mi">12</span><span class="p">,</span>
+                             <span class="n">num_waves</span><span class="o">=</span><span class="mi">60</span><span class="p">,</span> <span class="n">wave_amplitude</span><span class="o">=</span><span class="mf">0.8</span><span class="p">,</span>
+                             <span class="n">wave_frequency</span><span class="o">=</span><span class="mf">20.0</span><span class="p">,</span> <span class="n">inner_radius_ratio</span><span class="o">=</span><span class="mf">0.05</span><span class="p">)</span>
+<span class="n">pattern</span><span class="o">.</span><span class="n">add_flinque_at_clock</span><span class="p">(</span><span class="n">radius</span><span class="p">,</span> <span class="n">hour</span><span class="p">,</span> <span class="n">minute</span><span class="p">,</span> <span class="n">distance</span><span class="p">,</span> <span class="n">num_petals</span><span class="o">=</span><span class="mi">12</span><span class="p">,</span>
+                             <span class="n">num_waves</span><span class="o">=</span><span class="mi">60</span><span class="p">,</span> <span class="n">wave_amplitude</span><span class="o">=</span><span class="mf">0.8</span><span class="p">,</span>
+                             <span class="n">wave_frequency</span><span class="o">=</span><span class="mf">20.0</span><span class="p">,</span> <span class="n">inner_radius_ratio</span><span class="o">=</span><span class="mf">0.05</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">radius</span></code> and positioning arguments are required. Other defaults and validation
+match <a class="reference internal" href="patterns.html#flinquelayer"><span class="std std-ref">FlinqueLayer</span></a>; <code class="docutils literal notranslate"><span class="pre">radius</span></code> does not default to
+the compositor’s radius.</p>
+</section>
+<section id="positioned-diamant">
+<h3>Positioned diamant<a class="headerlink" href="#positioned-diamant" title="Link to this heading">¶</a></h3>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">pattern</span><span class="o">.</span><span class="n">add_diamant_at_polar</span><span class="p">(</span><span class="n">num_circles</span><span class="p">,</span> <span class="n">circle_radius</span><span class="p">,</span> <span class="n">angle</span><span class="p">,</span> <span class="n">distance</span><span class="p">,</span>
+                             <span class="n">resolution</span><span class="o">=</span><span class="mi">360</span><span class="p">)</span>
+<span class="n">pattern</span><span class="o">.</span><span class="n">add_diamant_at_clock</span><span class="p">(</span><span class="n">num_circles</span><span class="p">,</span> <span class="n">circle_radius</span><span class="p">,</span> <span class="n">hour</span><span class="p">,</span> <span class="n">minute</span><span class="p">,</span> <span class="n">distance</span><span class="p">,</span>
+                             <span class="n">resolution</span><span class="o">=</span><span class="mi">360</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>All arguments except <code class="docutils literal notranslate"><span class="pre">resolution</span></code> are required. Parameter meaning and validation
+match <a class="reference internal" href="patterns.html#diamantlayer"><span class="std std-ref">DiamantLayer</span></a>.</p>
+</section>
+<section id="positioned-limacon">
+<h3>Positioned limaçon<a class="headerlink" href="#positioned-limacon" title="Link to this heading">¶</a></h3>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">pattern</span><span class="o">.</span><span class="n">add_limacon_at_polar</span><span class="p">(</span><span class="n">num_curves</span><span class="p">,</span> <span class="n">base_radius</span><span class="p">,</span> <span class="n">amplitude</span><span class="p">,</span> <span class="n">angle</span><span class="p">,</span> <span class="n">distance</span><span class="p">,</span>
+                             <span class="n">resolution</span><span class="o">=</span><span class="mi">360</span><span class="p">)</span>
+<span class="n">pattern</span><span class="o">.</span><span class="n">add_limacon_at_clock</span><span class="p">(</span><span class="n">num_curves</span><span class="p">,</span> <span class="n">base_radius</span><span class="p">,</span> <span class="n">amplitude</span><span class="p">,</span> <span class="n">hour</span><span class="p">,</span> <span class="n">minute</span><span class="p">,</span>
+                             <span class="n">distance</span><span class="p">,</span> <span class="n">resolution</span><span class="o">=</span><span class="mi">360</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>All arguments except <code class="docutils literal notranslate"><span class="pre">resolution</span></code> are required. In particular, <code class="docutils literal notranslate"><span class="pre">amplitude</span></code> has
+no dial-derived default. Validation matches <a class="reference internal" href="patterns.html#limaconlayer"><span class="std std-ref">LimaconLayer</span></a>.</p>
+</section>
+<section id="positioned-paon">
+<h3>Positioned paon<a class="headerlink" href="#positioned-paon" title="Link to this heading">¶</a></h3>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">pattern</span><span class="o">.</span><span class="n">add_paon_at_polar</span><span class="p">(</span><span class="n">angle</span><span class="p">,</span> <span class="n">distance</span><span class="p">,</span> <span class="n">num_lines</span><span class="o">=</span><span class="mi">500</span><span class="p">,</span> <span class="n">radius</span><span class="o">=</span><span class="mf">22.0</span><span class="p">,</span>
+                          <span class="n">amplitude</span><span class="o">=</span><span class="mf">0.035</span><span class="p">,</span> <span class="n">wave_frequency</span><span class="o">=</span><span class="mf">10.0</span><span class="p">,</span> <span class="n">phase_rate</span><span class="o">=</span><span class="mf">9.0</span><span class="p">,</span>
+                          <span class="n">resolution</span><span class="o">=</span><span class="mi">800</span><span class="p">,</span> <span class="n">n_harmonics</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">fan_angle</span><span class="o">=</span><span class="mf">4.0</span><span class="p">,</span>
+                          <span class="n">vanishing_point</span><span class="o">=</span><span class="mf">0.3</span><span class="p">)</span>
+<span class="n">pattern</span><span class="o">.</span><span class="n">add_paon_at_clock</span><span class="p">(</span><span class="n">hour</span><span class="p">,</span> <span class="n">minute</span><span class="p">,</span> <span class="n">distance</span><span class="p">,</span> <span class="n">num_lines</span><span class="o">=</span><span class="mi">500</span><span class="p">,</span> <span class="n">radius</span><span class="o">=</span><span class="mf">22.0</span><span class="p">,</span>
+                          <span class="n">amplitude</span><span class="o">=</span><span class="mf">0.035</span><span class="p">,</span> <span class="n">wave_frequency</span><span class="o">=</span><span class="mf">10.0</span><span class="p">,</span> <span class="n">phase_rate</span><span class="o">=</span><span class="mf">9.0</span><span class="p">,</span>
+                          <span class="n">resolution</span><span class="o">=</span><span class="mi">800</span><span class="p">,</span> <span class="n">n_harmonics</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">fan_angle</span><span class="o">=</span><span class="mf">4.0</span><span class="p">,</span>
+                          <span class="n">vanishing_point</span><span class="o">=</span><span class="mf">0.3</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Positioning arguments come first. Remaining defaults and validation match
+<a class="reference internal" href="patterns.html#paonlayer"><span class="std std-ref">PaonLayer</span></a>, not <code class="docutils literal notranslate"><span class="pre">WatchFace.add_paon()</span></code>. In particular,
+<code class="docutils literal notranslate"><span class="pre">radius=22.0</span></code> is a fixed local radius, not the compositor radius; <code class="docutils literal notranslate"><span class="pre">None</span></code> is not a
+supported size default here.</p>
+</section>
+<section id="guillochepattern-generation-and-export">
+<h3><code class="docutils literal notranslate"><span class="pre">GuillochePattern</span></code> generation and export<a class="headerlink" href="#guillochepattern-generation-and-export" title="Link to this heading">¶</a></h3>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">pattern</span><span class="o">.</span><span class="n">generate</span><span class="p">()</span>
+<span class="n">pattern</span><span class="o">.</span><span class="n">to_svg</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
+<span class="n">pattern</span><span class="o">.</span><span class="n">to_stl</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">depth</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span> <span class="n">base_thickness</span><span class="o">=</span><span class="mf">2.0</span><span class="p">)</span>
+<span class="n">pattern</span><span class="o">.</span><span class="n">to_step</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">depth</span><span class="o">=</span><span class="mf">0.1</span><span class="p">)</span>
+<span class="n">pattern</span><span class="o">.</span><span class="n">export_all</span><span class="p">(</span><span class="n">base_name</span><span class="p">,</span> <span class="n">depth</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span> <span class="n">base_thickness</span><span class="o">=</span><span class="mf">2.0</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">generate()</span></code> regenerates all stored layers and returns <code class="docutils literal notranslate"><span class="pre">None</span></code>. <code class="docutils literal notranslate"><span class="pre">to_svg()</span></code> writes
+one combined SVG with default dial decorations; it can succeed without generated
+pattern lines. <code class="docutils literal notranslate"><span class="pre">to_stl()</span></code> and <code class="docutils literal notranslate"><span class="pre">to_step()</span></code> require drawable geometry after dial
+clipping.</p>
+<p><code class="docutils literal notranslate"><span class="pre">export_all()</span></code> writes three <strong>combined</strong> files, in order:</p>
+<ol class="arabic simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">base_name</span> <span class="pre">+</span> <span class="pre">&quot;.svg&quot;</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">base_name</span> <span class="pre">+</span> <span class="pre">&quot;.stl&quot;</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">base_name</span> <span class="pre">+</span> <span class="pre">&quot;.stp&quot;</span></code></p></li>
+</ol>
+<p>It does not write a file per layer or strip an extension from <code class="docutils literal notranslate"><span class="pre">base_name</span></code>. With
+no layers, it raises <code class="docutils literal notranslate"><span class="pre">OSError</span></code> before writing. With ungenerated or fully clipped
+layers, SVG can be written before STL fails. Export is not transactional: a
+failure does not remove files already written. STEP uses the <code class="docutils literal notranslate"><span class="pre">.stp</span></code> suffix in
+this method, not <code class="docutils literal notranslate"><span class="pre">.step</span></code>.</p>
+<p><code class="docutils literal notranslate"><span class="pre">repr(pattern)</span></code> includes radius and stored layer count, but Python exposes no
+<code class="docutils literal notranslate"><span class="pre">layer_count()</span></code>, <code class="docutils literal notranslate"><span class="pre">get_lines()</span></code>, <code class="docutils literal notranslate"><span class="pre">all_paths()</span></code>, or <code class="docutils literal notranslate"><span class="pre">clipped_paths()</span></code> method.</p>
+</section>
+<section id="guillochepattern-example">
+<h3><code class="docutils literal notranslate"><span class="pre">GuillochePattern</span></code> example<a class="headerlink" href="#guillochepattern-example" title="Link to this heading">¶</a></h3>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">turtles</span><span class="w"> </span><span class="kn">import</span> <span class="n">GuillochePattern</span>
+
+<span class="n">pattern</span> <span class="o">=</span> <span class="n">GuillochePattern</span><span class="p">(</span><span class="n">radius</span><span class="o">=</span><span class="mf">38.0</span><span class="p">)</span>
+<span class="n">pattern</span><span class="o">.</span><span class="n">add_layer_at_clock</span><span class="p">(</span>
+    <span class="n">spiro_type</span><span class="o">=</span><span class="s2">"horizontal"</span><span class="p">,</span> <span class="n">outer_radius</span><span class="o">=</span><span class="mf">8.0</span><span class="p">,</span> <span class="n">radius_ratio</span><span class="o">=</span><span class="mf">0.7</span><span class="p">,</span>
+    <span class="n">point_distance</span><span class="o">=</span><span class="mf">0.8</span><span class="p">,</span> <span class="n">rotations</span><span class="o">=</span><span class="mi">7</span><span class="p">,</span> <span class="n">resolution</span><span class="o">=</span><span class="mi">360</span><span class="p">,</span>
+    <span class="n">hour</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">minute</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">distance</span><span class="o">=</span><span class="mf">15.0</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="n">pattern</span><span class="o">.</span><span class="n">add_limacon_at_polar</span><span class="p">(</span>
+    <span class="n">num_curves</span><span class="o">=</span><span class="mi">24</span><span class="p">,</span> <span class="n">base_radius</span><span class="o">=</span><span class="mf">6.0</span><span class="p">,</span> <span class="n">amplitude</span><span class="o">=</span><span class="mf">3.0</span><span class="p">,</span> <span class="n">angle</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">distance</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="n">pattern</span><span class="o">.</span><span class="n">generate</span><span class="p">()</span>
+<span class="n">pattern</span><span class="o">.</span><span class="n">to_svg</span><span class="p">(</span><span class="s2">"combined.svg"</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+</section>
+<section id="clipping-and-draw-order">
+<span id="id3"></span><h2>Clipping and draw order<a class="headerlink" href="#clipping-and-draw-order" title="Link to this heading">¶</a></h2>
+<p>Layer size and dial radius are independent. Adding a layer does not resize it,
+reject it for crossing the dial edge, or change its stored coordinates.</p>
+<div class="table-wrapper colwidths-auto docutils container">
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Output</p></th>
+<th class="head"><p>Dial-boundary behavior</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>Combined SVG</p></td>
+<td><p>All pattern content is inside a circular SVG <code class="docutils literal notranslate"><span class="pre">clip-path</span></code> centered at the origin with the compositor’s radius. Underlying path coordinates can extend outside that circle.</p></td>
+</tr>
+<tr class="row-odd"><td><p>Combined STL</p></td>
+<td><p>Every family’s planar polylines are geometrically clipped to the dial circle before ribbon generation.</p></td>
+</tr>
+<tr class="row-even"><td><p>Combined STEP</p></td>
+<td><p>Every family’s planar polylines are geometrically clipped to the dial circle before serialization at <code class="docutils literal notranslate"><span class="pre">z=0</span></code>.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>Geometric clipping splits a stroke when it exits and re-enters the dial. The
+resulting pieces remain separate open paths; no closing chord is added across
+the clipped gap. Local circular boundaries in Paon, Clous de Paris, and Cube are
+separate from this dial boundary. The standalone layer’s <code class="docutils literal notranslate"><span class="pre">get_lines()</span></code> is not
+modified by combined export.</p>
+<p>SVG painting order is <strong>fixed by family, not by global insertion order</strong>.
+Insertion order is retained within a family; all three spirograph variants share
+one insertion-ordered family. Adding a spirograph after a Cube layer still
+renders the spirograph first.</p>
+<div class="table-wrapper colwidths-auto docutils container">
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>SVG</p></th>
+<th class="head"><p>Pattern painting order, first to last</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">WatchFace</span></code></p></td>
+<td><p>Spirographs → flinqué → diamant → draperie → huit-eight → limaçon → paon → Clous de Paris → Cube.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">GuillochePattern</span></code></p></td>
+<td><p>Spirographs → flinqué → diamant → huit-eight → draperie → paon → limaçon → Clous de Paris → Cube.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>The second row describes the combined Rust renderer used by Python
+<code class="docutils literal notranslate"><span class="pre">GuillochePattern</span></code>; its Python adders expose only spirographs, flinqué, diamant,
+paon, and limaçon. Unsupported families in that row do not imply Python methods.
+Among the exposed families, paon is painted before limaçon, unlike <code class="docutils literal notranslate"><span class="pre">WatchFace</span></code>.</p>
+<p>For <code class="docutils literal notranslate"><span class="pre">WatchFace</span></code>, the optional inner circle is painted first, followed by the
+clipped pattern group, optional bezel, and holes in hole-insertion order.
+<code class="docutils literal notranslate"><span class="pre">GuillochePattern</span></code> always paints its inner circle first and its default bezel
+and center-hole circle after the pattern group. Holes are filled SVG circles,
+not masks or clipping exclusions for pattern geometry.</p>
+<p>Both combined SVG renderers use a square canvas of side <code class="docutils literal notranslate"><span class="pre">5</span> <span class="pre">*</span> <span class="pre">radius</span></code> mm with
+viewBox <code class="docutils literal notranslate"><span class="pre">(-2.5</span> <span class="pre">*</span> <span class="pre">radius,</span> <span class="pre">-2.5</span> <span class="pre">*</span> <span class="pre">radius,</span> <span class="pre">5</span> <span class="pre">*</span> <span class="pre">radius,</span> <span class="pre">5</span> <span class="pre">*</span> <span class="pre">radius)</span></code>, rather than
+fitting to the pattern bounds. Pattern strokes have no fill and use round caps
+and joins. Spirograph colors cycle through <code class="docutils literal notranslate"><span class="pre">#1a1a1a</span></code>, <code class="docutils literal notranslate"><span class="pre">#2d2d2d</span></code>, <code class="docutils literal notranslate"><span class="pre">#3a3a3a</span></code>,
+<code class="docutils literal notranslate"><span class="pre">#454545</span></code>, <code class="docutils literal notranslate"><span class="pre">#505050</span></code>, and <code class="docutils literal notranslate"><span class="pre">#5a5a5a</span></code>; their widths cycle through 0.04, 0.035, 0.03,
+0.03, 0.025, and 0.025 mm. Other families use <code class="docutils literal notranslate"><span class="pre">#1a1a1a</span></code> at 0.03 mm. These styles
+are not configurable through the documented Python composition methods.</p>
+</section>
+<section id="export-limitations">
+<span id="id4"></span><h2>Export limitations<a class="headerlink" href="#export-limitations" title="Link to this heading">¶</a></h2>
+<ul class="simple">
+<li><p>Combined exporters include every stored family’s generated lines. They use
+planar coordinates for spherical spirographs; only standalone spherical STL
+and STEP use the projected 3D points.</p></li>
+<li><p>STL emits zero-thickness side ribbons from <code class="docutils literal notranslate"><span class="pre">z=0</span></code> to <code class="docutils literal notranslate"><span class="pre">z=-depth</span></code>, with
+placeholder normals. It does not produce a watertight dial, groove width, or
+base plate. <code class="docutils literal notranslate"><span class="pre">base_thickness</span></code> is accepted but unused by the mesh implementation.</p></li>
+<li><p>STEP writes an AP214 geometric curve set of polylines at <code class="docutils literal notranslate"><span class="pre">z=0</span></code>, not a solid or
+cut grooves. <code class="docutils literal notranslate"><span class="pre">depth</span></code> is accepted but does not alter these coordinates.</p></li>
+<li><p>Export <code class="docutils literal notranslate"><span class="pre">depth</span></code> and <code class="docutils literal notranslate"><span class="pre">base_thickness</span></code> are converted to floats, but these
+composition exporters do not add finite/positive-value validation for them.</p></li>
+<li><p>Inner circles, bezels, and holes are SVG-only decorations. They do not become
+physical features in combined STL or STEP.</p></li>
+<li><p>SVG export without generated pattern lines is allowed; that is not evidence
+that layers have been generated. STL and STEP reject an empty drawable result.</p></li>
+</ul>
+<p>See <a class="reference internal" href="exports.html"><span class="std std-doc">Exports</span></a> for format details and <a class="reference internal" href="errors.html"><span class="std std-doc">Errors</span></a> for exception
+mapping. Rose-engine objects use a separate API described in
+<a class="reference internal" href="rose-engine.html"><span class="std std-doc">Rose engine</span></a>.</p>
+</section>
+</section>
+
+        </article>
+      </div>
+      <footer>
+        
+        <div class="related-pages">
+          <a class="next-page" href="rose-engine.html">
+              <div class="page-info">
+                <div class="context">
+                  <span>Next</span>
+                </div>
+                <div class="title">Rose engine Python API</div>
+              </div>
+              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
+            </a>
+          <a class="prev-page" href="patterns.html">
+              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
+              <div class="page-info">
+                <div class="context">
+                  <span>Previous</span>
+                </div>
+                
+                <div class="title">Pattern layers and spirographs</div>
+                
+              </div>
+            </a>
+        </div>
+        <div class="bottom-of-page">
+          <div class="left-details">
+            <div class="copyright">
+                Copyright &#169; the turtles authors
+            </div>
+            Made with <a href="https://www.sphinx-doc.org/">Sphinx</a> and <a class="muted-link" href="https://pradyunsg.me">@pradyunsg</a>'s
+            
+            <a href="https://github.com/pradyunsg/furo">Furo</a>
+            
+          </div>
+          <div class="right-details">
+            
+          </div>
+        </div>
+        
+      </footer>
+    </div>
+    <aside class="toc-drawer">
+      
+      
+      <div class="toc-sticky toc-scroll">
+        <div class="toc-title-container">
+          <span class="toc-title">
+            On this page
+          </span>
+        </div>
+        <div class="toc-tree-container">
+          <div class="toc-tree">
+            <ul>
+<li><a class="reference internal" href="#">Composition</a><ul>
+<li><a class="reference internal" href="#shared-units-validation-and-lifecycle">Shared units, validation, and lifecycle</a></li>
+<li><a class="reference internal" href="#watchface"><code class="docutils literal notranslate"><span class="pre">WatchFace</span></code></a><ul>
+<li><a class="reference internal" href="#watchface-constructor-and-property"><code class="docutils literal notranslate"><span class="pre">WatchFace</span></code> constructor and property</a></li>
+<li><a class="reference internal" href="#dial-elements">Dial elements</a></li>
+<li><a class="reference internal" href="#unimplemented-elements">Unimplemented elements</a></li>
+<li><a class="reference internal" href="#adding-existing-layers">Adding existing layers</a></li>
+<li><a class="reference internal" href="#pattern-convenience-methods">Pattern convenience methods</a><ul>
+<li><a class="reference internal" href="#flinque">Flinqué</a></li>
+<li><a class="reference internal" href="#diamant">Diamant</a></li>
+<li><a class="reference internal" href="#limacon">Limaçon</a></li>
+<li><a class="reference internal" href="#draperie">Draperie</a></li>
+<li><a class="reference internal" href="#paon">Paon</a></li>
+<li><a class="reference internal" href="#huit-eight">Huit-eight</a></li>
+<li><a class="reference internal" href="#clous-de-paris">Clous de Paris</a></li>
+<li><a class="reference internal" href="#cube">Cube</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#watchface-generation-and-export"><code class="docutils literal notranslate"><span class="pre">WatchFace</span></code> generation and export</a></li>
+<li><a class="reference internal" href="#watchface-example"><code class="docutils literal notranslate"><span class="pre">WatchFace</span></code> example</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#guillochepattern"><code class="docutils literal notranslate"><span class="pre">GuillochePattern</span></code></a><ul>
+<li><a class="reference internal" href="#guillochepattern-constructor-and-property"><code class="docutils literal notranslate"><span class="pre">GuillochePattern</span></code> constructor and property</a></li>
+<li><a class="reference internal" href="#adding-existing-objects">Adding existing objects</a></li>
+<li><a class="reference internal" href="#positioned-spirographs">Positioned spirographs</a></li>
+<li><a class="reference internal" href="#positioned-flinque">Positioned flinqué</a></li>
+<li><a class="reference internal" href="#positioned-diamant">Positioned diamant</a></li>
+<li><a class="reference internal" href="#positioned-limacon">Positioned limaçon</a></li>
+<li><a class="reference internal" href="#positioned-paon">Positioned paon</a></li>
+<li><a class="reference internal" href="#guillochepattern-generation-and-export"><code class="docutils literal notranslate"><span class="pre">GuillochePattern</span></code> generation and export</a></li>
+<li><a class="reference internal" href="#guillochepattern-example"><code class="docutils literal notranslate"><span class="pre">GuillochePattern</span></code> example</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#clipping-and-draw-order">Clipping and draw order</a></li>
+<li><a class="reference internal" href="#export-limitations">Export limitations</a></li>
+</ul>
+</li>
+</ul>
+
+          </div>
+        </div>
+      </div>
+      
+      
+    </aside>
+  </div>
+</div><script src="../../_static/documentation_options.js?v=01f34227"></script>
+    <script src="../../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/scripts/furo.js?v=46bd48cc"></script>
+    <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../../_static/copybutton.js?v=f281be69"></script>
+    <script src="../../_static/design-tabs.js?v=f930bc37"></script>
+    <script data-searchlite-index="searchlite-index.json" defer="defer" src="../../_static/searchlite.js?v=a5320898"></script>
+    <script data-searchlite-adopt="true" defer="defer" src="../../_static/searchlite-ui.js?v=4e4bdd69"></script>
+    <script src="../../_static/js/custom.js?v=956e5d78"></script>
+    </body>
+</html>
