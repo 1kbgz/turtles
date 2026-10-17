@@ -44,8 +44,8 @@ lint-rs:  ## run rust linter
 	make -C rust lint
 
 lint-docs:  ## lint docs with mdformat and codespell
-	python -m mdformat --check README.md 
-	python -m codespell_lib README.md 
+	python -m mdformat --check README.md docs/home.md docs/tutorials docs/how-to docs/reference docs/explanation
+	python -m codespell_lib README.md docs/home.md docs/tutorials docs/how-to docs/reference docs/explanation
 
 lint: lint-rs lint-py lint-docs  ## run project linters
 
@@ -61,8 +61,12 @@ fix-rs:  ## fix rust formatting
 	make -C rust fix
 
 fix-docs:  ## autoformat docs with mdformat and codespell
-	python -m mdformat README.md 
-	python -m codespell_lib --write README.md 
+	python -m mdformat README.md docs/home.md docs/tutorials docs/how-to docs/reference docs/explanation
+	python -m codespell_lib --write README.md docs/home.md docs/tutorials docs/how-to docs/reference docs/explanation
+
+.PHONY: docs
+docs:  ## build documentation with warnings treated as errors
+	yardang build --warning-is-error
 
 fix: fix-rs fix-py fix-docs  ## run project autoformatters
 

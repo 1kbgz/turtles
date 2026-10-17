@@ -14,7 +14,17 @@
 
 ## Overview
 
-A library for generating spirograph and guilloché patterns.
+A Python and Rust library for generating spirograph and guilloché patterns.
+
+## Documentation
+
+Start with [your first pattern](https://github.com/1kbgz/turtles/blob/main/docs/tutorials/first-pattern.md), or browse the
+[documentation](https://github.com/1kbgz/turtles/blob/main/docs/home.md):
+
+- [Tutorials](https://github.com/1kbgz/turtles/blob/main/docs/tutorials/index.md): generate a pattern, compose a dial, and run a rose engine.
+- [How-to guides](https://github.com/1kbgz/turtles/blob/main/docs/how-to/index.md): install, position layers, export, and develop.
+- [Reference](https://github.com/1kbgz/turtles/blob/main/docs/reference/index.md): Python APIs, Rust entry points, units, defaults, and errors.
+- [Explanation](https://github.com/1kbgz/turtles/blob/main/docs/explanation/index.md): pattern models, coordinates, clipping, and export geometry.
 
 ## Examples
 
@@ -57,27 +67,35 @@ A library for generating spirograph and guilloché patterns.
 
 ### Export Formats
 
-- **SVG** - 2D vector output for laser engraving and visualization
-- **STEP (.stp)** - 3D CAD format for CNC milling toolpath generation
-- **STL** - 3D mesh format for CNC machining and 3D printing
+- **SVG** - 2D vector previews and pattern paths.
+- **STEP (.stp)** - Sampled CAD curves, not solid geometry or a CNC program.
+- **STL** - Triangle ribbons, not watertight plates or swept grooves.
+
+Supported methods differ by class. See the [export reference](https://github.com/1kbgz/turtles/blob/main/docs/reference/exports.md)
+before choosing an export route.
 
 ## Installation
 
 ### Rust
 
-```bash
-cargo add turtle
-```
+The library crate is `turtles`, defined in the nested Rust package. See
+[installation](https://github.com/1kbgz/turtles/blob/main/docs/how-to/install.md) for a local Cargo dependency and the
+[Rust reference](https://github.com/1kbgz/turtles/blob/main/docs/reference/rust.md) for a complete example.
 
 ### Python
+
+Requires Python 3.11 or later.
 
 ```bash
 pip install pyturtles
 ```
 
+Import the package as `turtles`. Source builds require Rust and a native linker;
+see [installation](https://github.com/1kbgz/turtles/blob/main/docs/how-to/install.md).
+
 ### JavaScript
 
-`turtles.js` coming soon.
+JavaScript bindings are not currently included.
 
 ## License
 
