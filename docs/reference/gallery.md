@@ -15,7 +15,7 @@ variant changes grid rotation to zero.
 
 ![Square hobnail grid](../img/clous_de_paris_square.png)
 
-API: [`ClousDeParisLayer`](patterns.md#clousdeparislayer).
+API: {ref}`ClousDeParisLayer <clousdeparislayer>`.
 [Example program](https://github.com/1kbgz/turtles/blob/main/turtles/examples/clous_de_paris.py).
 
 ## Cube
@@ -24,7 +24,7 @@ API: [`ClousDeParisLayer`](patterns.md#clousdeparislayer).
 
 Grouped zigzag grooves and shifted gaps produce the tumbling-blocks appearance.
 
-API: [`CubeLayer`](patterns.md#cubelayer).
+API: {ref}`CubeLayer <cubelayer>`.
 [Example program](https://github.com/1kbgz/turtles/blob/main/turtles/examples/cube.py).
 
 ## Diamant
@@ -34,7 +34,7 @@ API: [`CubeLayer`](patterns.md#cubelayer).
 Circles tangent to a shared center form a mesh. The full standalone extent is
 twice the individual circle radius.
 
-API: [`DiamantLayer`](patterns.md#diamantlayer).
+API: {ref}`DiamantLayer <diamantlayer>`.
 [Example program](https://github.com/1kbgz/turtles/blob/main/turtles/examples/diamant.py).
 
 ## Draperie
@@ -46,7 +46,7 @@ sharp variants use different phase envelopes.
 
 ![Sharp folded bands](../img/draperie_sharp.png)
 
-API: [`DraperieLayer`](patterns.md#draperielayer).
+API: {ref}`DraperieLayer <draperielayer>`.
 [Example program](https://github.com/1kbgz/turtles/blob/main/turtles/examples/draperie.py).
 
 ## Flinqué
@@ -55,7 +55,7 @@ API: [`DraperieLayer`](patterns.md#draperielayer).
 
 Concentric chevron rings combine radial petals with a finer ripple.
 
-API: [`FlinqueLayer`](patterns.md#flinquelayer).
+API: {ref}`FlinqueLayer <flinquelayer>`.
 [Example program](https://github.com/1kbgz/turtles/blob/main/turtles/examples/flinque.py).
 
 ## Huit-eight
@@ -64,16 +64,16 @@ API: [`FlinqueLayer`](patterns.md#flinquelayer).
 
 Rotated lemniscates form a woven mesh. Curves can also be grouped into clusters.
 
-API: [`HuitEightLayer`](patterns.md#huiteightlayer).
+API: {ref}`HuitEightLayer <huiteightlayer>`.
 [Example program](https://github.com/1kbgz/turtles/blob/main/turtles/examples/huiteight.py).
 
 ## Limaçon
 
 ![Phase-shifted limaçon curves](../img/limacon.png)
 
-Phase-shifted polar curves use $r = a + b\\sin(\\theta + \\phi)$.
+Phase-shifted polar curves use $r = a + b\sin(\theta + \phi)$.
 
-API: [`LimaconLayer`](patterns.md#limaconlayer).
+API: {ref}`LimaconLayer <limaconlayer>`.
 [Example program](https://github.com/1kbgz/turtles/blob/main/turtles/examples/diamant.py).
 
 ## Paon
@@ -82,12 +82,12 @@ API: [`LimaconLayer`](patterns.md#limaconlayer).
 
 Oscillating fan lines form peacock-feather arches inside a local circle.
 
-API: [`PaonLayer`](patterns.md#paonlayer).
+API: {ref}`PaonLayer <paonlayer>`.
 [Example program](https://github.com/1kbgz/turtles/blob/main/turtles/examples/paon.py).
 
 ## Spirographs and rose-engine patterns
 
-The three [spirograph classes](patterns.md#spirographs) generate hypotrochoids,
+The three {ref}`spirograph classes <spirographs>` generate hypotrochoids,
 with optional y modulation or dome projection. The
 [rose-engine classes](rose-engine.md) provide configurable single-pass and
 multi-pass models as well as factories for the eight direct motif families.

@@ -22,7 +22,7 @@ Path closure is separate from stroke styling. A spirograph SVG deliberately leav
 
 ## A clipping mask is not trimmed geometry
 
-The [two boundary levels](coordinates.md#local-and-global-boundaries-solve-different-problems) distinguish a layer's own region from the global dial circle. At the global level, combined SVG hides pattern content outside a circular clip path. The source path coordinates can still extend beyond the circle; the viewer simply does not show that ink.
+The {ref}`two boundary levels <local-and-global-boundaries-solve-different-problems>` distinguish a layer's own region from the global dial circle. At the global level, combined SVG hides pattern content outside a circular clip path. The source path coordinates can still extend beyond the circle; the viewer simply does not show that ink.
 
 Combined STEP and STL instead use geometrically clipped paths. The clipper intersects each sampled segment with the dial circle, inserts boundary points, and splits a path when it leaves and later reenters. It can also retain the portion of a crossing segment whose two endpoints are both outside. Keeping the pieces separate avoids adding a chord over the discarded interval.
 

@@ -22,7 +22,7 @@ in millimeters. Polar positioning and pattern rotations use radians;
 wave cycles, not a geometric angle. Clock placement uses the hour hand, including
 the minute contribution, with 12:00 upward (negative y) and 3:00 rightward.
 Hours are reduced modulo 12; the conventional hour 1–12 and minute 0–59 ranges
-are not explicitly enforced. See [Units and positioning](patterns.md#units-and-positioning).
+are not explicitly enforced. See {ref}`Units and positioning <units-and-positioning>`.
 
 Adding a layer does not generate its geometry. Binding methods accepting an
 existing layer reconstruct a fresh internal layer from its parameters; generated
@@ -211,7 +211,7 @@ face.add_huiteight(num_curves=36, scale=None, hour=12, minute=0, distance=0.0,
 
 `scale=None` resolves to `face.radius`. `scale` is each figure-eight's half-width
 in mm. Zero clusters select uniform rotations; automatic spread is used only
-when clustering is active. See [`HuitEightLayer`](patterns.md#huiteightlayer).
+when clustering is active. See {ref}`HuitEightLayer <huiteightlayer>`.
 
 #### Clous de Paris
 
@@ -340,7 +340,7 @@ performed. All base spirograph and positioning arguments are required.
 `dome_height` is used only for the spherical variant. Unused options do not
 undergo that variant's constructor checks, though Python-to-Rust type
 conversion still applies. Base parameter validation matches the
-[standalone spirographs](patterns.md#shared-parameters-and-validation).
+{ref}`standalone spirographs <shared-parameters-and-validation>`.
 The resulting Cartesian center must be finite. There is no positive-distance
 or dial-containment check.
 
@@ -359,7 +359,7 @@ pattern.add_flinque_at_clock(radius, hour, minute, distance, num_petals=12,
 ```
 
 `radius` and positioning arguments are required. Other defaults and validation
-match [`FlinqueLayer`](patterns.md#flinquelayer); `radius` does not default to
+match {ref}`FlinqueLayer <flinquelayer>`; `radius` does not default to
 the compositor's radius.
 
 ### Positioned diamant
@@ -372,7 +372,7 @@ pattern.add_diamant_at_clock(num_circles, circle_radius, hour, minute, distance,
 ```
 
 All arguments except `resolution` are required. Parameter meaning and validation
-match [`DiamantLayer`](patterns.md#diamantlayer).
+match {ref}`DiamantLayer <diamantlayer>`.
 
 ### Positioned limaçon
 
@@ -384,7 +384,7 @@ pattern.add_limacon_at_clock(num_curves, base_radius, amplitude, hour, minute,
 ```
 
 All arguments except `resolution` are required. In particular, `amplitude` has
-no dial-derived default. Validation matches [`LimaconLayer`](patterns.md#limaconlayer).
+no dial-derived default. Validation matches {ref}`LimaconLayer <limaconlayer>`.
 
 ### Positioned paon
 
@@ -400,7 +400,7 @@ pattern.add_paon_at_clock(hour, minute, distance, num_lines=500, radius=22.0,
 ```
 
 Positioning arguments come first. Remaining defaults and validation match
-[`PaonLayer`](patterns.md#paonlayer), not `WatchFace.add_paon()`. In particular,
+{ref}`PaonLayer <paonlayer>`, not `WatchFace.add_paon()`. In particular,
 `radius=22.0` is a fixed local radius, not the compositor radius; `None` is not a
 supported size default here.
 

@@ -221,4 +221,4 @@ pages = [
     "docs/explanation/index",
 ]
 use-autoapi = false
-exclude-patterns = ["docs/home.md", "TODO.md", "examples/README.md"]
+exclude-patterns = ["docs/home.md", "TODO.md", "examples/README.md", "rust/target/**"]

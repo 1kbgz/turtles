@@ -51,7 +51,7 @@ from the pattern rotation. Their other constructors call the rotation `angle`.
 The spirograph classes expose only origin-centered Python constructors. Their
 Rust positioning constructors are not Python class methods. Positioned Python
 spirographs are available through
-[`GuillochePattern.add_layer_at_polar()` and `add_layer_at_clock()`](composition.md#positioned-spirographs).
+{ref}`GuillochePattern.add_layer_at_polar() and add_layer_at_clock() <positioned-spirographs>`.
 
 ## Lifecycle and supported output
 
@@ -422,7 +422,7 @@ and nonnegative; pattern rotation, `leg_angle`, `center_x`, and `center_y` finit
 bound on every allocation or on total zigzag vertices.
 
 The standalone defaults are eight cuts and eight gap spacings.
-[`WatchFace.add_cube()`](composition.md#cube) instead defaults to twelve cuts and
+{ref}`WatchFace.add_cube() <cube>` instead defaults to twelve cuts and
 six gap spacings.
 
 (spirographs)=

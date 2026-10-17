@@ -19,10 +19,10 @@ The dial center is the origin. Positive x points right, and positive y points do
 Polar placement uses the ordinary formulas
 
 $$
-x = d\\cos\\theta, \\qquad y = d\\sin\\theta.
+x = d\cos\theta, \qquad y = d\sin\theta.
 $$
 
-Thus zero radians points right, $\\pi/2$ points down, $\\pi$ points left, and $-\\pi/2$ points up. Increasing a polar angle appears clockwise on screen because y increases downward. Importing the coordinates into a program that displays positive y upward can mirror that apparent orientation unless the receiving coordinate convention is accounted for.
+Thus zero radians points right, $\pi/2$ points down, $\pi$ points left, and $-\pi/2$ points up. Increasing a polar angle appears clockwise on screen because y increases downward. Importing the coordinates into a program that displays positive y upward can mirror that apparent orientation unless the receiving coordinate convention is accounted for.
 
 Placement angles and most geometric phase or grid-rotation values are in radians. There are specific exceptions: a V-bit's included angle and cube's `leg_angle` are in degrees. Paon's `fan_angle` is a phase-envelope scale, despite its name. There is no universal angle unit that can safely be inferred from the word “angle.”
 
@@ -31,7 +31,7 @@ Placement angles and most geometric phase or grid-rotation values are in radians
 Clock placement describes the direction of the **hour hand**, including its movement between hours. The helper converts an hour $h$ and minute $m$ to
 
 $$
-\\theta = -\\frac{\\pi}{2} + 2\\pi\\frac{60(h\\bmod 12)+m}{720}.
+\theta = -\frac{\pi}{2} + 2\pi\frac{60(h\bmod 12)+m}{720}.
 $$
 
 The full turn is 12 hours, or 720 minutes. At distance $d$, 12:00 is $(0,-d)$, 3:00 is $(d,0)$, 6:00 is $(0,d)$, and 9:00 is $(-d,0)$. At 3:30 the center lies halfway between the 3 and 4 hour positions, 15 degrees clockwise from 3:00. It does not point to 6 as the minute hand would. Similarly, 12:30 is only 15 degrees clockwise from the top.

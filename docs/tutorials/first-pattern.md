@@ -78,5 +78,5 @@ grooves are closer together. Both SVGs remain available for comparison.
 
 You have generated and inspected two standalone patterns. Continue with
 [a patterned watch dial](watch-dial.md) to place motifs inside a dial. The
-[Clous de Paris reference](../reference/patterns.md#clousdeparislayer) lists its
+{ref}`Clous de Paris reference <clousdeparislayer>` lists its
 positioning factories and constraints.

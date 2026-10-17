@@ -174,7 +174,7 @@ draperie, check the generated extent rather than assuming that a size parameter
 is an outer clipping radius.
 
 If overlapping motifs appear in an unexpected order, check
-[the fixed family painting order](../reference/composition.md#clipping-and-draw-order).
+{ref}`the fixed family painting order <clipping-and-draw-order>`.
 Insertion order is preserved within a family, but not across all families. Adding
 a background last does not necessarily paint it last. An offset motif also does
 not erase background paths beneath it.
