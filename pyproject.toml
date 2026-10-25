@@ -42,11 +42,7 @@ develop = [
     "hatch-rs",
     "hatchling",
     "mdformat",
-<<<<<<< before updating
     "mdformat-myst>=0.3.0",
-=======
-    "mdformat-frontmatter",
->>>>>>> after updating
     "mdformat-tables>=1",
     "pytest",
     "pytest-cov",
