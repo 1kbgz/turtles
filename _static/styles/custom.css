@@ -1,3 +1,48 @@
+/* Generic defaults applied for every theme. Theme-specific overrides live in a
+   bundled `{theme}.css` and are appended after this file. */
+
+/* Handle logo switching for light/dark themes */
+/* Put in code like:
+<a class="logo-light" href="https://github.com/nbprint/nbprint#gh-light-mode-only">
+  <img src="https://github.com/nbprint/nbprint/raw/main/docs/img/logo-light.png?raw=true#gh-light-mode-only" alt="nbprint" width="400"></a>
+</a>
+<a class="logo-dark" href="https://github.com/nbprint/nbprint#gh-dark-mode-only">
+  <img src="https://github.com/nbprint/nbprint/raw/main/docs/img/logo-dark.png?raw=true#gh-dark-mode-only" alt="nbprint" width="400"></a>
+</a>
+*/
+/* Themes that toggle the color scheme with their own attribute add matching
+   rules on top of this file. */
+@media (prefers-color-scheme: dark) {
+    .logo-light {
+        display: none;
+    }
+}
+
+@media (prefers-color-scheme: light) {
+    .logo-dark {
+        display: none;
+    }
+}
+
+
+/* Handle mermaid diagrams in dark mode */
+@media (prefers-color-scheme: dark) {
+    .mermaid-container {
+        background-color: #222;
+    }
+    pre.mermaid svg path {
+        stroke: white !important;
+    }
+}
+@media (prefers-color-scheme: light) {
+    .mermaid-container {
+        background-color: #fafafa;
+    }
+}
+/* Per-theme overrides layered on top of the generic custom.css defaults. Furo
+   drives light/dark through a `data-theme` attribute on <body>, so the rules
+   that read that attribute belong here rather than in the generic file. */
+
 /* Wide main page */
 .content {
     flex: 3;
@@ -14,15 +59,7 @@ article table.align-default {
     margin-left: 0;
 }
 
-/* Handle logo switching for light/dark themes */
-/* Put in code like:
-<a class="logo-light" href="https://github.com/nbprint/nbprint#gh-light-mode-only">
-  <img src="https://github.com/nbprint/nbprint/raw/main/docs/img/logo-light.png?raw=true#gh-light-mode-only" alt="nbprint" width="400"></a>
-</a>
-<a class="logo-dark" href="https://github.com/nbprint/nbprint#gh-dark-mode-only">
-  <img src="https://github.com/nbprint/nbprint/raw/main/docs/img/logo-dark.png?raw=true#gh-dark-mode-only" alt="nbprint" width="400"></a>
-</a>
-*/
+/* Logo switching driven by furo's data-theme attribute */
 body[data-theme="light"] .logo-light {
     display: inline;
 }
@@ -36,20 +73,7 @@ body[data-theme="dark"] .logo-dark {
     display: inline;
 }
 
-@media (prefers-color-scheme: dark) {
-    .logo-light {
-        display: none;
-    }
-}
-
-@media (prefers-color-scheme: light) {
-    .logo-dark {
-        display: none;
-    }
-}
-
-
-/* Handle mermaid diagrams in dark mode */
+/* Mermaid diagrams in dark mode */
 body[data-theme="light"] .mermaid-container {
     background-color: #fafafa;
 }
@@ -62,18 +86,7 @@ body[data-theme="dark"] .mermaid-container {
 body[data-theme="dark"] pre.mermaid svg path {
     stroke: white !important;
 }
-@media (prefers-color-scheme: dark) {
-    .mermaid-container {
-        background-color: #222;
-    }
-    pre.mermaid svg path {
-        stroke: white !important;
-    }
-}
 @media (prefers-color-scheme: light) {
-    .mermaid-container {
-        background-color: #fafafa;
-    }
     body[data-theme="dark"] pre.mermaid svg path {
         stroke: black !important;
     }
