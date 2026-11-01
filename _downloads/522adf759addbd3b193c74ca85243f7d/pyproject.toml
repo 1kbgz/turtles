@@ -1,7 +1,7 @@
 [build-system]
 requires = [
     "hatchling",
-    "hatch-rs>=0.4.1",
+    "hatch-rs>=0.4.3",
 ]
 build-backend = "hatchling.build"
 
@@ -57,7 +57,7 @@ docs = [
     "mdformat",
     "mdformat-myst>=0.3.0",
     "mdformat-tables>=1",
-    "yardang[themes]>=0.10.3",
+    "yardang[themes]>=0.11.0",
 ]
 
 [project.scripts]
