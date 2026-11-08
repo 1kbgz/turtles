@@ -9,7 +9,7 @@ use turtles::{
 };
 
 /// Python wrapper for RosettePattern
-#[pyclass]
+#[pyclass(from_py_object)]
 #[derive(Clone)]
 pub struct RosettePattern {
     pub(crate) inner: BaseRosettePattern,
