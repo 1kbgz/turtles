@@ -210,6 +210,31 @@ def test_rose_engine_config():
     assert config_dia.base_radius == 20.0
 
 
+def test_rose_engine_rosette_reuse():
+    from turtles import CuttingBit, RoseEngineConfig, RoseEngineLatheRun, RosettePattern
+
+    primary = RosettePattern.multi_lobe(lobes=8)
+    secondary = RosettePattern.sinusoidal(frequency=3.0)
+    bit = CuttingBit.v_shaped(angle=30.0, width=0.5)
+    expected_config = RoseEngineConfig.compound(
+        base_radius=20.0, primary_lobes=8, primary_amplitude=2.0, secondary_frequency=3.0, secondary_amplitude=1.0
+    )
+    expected_config.set_resolution(64)
+    expected_run = RoseEngineLatheRun(expected_config, bit, num_passes=2, segments_per_pass=1)
+    expected_run.generate()
+    expected_lines = expected_run.get_lines()
+    assert expected_lines
+
+    for _ in range(2):
+        config = RoseEngineConfig(base_radius=20.0, amplitude=2.0)
+        config.set_resolution(64)
+        config.set_rosette(primary)
+        config.with_secondary_rosette(secondary, amplitude=1.0)
+        run = RoseEngineLatheRun(config, bit, num_passes=2, segments_per_pass=1)
+        run.generate()
+        assert run.get_lines() == expected_lines
+
+
 def test_rosette_pattern():
     """Test RosettePattern creation"""
     from turtles import RosettePattern
