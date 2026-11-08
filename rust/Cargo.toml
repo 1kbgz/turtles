@@ -14,10 +14,6 @@ path = "src/lib.rs"
 crate-type = ["rlib"]
 
 [dependencies]
-<<<<<<< before updating
 svg = "0.18"
 stl_io = "0.7"
 chrono = "0.4"
-=======
->>>>>>> after updating
-
